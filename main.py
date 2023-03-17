@@ -8,17 +8,17 @@ import csv
 from specific_entity_processor import EntityProcessor
 from file_handler import FileHandler
 
-data_file_path = os.getcwd() + "/DataFiles/"
+data_file_path = os.getcwd() + "/data_files/"
+
 
 def input_intelligence():
     """
     This method creates a text file for the user to input their intelligence statement into.
     """
-    print("Intelligence statement help:\n")
-    print("- Please include as much information as possible\n")
-    print("- If an entity is a person please include known associates\n")
-    print("A notepad window will now open - enter the intelligence statement in there.")
+    print("A notepad window will now open in your default text editor.")
+    print("Please enter the intelligence statement in there and save the file.\n")
     file_handler.write_intel_file()
+
 
 def input_bias_sources():
     """
@@ -26,18 +26,19 @@ def input_bias_sources():
     """
     print("Enter a Bias Source")
     print("You will now be asked to enter any sources you believe are important to compare to.")
-    print("This allows other sources of intelligence \
-          (such as closed or classified sources) to be compared.")
-    option = " " + str(input("Press ENTER to continue or press 'X' to skip this step. >>> "))
-    if option in {"x", "X"}:
-        return
-    file_handler.write_bias_file()
+    print("This allows other sources of intelligence"
+          "(such as closed or classified sources) to be compared.")
+    option = str(input("Press ENTER to continue or press 'X' to skip this step. >>> "))
+    if option not in {"x", "X"}:
+        file_handler.write_bias_file()
+    return
+
 
 if __name__ == '__main__':
     # This code won't run if this file is imported.
     file_handler = FileHandler(data_file_path)
     input_intelligence()
-    input("Press enter to continue")
+    input("\nPress ENTER to continue...\n")
     input_bias_sources()
     test_object = EntityProcessor(file_handler.read_file("intelligence_file.txt"))
     test_object.test_func()
