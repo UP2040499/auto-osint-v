@@ -1,4 +1,4 @@
-NER_training_testing/train/model/model-last filter=lfs diff=lfs merge=lfs -text
+NER_training_testing/train/model/ filter=lfs diff=lfs merge=lfs -text
 /NER_training_testing/train/output/re3d-train.spacy filter=lfs diff=lfs merge=lfs -text
 /NER_training_testing/train/re3d-train.conll filter=lfs diff=lfs merge=lfs -text
 /NER_training_testing/train/model/model-best-from-colab/ner/model filter=lfs diff=lfs merge=lfs -text
