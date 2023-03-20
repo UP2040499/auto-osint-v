@@ -3,8 +3,6 @@ This module forms the main part of the program, where other modules are run from
 """
 
 import os
-import webbrowser
-import csv
 from specific_entity_processor import EntityProcessor
 from file_handler import FileHandler
 
@@ -31,7 +29,6 @@ def input_bias_sources():
     option = str(input("Press ENTER to continue or press 'X' to skip this step. >>> "))
     if option not in {"x", "X"}:
         file_handler.write_bias_file()
-    return
 
 
 if __name__ == '__main__':
