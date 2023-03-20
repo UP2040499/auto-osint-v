@@ -40,5 +40,5 @@ if __name__ == '__main__':
     input_intelligence()
     input("\nPress ENTER to continue...\n")
     input_bias_sources()
-    test_object = EntityProcessor(file_handler.read_file("intelligence_file.txt"))
-    test_object.test_func()
+    test_object = EntityProcessor(file_handler.read_file("intelligence_file.txt"), file_handler)
+    test_object.store_words_from_label()
