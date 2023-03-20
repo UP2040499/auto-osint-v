@@ -127,3 +127,6 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# irrelevant NER models
+NER_training_testing/train/model/model-last
