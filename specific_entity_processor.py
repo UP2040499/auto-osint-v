@@ -8,7 +8,8 @@ Subprocesses to this module attempt to interrogate some of this information.
 
 import spacy
 
-NER = spacy.load("en_core_web_sm")
+# Load the best model trained using Google Colab
+NER = spacy.load("NER_training_testing/train/model/model-best-from-colab")
 
 
 class EntityProcessor:
@@ -22,5 +23,5 @@ class EntityProcessor:
         text1 = NER(self.intel_statement)
 
         for word in text1.ents:
-            print(word.text, word.label_)    # prints the entity and its label. e.g., "MARS LOC"
+            print(word.text, "LABEL: ", word.label_)    # prints the entity and its label. e.g., "MARS LOC"
             
