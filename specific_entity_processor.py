@@ -17,13 +17,13 @@ class EntityProcessor:
     This class provides methods for recognising the individual entities in a statement and storing
     them appropriately.
     """
-    def __init__(self, intel_statement, file_handler):
+    def __init__(self, intel_statement, file_handler_object):
         """
         Initialises variables to be used in this object.
         :param intel_statement: This is the intelligence statement input in main.py
         """
         self.intel_statement = intel_statement
-        self.file_handler = file_handler
+        self.file_handler = file_handler_object
 
     def store_words_from_label(self):
         """
