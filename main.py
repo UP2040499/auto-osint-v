@@ -5,6 +5,7 @@ This module forms the main part of the program, where other modules are run from
 import os
 from specific_entity_processor import EntityProcessor
 from file_handler import FileHandler
+from semantic_analyser import SemanticAnalyser
 
 data_file_path = os.getcwd() + "/data_files/"
 
@@ -34,8 +35,11 @@ def input_bias_sources():
 if __name__ == '__main__':
     # This code won't run if this file is imported.
     file_handler = FileHandler(data_file_path)
-    input_intelligence()
-    input("\nPress ENTER to continue...\n")
-    input_bias_sources()
-    test_object = EntityProcessor(file_handler.read_file("intelligence_file.txt"), file_handler)
-    test_object.store_words_from_label()
+    #input_intelligence()
+    #input("\nPress ENTER to continue...\n")
+    #input_bias_sources()
+    #test_object = EntityProcessor(file_handler.read_file("intelligence_file.txt"), file_handler)
+    #test_object.store_words_from_label()
+    # call to semantic analyser
+    analyse_sentiment_object = SemanticAnalyser(file_handler.read_file("intelligence_file.txt"))
+    analyse_sentiment_object.statement_analyser()
