@@ -29,3 +29,6 @@ class SemanticAnalyser:
         sentiment_analysis = pipeline("sentiment-analysis",
                                       model="Souvikcmsa/BERT_sentiment_analysis")
         print(sentiment_analysis(self.intel_statement))
+        # create a sentiment threshold for the intel statement
+        # If the threshold is exceeded add extra information to warn user that their statement is
+        # likely bias or sensational, see Calvo et al. (2021).
