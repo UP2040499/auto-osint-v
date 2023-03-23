@@ -7,21 +7,18 @@ import os
 import webbrowser
 
 
-def write_to_csv_file(file_object, text, alias):
+def write_to_csv_file(file_object, to_write):
     """
     Writes given text to a given file object.
-    :param alias: can be empty string. useful for info
-    such as coordinates to give an alias (location name) to them.
-    :param text: the given text to
-    write to the file.
+    :param to_write: list of elements to write to csv file
     :param file_object: the file object, created when opening a file (e.g.,
     "with open(file) as file_object:")
     :return: Nothing
     """
     try:
-        fieldnames = ['Info', 'Alias']
-        writer = csv.DictWriter(file_object, fieldnames)
-        writer.writerow({'Info': text, 'Alias': alias})
+        writer = csv.writer(file_object, delimiter=',')
+        # this isn't right
+        writer.writerow(to_write)  # writes a row of the csv file using the list 'to_files'
     except ValueError as exc:
         raise ValueError("I/O operation on closed file. Issue with FileHandler.open_label_file") \
             from exc
@@ -120,16 +117,39 @@ class FileHandler:
             file_path = str(os.path.join(label_files_directory, label + ".csv"))
         except FileExistsError:
             file_path = str(os.path.join(label_files_directory, label + ".csv"))
+        fieldnames = ['Info', 'Alias']
         try:
             with open(file_path, "x", encoding="utf-8") as label_file:
                 # Creation of csv file
-                fieldnames = ['Info', 'Alias']
                 writer = csv.DictWriter(label_file, fieldnames)
                 # enter source type and key information
                 writer.writeheader()
                 # Write info to csv
-                write_to_csv_file(label_file, text, alias)
+                to_write = [text, alias]
+                write_to_csv_file(label_file, to_write)
         except FileExistsError:
             with open(file_path, "a", encoding="utf-8") as label_file:
                 # Write info to csv
-                write_to_csv_file(label_file, text, alias)
+                to_write = [text, alias]
+                write_to_csv_file(label_file, to_write)
+
+    def open_evidence_file(self, to_write):
+        """
+        Creates/Opens evidence file and writes to it.
+        :type to_write: List of elements to write to file
+        :return: Nothing - output to file
+        """
+        evidence_file_path = self.data_file_path + "evidence_file.csv"
+        fieldnames = ["evidence type", "info", "extra info", "score", "source link"]
+        try:
+            with open(evidence_file_path, "x", encoding="utf-8") as evidence_file:
+                # Creation of csv file
+                writer = csv.DictWriter(evidence_file, fieldnames)
+                # enter source type and key information
+                writer.writeheader()
+                # Write info to csv
+                write_to_csv_file(evidence_file, to_write)
+        except FileExistsError:
+            with open(evidence_file_path, "a", encoding="utf-8") as evidence_file:
+                # Append info to csv
+                write_to_csv_file(evidence_file, to_write)
