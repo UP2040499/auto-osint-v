@@ -35,12 +35,17 @@ def input_bias_sources():
 if __name__ == '__main__':
     # This code won't run if this file is imported.
     file_handler = FileHandler(data_file_path)
-    # input_intelligence()
-    # input("\nPress ENTER to continue...\n")
-    # input_bias_sources()
-    # test_object = EntityProcessor(file_handler.read_file("intelligence_file.txt"), file_handler)
-    # test_object.store_words_from_label()
-    # call to semantic analyser
+    # Only input point for user - potential refinement would be a feedback loop to the user.
+    input_intelligence()
+    input("\nPress ENTER to continue...\n")
+    input_bias_sources()
+    # Entity Processor - identifies specific entities mentioned in intel statement
+    process_entities = EntityProcessor(file_handler.read_file("intelligence_file.txt"),
+                                       file_handler)
+    process_entities.store_words_from_label()
+    # Clean evidence_file.csv
+    os.remove(data_file_path+"evidence_file.csv")
+    # call to semantic analyser - sentiment analysis on intel statement
     analyse_sentiment_object = SemanticAnalyser(file_handler.read_file("intelligence_file.txt"),
-                                                file_handler)
+                                                "intelligence_statement", file_handler)
     analyse_sentiment_object.statement_analyser()

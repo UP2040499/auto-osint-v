@@ -21,7 +21,7 @@ def write_to_csv_file(file_object, to_write, fieldnames):
     :return: Nothing
     """
     try:
-        writer = csv.DictWriter(file_object, fieldnames)
+        writer = csv.writer(file_object, delimiter=',')
         # this isn't right
         writer.writerow(to_write)  # writes a row of the csv file using the list 'to_files'
     except ValueError as exc:
@@ -156,5 +156,5 @@ class FileHandler:
                 write_to_csv_file(evidence_file, to_write, fieldnames)
         except FileExistsError:
             with open(evidence_file_path, "a", encoding="utf-8") as evidence_file:
-                # Write info to csv
+                # Append info to csv
                 write_to_csv_file(evidence_file, to_write, fieldnames)
