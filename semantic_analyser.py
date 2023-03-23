@@ -3,9 +3,7 @@ This module's primary role is to analyse the semantics of the intelligence state
 This module will likely be reused/modified within source aggregation.
 """
 
-from transformers import AutoTokenizer, AutoModelForSequenceClassification, pipeline
-
-import file_handler
+from transformers import pipeline
 
 
 class SemanticAnalyser:

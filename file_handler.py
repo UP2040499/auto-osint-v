@@ -7,15 +7,10 @@ import os
 import webbrowser
 
 
-def write_to_csv_file(file_object, to_write, fieldnames):
+def write_to_csv_file(file_object, to_write):
     """
     Writes given text to a given file object.
     :param to_write: list of elements to write to csv file
-    :param fieldnames: field names for the csv file
-    :param alias: can be empty string. useful for info
-    such as coordinates to give an alias (location name) to them.
-    :param text: the given text to
-    write to the file.
     :param file_object: the file object, created when opening a file (e.g.,
     "with open(file) as file_object:")
     :return: Nothing
@@ -131,12 +126,12 @@ class FileHandler:
                 writer.writeheader()
                 # Write info to csv
                 to_write = [text, alias]
-                write_to_csv_file(label_file, to_write, fieldnames)
+                write_to_csv_file(label_file, to_write)
         except FileExistsError:
             with open(file_path, "a", encoding="utf-8") as label_file:
                 # Write info to csv
                 to_write = [text, alias]
-                write_to_csv_file(label_file, to_write, fieldnames)
+                write_to_csv_file(label_file, to_write)
 
     def open_evidence_file(self, to_write):
         """
@@ -153,8 +148,8 @@ class FileHandler:
                 # enter source type and key information
                 writer.writeheader()
                 # Write info to csv
-                write_to_csv_file(evidence_file, to_write, fieldnames)
+                write_to_csv_file(evidence_file, to_write)
         except FileExistsError:
             with open(evidence_file_path, "a", encoding="utf-8") as evidence_file:
                 # Append info to csv
-                write_to_csv_file(evidence_file, to_write, fieldnames)
+                write_to_csv_file(evidence_file, to_write)
