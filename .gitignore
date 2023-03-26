@@ -129,4 +129,4 @@ dmypy.json
 .pyre/
 
 # irrelevant NER models
-NER_training_testing/train/model/model-last
+auto_osint_v/NER_training_testing/train/model/model-last
