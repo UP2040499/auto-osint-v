@@ -6,8 +6,9 @@ Subprocesses to this module attempt to interrogate some of this information.
 
 # Named Entity Recognition (NER) using NLP
 
-import spacy
 import os
+import spacy
+
 
 # Load the best model trained using Google Colab
 NER = spacy.load(os.getcwd() +

@@ -56,8 +56,8 @@ class SourceAggregator:
             num_return_sequences=10)  # Returns x queries, default = 3
 
         print("\nGenerated Queries:")
-        for i in range(len(outputs)):
-            query = tokenizer.decode(outputs[i], skip_special_tokens=True)
+        for i, output in enumerate(outputs):
+            query = tokenizer.decode(output, skip_special_tokens=True)
             # self.queries.append(str(query))
             print(f'{i + 1}: {query}')
 
