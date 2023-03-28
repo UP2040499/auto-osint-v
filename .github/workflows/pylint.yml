@@ -14,10 +14,14 @@ jobs:
       uses: actions/setup-python@v3
       with:
         python-version: ${{ matrix.python-version }}
+    - name: Add conda to system path
+      run: |
+        # $CONDA is an environment variable pointing to the root of the miniconda directory
+        echo $CONDA/bin >> $GITHUB_PATH
     - name: Install dependencies
       run: |
-        $CONDA/bin/conda env update --file environment.yml --name base
-        $CONDA/bin/conda install pylint
+        conda env update --file environment.yml --name base
     - name: Analysing the code with pylint
       run: |
+        conda install pylint
         pylint $(git ls-files '*.py')
