@@ -6,7 +6,7 @@ This module will likely be reused/modified within source aggregation.
 from transformers import pipeline
 
 
-class SemanticAnalyser:
+class SentimentAnalyser:
     """
     This class provides methods for conducting semantic analysis on a given document.
     This document could be the intelligence statement or a different document.
