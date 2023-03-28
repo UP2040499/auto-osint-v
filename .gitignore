@@ -130,3 +130,6 @@ dmypy.json
 
 # irrelevant NER models
 auto_osint_v/NER_training_testing/train/model/model-last
+
+# auto-generated data files
+auto_osint_v/data_files/target_info_files

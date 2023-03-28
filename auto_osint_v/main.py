@@ -6,11 +6,14 @@ import os
 import sys
 from specific_entity_processor import EntityProcessor
 from file_handler import FileHandler
-from sentiment_analyser import SentimentAnalyser
+from sentiment_analyser import SemanticAnalyser
 from source_aggregator import SourceAggregator
 
 data_file_path = os.getcwd() + "/data_files/"
-sys.path.append("/auto_osint_v/main.py")
+sys.path.append(
+    "/auto_osint_v/main.py")
+
+os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:128"
 
 
 def input_intelligence():
@@ -50,9 +53,8 @@ if __name__ == '__main__':
     # Clean evidence_file.csv
     os.remove(data_file_path+"evidence_file.csv")
     # call to semantic analyser - sentiment analysis on intel statement
-    analyse_sentiment_object = SentimentAnalyser(intel_file, "intelligence_statement", file_handler)
+    analyse_sentiment_object = SemanticAnalyser(intel_file, "intelligence_statement", file_handler)
     analyse_sentiment_object.statement_analyser()
     # Source aggregation below
     source_aggregator = SourceAggregator(intel_file, data_file_path)
     source_aggregator.search_query_generator()
-    

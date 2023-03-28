@@ -42,19 +42,23 @@ class SourceAggregator:
         # Query generation based on the context of the intelligence statement
         tokenizer = T5Tokenizer.from_pretrained('BeIR/query-gen-msmarco-t5-large-v1')
         model = T5ForConditionalGeneration.from_pretrained('BeIR/query-gen-msmarco-t5-large-v1')
+        # WARNING: If you are getting out of memory errors the model will need to be changed from
+        # 'large' to 'base'.
+        # If it is borderline try to change the max_length and num_return_sequences parameters
+        # below.
 
         input_ids = tokenizer.encode(self.intel_statement, return_tensors='pt')
         outputs = model.generate(
             input_ids=input_ids,
-            max_length=240,
+            max_length=240,     # default = 64
             do_sample=True,
-            top_p=0.95,
-            num_return_sequences=10)  # Returns 10 queries
+            top_p=0.95,         # default = 0.95
+            num_return_sequences=10)  # Returns x queries, default = 3
 
         print("\nGenerated Queries:")
         for i in range(len(outputs)):
             query = tokenizer.decode(outputs[i], skip_special_tokens=True)
-            self.queries.append(str(query))
+            # self.queries.append(str(query))
             print(f'{i + 1}: {query}')
 
     # Google Search
