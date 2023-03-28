@@ -50,7 +50,7 @@ class SourceAggregator:
         input_ids = tokenizer.encode(self.intel_statement, return_tensors='pt')
         outputs = model.generate(
             input_ids=input_ids,
-            max_length=240,     # default = 64
+            max_length=128,     # default = 64
             do_sample=True,
             top_p=0.95,         # default = 0.95
             num_return_sequences=10)  # Returns x queries, default = 3
