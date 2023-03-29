@@ -4,10 +4,10 @@ This module forms the main part of the program, where other modules are run from
 
 import os
 import sys
-from specific_entity_processor import EntityProcessor
-from file_handler import FileHandler
-from sentiment_analyser import SemanticAnalyser
-from source_aggregator import SourceAggregator
+from auto_osint_v.specific_entity_processor import EntityProcessor
+from auto_osint_v.file_handler import FileHandler
+from auto_osint_v.sentiment_analyser import SemanticAnalyser
+from auto_osint_v.source_aggregator import SourceAggregator
 
 data_file_path = os.getcwd() + "/data_files/"
 sys.path.append(
