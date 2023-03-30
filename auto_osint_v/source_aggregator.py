@@ -47,7 +47,7 @@ class SourceAggregator:
         model = T5ForConditionalGeneration.from_pretrained('BeIR/query-gen-msmarco-t5-large-v1')
         # WARNING: If you are getting out of memory errors the model will need to be changed from
         # 'large' to 'base'.
-        # Potential future fix to this problem - wrap in a try-except.
+        # Potential future fix to this problem - wrap in a try-except to auto switch to base model.
         # If it is borderline try to change the max_length and num_return_sequences parameters
         # below.
 

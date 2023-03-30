@@ -46,18 +46,25 @@ if __name__ == '__main__':
     input("\nPress ENTER to continue...\n")
     input_bias_sources()
     # Read intelligence file
+    print("Reading intelligence file...")
     intel_file = file_handler.read_file("intelligence_file.txt")
     # Entity Processor - identifies specific entities mentioned in intel statement
+    print("Processing entities...")
     process_entities = EntityProcessor(intel_file, file_handler)
     process_entities.store_words_from_label()
     # Clean evidence_file.csv
     os.remove(data_file_path+"evidence_file.csv")
-    # call to semantic analyser - sentiment analysis on intel statement
+    # call to sentiment analyser - sentiment analysis on intel statement
+    print("Analysing sentiment of intelligence statement...")
     analyse_sentiment_object = SemanticAnalyser(intel_file, "intelligence_statement", file_handler)
     analyse_sentiment_object.statement_analyser()
     # Source aggregation below
+    print("\nAggregating Sources:")
     source_aggregator = SourceAggregator(intel_file, data_file_path, file_handler)
     # generates 10 queries and stores it in the source_aggregator object
+    print("Generating queries...")
     source_aggregator.search_query_generator()
-    # Searches google using the queries stored in source_aggregator
+    # Searches google using the queries stored in source_aggregator object
+    print("Searching google...")
     source_aggregator.google_search()
+    # searches [social media sites] using queries stored in source_aggregator object
