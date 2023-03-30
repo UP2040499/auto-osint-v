@@ -7,7 +7,6 @@ import os
 import webbrowser
 
 
-
 class FileHandler:
     """
     FileHandler class handles anything file related for the whole tool.
@@ -88,7 +87,8 @@ class FileHandler:
         for file in os.listdir(directory):
             os.remove(os.path.join(directory, file))
 
-    def write_to_given_csv_file(self, file_object, to_write):
+    @staticmethod
+    def write_to_given_csv_file(file_object, to_write):
         """
         Writes given text to a given file object.
         :param to_write: iterable to write to the csv file
@@ -100,7 +100,8 @@ class FileHandler:
             writer = csv.writer(file_object, delimiter=',')
             writer.writerow(to_write)  # writes a row of the csv file using the list 'to_files'
         except ValueError as exc:
-            raise ValueError("I/O operation on closed file. Issue with FileHandler.open_label_file") \
+            raise ValueError(
+                "I/O operation on closed file. Issue with FileHandler.open_label_file") \
                 from exc
 
     def write_to_txt_file_remove_duplicates(self, file_object, to_write):
