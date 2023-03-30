@@ -56,5 +56,8 @@ if __name__ == '__main__':
     analyse_sentiment_object = SemanticAnalyser(intel_file, "intelligence_statement", file_handler)
     analyse_sentiment_object.statement_analyser()
     # Source aggregation below
-    source_aggregator = SourceAggregator(intel_file, data_file_path)
+    source_aggregator = SourceAggregator(intel_file, data_file_path, file_handler)
+    # generates 10 queries and stores it in the source_aggregator object
     source_aggregator.search_query_generator()
+    # Searches google using the queries stored in source_aggregator
+    source_aggregator.google_search()

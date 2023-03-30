@@ -7,22 +7,6 @@ import os
 import webbrowser
 
 
-def write_to_csv_file(file_object, to_write):
-    """
-    Writes given text to a given file object.
-    :param to_write: list of elements to write to csv file
-    :param file_object: the file object, created when opening a file (e.g.,
-    "with open(file) as file_object:")
-    :return: Nothing
-    """
-    try:
-        writer = csv.writer(file_object, delimiter=',')
-        # this isn't right
-        writer.writerow(to_write)  # writes a row of the csv file using the list 'to_files'
-    except ValueError as exc:
-        raise ValueError("I/O operation on closed file. Issue with FileHandler.open_label_file") \
-            from exc
-
 
 class FileHandler:
     """
@@ -34,6 +18,8 @@ class FileHandler:
         Initialises the FileHandler object
         :param data_file: the file path for all data files - likely './data_files/'.
         """
+        # empty list to hold unique urls present after searching
+        self.urls_present = []
         self.data_file_path = data_file
 
     def write_bias_file(self):
@@ -102,6 +88,48 @@ class FileHandler:
         for file in os.listdir(directory):
             os.remove(os.path.join(directory, file))
 
+    def write_to_given_csv_file(self, file_object, to_write):
+        """
+        Writes given text to a given file object.
+        :param to_write: iterable to write to the csv file
+        :param file_object: the file object, created when opening a file (e.g.,
+        "with open(file) as file_object:")
+        :return: Nothing
+        """
+        try:
+            writer = csv.writer(file_object, delimiter=',')
+            writer.writerow(to_write)  # writes a row of the csv file using the list 'to_files'
+        except ValueError as exc:
+            raise ValueError("I/O operation on closed file. Issue with FileHandler.open_label_file") \
+                from exc
+
+    def write_to_txt_file_remove_duplicates(self, file_object, to_write):
+        """
+        Writes the given text to a given file object *and* ensures any duplicates are not written
+        to the file.
+        :param file_object: File object passed from opening the file.
+        :param to_write: The text to write.
+        :return: nothing
+        """
+        # check whether lines are unique
+        if to_write not in self.urls_present:
+            # write to file
+            file_object.write(to_write + "\n")
+            # add unique line to lines_present lines
+            self.urls_present.append(to_write)
+
+    def create_new_txt_file(self, filename):
+        """
+        Creates a new txt file
+        :param filename: name of new file
+        :return: object for the new file
+        """
+        return open(os.path.join(self.data_file_path, filename), "w", encoding="utf-8")
+
+    @staticmethod
+    def close_file(file_object):
+        file_object.close()
+
     def open_label_file(self, label, text, alias):
         """
         Creates/Opens label file directory and the label file itself
@@ -126,12 +154,12 @@ class FileHandler:
                 writer.writeheader()
                 # Write info to csv
                 to_write = [text, alias]
-                write_to_csv_file(label_file, to_write)
+                self.write_to_given_csv_file(label_file, to_write)
         except FileExistsError:
             with open(file_path, "a", encoding="utf-8") as label_file:
                 # Write info to csv
                 to_write = [text, alias]
-                write_to_csv_file(label_file, to_write)
+                self.write_to_given_csv_file(label_file, to_write)
 
     def open_evidence_file(self, to_write):
         """
@@ -148,8 +176,8 @@ class FileHandler:
                 # enter source type and key information
                 writer.writeheader()
                 # Write info to csv
-                write_to_csv_file(evidence_file, to_write)
+                self.write_to_given_csv_file(evidence_file, to_write)
         except FileExistsError:
             with open(evidence_file_path, "a", encoding="utf-8") as evidence_file:
                 # Append info to csv
-                write_to_csv_file(evidence_file, to_write)
+                self.write_to_given_csv_file(evidence_file, to_write)

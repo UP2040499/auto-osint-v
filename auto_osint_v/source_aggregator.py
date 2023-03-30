@@ -4,8 +4,8 @@ This includes using search engines (Google) and searching social media websites
 (Twitter, Reddit, etc.)
 """
 
-import os
 from transformers import T5Tokenizer, T5ForConditionalGeneration
+from googlesearch import search
 
 
 class SourceAggregator:
@@ -17,7 +17,7 @@ class SourceAggregator:
     Everything output will be put into a 'Potential Corroboration Store'.
     """
     # Initialise object
-    def __init__(self, intel_statement, data_folder):
+    def __init__(self, intel_statement, data_folder, file_handler_object):
         """
         Initialises the SourceAggregator object
         :param intel_statement: The original intel statement
@@ -25,6 +25,7 @@ class SourceAggregator:
         """
         self.intel_statement = intel_statement
         self.data_file_path = data_folder
+        self.file_handler = file_handler_object
         self.queries = []
 
     # For searching, I think the key information needs to be extracted from the intel statement
@@ -35,8 +36,10 @@ class SourceAggregator:
         Creates a search query based on the intelligence statement, to be used in the search methods
         below.
         This is a resource (particularly memory) intensive process. Limit usage.
-        Uses the BeIR/query-gen-msmarco-t5-large-v1 model and example code available on
+        Uses the BeIR/query-gen-msmarco-t5-large-v1 pre-trained model and example code available on
         HuggingFace.co
+        Currently uses the 'large' model for accuracy. This can be downgraded to 'base' for reduced
+        accuracy but better performance.
         :return: List of queries
         """
         # Query generation based on the context of the intelligence statement
@@ -44,6 +47,7 @@ class SourceAggregator:
         model = T5ForConditionalGeneration.from_pretrained('BeIR/query-gen-msmarco-t5-large-v1')
         # WARNING: If you are getting out of memory errors the model will need to be changed from
         # 'large' to 'base'.
+        # Potential future fix to this problem - wrap in a try-except.
         # If it is borderline try to change the max_length and num_return_sequences parameters
         # below.
 
@@ -55,15 +59,23 @@ class SourceAggregator:
             top_p=0.95,         # default = 0.95
             num_return_sequences=10)  # Returns x queries, default = 3
 
-        print("\nGenerated Queries:")
+        # print("\nGenerated Queries:")
         for i, output in enumerate(outputs):
             query = tokenizer.decode(output, skip_special_tokens=True)
-            # self.queries.append(str(query))
-            print(f'{i + 1}: {query}')
+            self.queries.append(str(query))
+            # print(f'{i + 1}: {query}')
 
     # Google Search
+    def google_search(self):
+        search_results_file = self.file_handler.create_new_txt_file("search_results.txt")
+        # Search google with given query, 10 results (10 per query).
+        for query in self.queries:
+            for url in search(query, tld="com", num=10, stop=10, pause=2):
+                self.file_handler.write_to_txt_file_remove_duplicates(search_results_file, url)
+        self.file_handler.close_file(search_results_file)
 
     # Social Media Search
+    # reuse file_handler.write_to_txt_file_remove_duplicates method
 
     # Video Processor
 
