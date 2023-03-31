@@ -52,6 +52,7 @@ if __name__ == '__main__':
     print("Processing entities...")
     process_entities = EntityProcessor(intel_file, file_handler)
     process_entities.store_words_from_label()
+
     # Clean evidence_file.csv
     file_handler.clean_data_file(data_file_path + "evidence_file.csv")
     # call to sentiment analyser - sentiment analysis on intel statement

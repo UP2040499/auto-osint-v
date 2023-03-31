@@ -85,6 +85,9 @@ class SourceAggregator:
         for query in self.queries:
             for url in search(query, tld="com", num=10, stop=10, pause=2):
                 self.file_handler.write_to_txt_file_remove_duplicates(search_results_file, url)
+
+        # For greater accuracy we should just get keywords from the statement and use those
+
         self.file_handler.close_file(search_results_file)
 
     # Social Media Search
@@ -94,12 +97,10 @@ class SourceAggregator:
 
         :return:
         """
+        from Scweet.scweet import scrape
         # open or create txt file to store search results
         search_results_file = self.file_handler.open_txt_file(self.search_results_filename)
 
-        # twitter scrape using scweet - gives us more options for getting more accurate results
-
-        # everything else being generated using the code below
         # we can also specify more parameters for focusing on a particular location
         # see googlesearch.search()
         for query, site in zip(self.queries, self.social_media_sites):

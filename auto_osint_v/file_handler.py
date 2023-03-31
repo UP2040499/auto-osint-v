@@ -78,6 +78,14 @@ class FileHandler:
             file.close()
             return temp
 
+    def get_keywords_from_target_info(self):
+        # list target info files
+        # read each file individually
+        # discard first line
+        # read each line and store the 'Text' field
+        # add Text to list
+        # return list after each file has been examined
+
     @staticmethod
     def clean_directory(directory):
         """
@@ -127,14 +135,6 @@ class FileHandler:
             # add unique line to lines_present lines
             self.urls_present.append(to_write)
 
-    def create_new_txt_file(self, filename):
-        """
-        Creates a new txt file
-        :param filename: name of new file
-        :return: object for the new file
-        """
-        return open(os.path.join(self.data_file_path, filename), "w", encoding="utf-8")
-
     def open_txt_file(self, filename):
         """
         Opens a file or creates one if it does not exist, returns the fileIO object.
@@ -143,7 +143,7 @@ class FileHandler:
         :return: file object
         """
         try:
-            return open(os.path.join(self.data_file_path, filename), "a")
+            return open(os.path.join(self.data_file_path, filename), "a", encoding="utf-8")
         except FileNotFoundError:
             return open(os.path.join(self.data_file_path, filename), "w", encoding="utf-8")
 
