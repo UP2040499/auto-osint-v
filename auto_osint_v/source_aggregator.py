@@ -16,17 +16,25 @@ class SourceAggregator:
     it can be shipped as a class with one input & one output.
     Everything output will be put into a 'Potential Corroboration Store'.
     """
+
     # Initialise object
-    def __init__(self, intel_statement, data_folder, file_handler_object):
+    def __init__(self, intel_statement, file_handler_object):
         """
         Initialises the SourceAggregator object
         :param intel_statement: The original intel statement
-        :param data_folder: Path to data_files folder
+        :param file_handler_object: The FileHandler object passed from main.py
         """
         self.intel_statement = intel_statement
-        self.data_file_path = data_folder
         self.file_handler = file_handler_object
+        self.search_results_filename = "search_results.txt"
         self.queries = []
+        # list of social media sites - to add more insert the domain name here.
+        self.social_media_sites = ["www.instagram.com", "www.tiktok.com", "www.facebook.com",
+                                   "www.youtube.com", "www.reddit.com", "www.twitter.com",
+                                   "www.pinterest.com", "www.github.com", "www.tumblr.com",
+                                   "www.flickr.com", "www.steamcommunity.com", "vimeo.com",
+                                   "medium.com", "vk.com", "imgur.com", "www.patreon.com",
+                                   "bitbucket.org", "www.dailymotion.com", "news.ycombinator.com"]
 
     # For searching, I think the key information needs to be extracted from the intel statement
     # Don't want to search using just the intel statement itself.
@@ -54,21 +62,26 @@ class SourceAggregator:
         input_ids = tokenizer.encode(self.intel_statement, return_tensors='pt')
         outputs = model.generate(
             input_ids=input_ids,
-            max_length=128,     # default = 64
+            max_length=128,  # default = 64
             do_sample=True,
-            top_p=0.95,         # default = 0.95
+            top_p=0.95,  # default = 0.95
             num_return_sequences=10)  # Returns x queries, default = 3
 
-        # print("\nGenerated Queries:")
+        print("\nGenerated Queries:")
         for i, output in enumerate(outputs):
             query = tokenizer.decode(output, skip_special_tokens=True)
             self.queries.append(str(query))
-            # print(f'{i + 1}: {query}')
+            print(f'{i + 1}: {query}')
 
     # Google Search
     def google_search(self):
-        search_results_file = self.file_handler.create_new_txt_file("search_results.txt")
+        """
+
+        :return:
+        """
+        search_results_file = self.file_handler.open_txt_file(self.search_results_filename)
         # Search google with given query, 10 results (10 per query).
+        # tld could be changed to co.uk for better performance?
         for query in self.queries:
             for url in search(query, tld="com", num=10, stop=10, pause=2):
                 self.file_handler.write_to_txt_file_remove_duplicates(search_results_file, url)
@@ -76,6 +89,32 @@ class SourceAggregator:
 
     # Social Media Search
     # reuse file_handler.write_to_txt_file_remove_duplicates method
+    def social_media_search(self):
+        """
+
+        :return:
+        """
+        # open or create txt file to store search results
+        search_results_file = self.file_handler.open_txt_file(self.search_results_filename)
+
+        # twitter scrape using scweet - gives us more options for getting more accurate results
+
+        # everything else being generated using the code below
+        # we can also specify more parameters for focusing on a particular location
+        # see googlesearch.search()
+        for query, site in zip(self.queries, self.social_media_sites):
+            for url in search(f"{query} site:{site}", tld="com", num=10, stop=10, pause=2):
+                # do operation with url
+                self.file_handler.write_to_txt_file_remove_duplicates(search_results_file, url)
+        self.file_handler.close_file(search_results_file)
+
+        # potential future addition: username search using ncorbuk's Looking Glass python tool
+        # https://github.com/ncorbuk/Python-Tutorial---Hunt-Down-Social-Media-Accounts-by-Usernames-for-Open-Source-Intelligence-
+
+    def run_searches(self):
+        self.file_handler.clean_data_file(self.search_results_filename)
+        self.google_search()
+        self.social_media_search()
 
     # Video Processor
 
@@ -89,3 +128,5 @@ class SourceAggregator:
     # Finally, store all potentially corroborating sources.
 
     # Will need a 'find_sources' method that runs all methods in this class.
+    def get_social_media_sites(self):
+        return self.social_media_sites

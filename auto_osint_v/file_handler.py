@@ -87,6 +87,14 @@ class FileHandler:
         for file in os.listdir(directory):
             os.remove(os.path.join(directory, file))
 
+    def clean_data_file(self, filename):
+        """
+        Removes all data in given file
+        :param filename: name of file, can be path relative to 'data_files' directory
+        :return:
+        """
+        os.remove(os.path.join(self.data_file_path, filename))
+
     @staticmethod
     def write_to_given_csv_file(file_object, to_write):
         """
@@ -127,15 +135,27 @@ class FileHandler:
         """
         return open(os.path.join(self.data_file_path, filename), "w", encoding="utf-8")
 
+    def open_txt_file(self, filename):
+        """
+        Opens a file or creates one if it does not exist, returns the fileIO object.
+        Clean every temp file created here by using clean_directory.
+        :param filename: name of file to open
+        :return: file object
+        """
+        try:
+            return open(os.path.join(self.data_file_path, filename), "a")
+        except FileNotFoundError:
+            return open(os.path.join(self.data_file_path, filename), "w", encoding="utf-8")
+
     @staticmethod
     def close_file(file_object):
         file_object.close()
 
-    def open_label_file(self, label, text, alias):
+    def open_label_file(self, label, text, mentions):
         """
         Creates/Opens label file directory and the label file itself
         :param text: The labelled word
-        :param alias: An alias for the information labelled.
+        :param mentions: The number of times the text has appeared.
         :param label: This will be the name for the label file. This is the label associated with a
         word
         :return: Nothing - output to file
@@ -146,7 +166,7 @@ class FileHandler:
             file_path = str(os.path.join(label_files_directory, label + ".csv"))
         except FileExistsError:
             file_path = str(os.path.join(label_files_directory, label + ".csv"))
-        fieldnames = ['Info', 'Alias']
+        fieldnames = ['Info', 'Mentions']
         try:
             with open(file_path, "x", encoding="utf-8") as label_file:
                 # Creation of csv file
@@ -154,12 +174,12 @@ class FileHandler:
                 # enter source type and key information
                 writer.writeheader()
                 # Write info to csv
-                to_write = [text, alias]
+                to_write = [text, mentions]
                 self.write_to_given_csv_file(label_file, to_write)
         except FileExistsError:
             with open(file_path, "a", encoding="utf-8") as label_file:
                 # Write info to csv
-                to_write = [text, alias]
+                to_write = [text, mentions]
                 self.write_to_given_csv_file(label_file, to_write)
 
     def open_evidence_file(self, to_write):
