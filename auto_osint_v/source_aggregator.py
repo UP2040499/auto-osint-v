@@ -35,6 +35,8 @@ class SourceAggregator:
                                    "www.flickr.com", "www.steamcommunity.com", "vimeo.com",
                                    "medium.com", "vk.com", "imgur.com", "www.patreon.com",
                                    "bitbucket.org", "www.dailymotion.com", "news.ycombinator.com"]
+        # List of words that have no meaning without context
+        self.irrelevant_words = ["it", "them", "they"]
 
     # For searching, I think the key information needs to be extracted from the intel statement
     # Don't want to search using just the intel statement itself.
@@ -80,14 +82,16 @@ class SourceAggregator:
         :return:
         """
         search_results_file = self.file_handler.open_txt_file(self.search_results_filename)
-        # Search google with given query, 10 results (10 per query).
+        # Get keywords from target info
+        keywords = self.file_handler.get_keywords_from_target_info()
+        # Search google with given query and keyword, 10 results (10 per query & keyword).
         # tld could be changed to co.uk for better performance?
-        for query in self.queries:
-            for url in search(query, tld="com", num=10, stop=10, pause=2):
+        for query, keyword in zip(self.queries, keywords):
+            for url in search(query, tld="com", num=5, stop=5, pause=2):
                 self.file_handler.write_to_txt_file_remove_duplicates(search_results_file, url)
-
-        # For greater accuracy we should just get keywords from the statement and use those
-
+            if keyword not in self.irrelevant_words:
+                for url in search(keyword, tld="com", num=5, stop=5, pause=2):
+                    self.file_handler.write_to_txt_file_remove_duplicates(search_results_file, url)
         self.file_handler.close_file(search_results_file)
 
     # Social Media Search
@@ -97,20 +101,22 @@ class SourceAggregator:
 
         :return:
         """
-        from Scweet.scweet import scrape
         # open or create txt file to store search results
         search_results_file = self.file_handler.open_txt_file(self.search_results_filename)
-
+        # Get keywords
+        keywords = self.file_handler.get_keywords_from_target_info()
         # we can also specify more parameters for focusing on a particular location
         # see googlesearch.search()
-        for query, site in zip(self.queries, self.social_media_sites):
-            for url in search(f"{query} site:{site}", tld="com", num=10, stop=10, pause=2):
+        for query, site, keyword in zip(self.queries, self.social_media_sites, keywords):
+            for url in search(f"{query} site:{site}", tld="com", num=5, stop=5, pause=2):
                 # do operation with url
                 self.file_handler.write_to_txt_file_remove_duplicates(search_results_file, url)
-        self.file_handler.close_file(search_results_file)
+            if keyword not in self.irrelevant_words:
+                for url in search(f"{keyword} site:{site}", tld="com", num=5, stop=5, pause=2):
+                    # do operation with url
+                    self.file_handler.write_to_txt_file_remove_duplicates(search_results_file, url)
 
-        # potential future addition: username search using ncorbuk's Looking Glass python tool
-        # https://github.com/ncorbuk/Python-Tutorial---Hunt-Down-Social-Media-Accounts-by-Usernames-for-Open-Source-Intelligence-
+        self.file_handler.close_file(search_results_file)
 
     def run_searches(self):
         self.file_handler.clean_data_file(self.search_results_filename)

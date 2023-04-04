@@ -5,6 +5,7 @@ This module handles all our data files. CSV or TXT.
 import csv
 import os
 import webbrowser
+import pandas as pd
 
 
 class FileHandler:
@@ -79,12 +80,23 @@ class FileHandler:
             return temp
 
     def get_keywords_from_target_info(self):
+        """
+        Gets all the information that is stored in the 'Info' field in each target info file.
+        :return: All the info stored in /target_info_files/
+        """
+        target_files_dir = os.path.join(self.data_file_path, "target_info_files/")
         # list target info files
+        target_files = os.listdir(target_files_dir)
+        # Create list to store keywords
+        info_all = []
         # read each file individually
-        # discard first line
-        # read each line and store the 'Text' field
-        # add Text to list
+        for file in target_files:
+            filepath = os.path.join(target_files_dir, file)
+            frame = pd.read_csv(filepath, index_col=False)
+            # appends every entry in the 'info' column to the 'info_all' list
+            info_all.extend(frame["Info"].values.tolist())
         # return list after each file has been examined
+        return info_all
 
     @staticmethod
     def clean_directory(directory):
@@ -202,3 +214,7 @@ class FileHandler:
             with open(evidence_file_path, "a", encoding="utf-8") as evidence_file:
                 # Append info to csv
                 self.write_to_given_csv_file(evidence_file, to_write)
+
+    @staticmethod
+    def flatten(list_of_lists):
+        return [item for sublist in list_of_lists for item in sublist]
