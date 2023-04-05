@@ -141,12 +141,11 @@ class SourceAggregator:
     # then retrieve the metadata for the media (if available)
 
     # Key information generator (likely using a BERT QA model)
-    # need to keep in mind the resource cost of processing, given we have already attempted to
+    # need to keep in mind the resource cost of processing, given time and resource costs are
+    # already high.
 
     # Sentiment analysis of key information and headlines
     # Very poor scores will lead to the source being discarded
     # Finally, store all potentially corroborating sources.
 
     # Will need a 'find_sources' method that runs all methods in this class.
-    def get_social_media_sites(self):
-        return self.social_media_sites

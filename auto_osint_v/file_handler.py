@@ -220,7 +220,3 @@ class FileHandler:
             with open(evidence_file_path, "a", encoding="utf-8") as evidence_file:
                 # Append info to csv
                 self.write_to_given_csv_file(evidence_file, to_write)
-
-    @staticmethod
-    def flatten(list_of_lists):
-        return [item for sublist in list_of_lists for item in sublist]
