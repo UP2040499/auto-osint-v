@@ -84,6 +84,9 @@ class FileHandler:
         Gets all the information that is stored in the 'Info' field in each target info file.
         :return: All the info stored in /target_info_files/
         """
+        # List of words that have no meaning without context
+        irrelevant_words = ["it", "them", "they"]
+        # the directory to find the target info files
         target_files_dir = os.path.join(self.data_file_path, "target_info_files/")
         # list target info files
         target_files = os.listdir(target_files_dir)
@@ -93,8 +96,11 @@ class FileHandler:
         for file in target_files:
             filepath = os.path.join(target_files_dir, file)
             frame = pd.read_csv(filepath, index_col=False)
-            # appends every entry in the 'info' column to the 'info_all' list
-            info_all.extend(frame["Info"].values.tolist())
+            # appends every entry in the 'info' column to the 'info_all' list unless
+            # it is irrelevant
+            value = frame["Info"].values.tolist()
+            if value not in irrelevant_words:
+                info_all.extend(value)
         # return list after each file has been examined
         return info_all
 

@@ -3,7 +3,7 @@ Python Class for all functions of aggregating sources from open sources.
 This includes using search engines (Google) and searching social media websites
 (Twitter, Reddit, etc.)
 """
-
+from tqdm import tqdm
 from transformers import T5Tokenizer, T5ForConditionalGeneration
 from googlesearch import search
 
@@ -35,8 +35,8 @@ class SourceAggregator:
                                    "www.flickr.com", "www.steamcommunity.com", "vimeo.com",
                                    "medium.com", "vk.com", "imgur.com", "www.patreon.com",
                                    "bitbucket.org", "www.dailymotion.com", "news.ycombinator.com"]
-        # List of words that have no meaning without context
-        self.irrelevant_words = ["it", "them", "they"]
+        # Keywords here because they are used throughout the class
+        self.keywords = self.file_handler.get_keywords_from_target_info()
 
     # For searching, I think the key information needs to be extracted from the intel statement
     # Don't want to search using just the intel statement itself.
@@ -62,18 +62,17 @@ class SourceAggregator:
         # below.
 
         input_ids = tokenizer.encode(self.intel_statement, return_tensors='pt')
+        num_queries = 10
         outputs = model.generate(
             input_ids=input_ids,
             max_length=128,  # default = 64
             do_sample=True,
             top_p=0.95,  # default = 0.95
-            num_return_sequences=10)  # Returns x queries, default = 3
+            num_return_sequences=num_queries)  # Returns x queries, default = 3
 
-        print("\nGenerated Queries:")
-        for i, output in enumerate(outputs):
+        for i, output in enumerate(tqdm(outputs, desc="Generating Queries", total=num_queries)):
             query = tokenizer.decode(output, skip_special_tokens=True)
             self.queries.append(str(query))
-            print(f'{i + 1}: {query}')
 
     # Google Search
     def google_search(self):
@@ -82,16 +81,17 @@ class SourceAggregator:
         :return:
         """
         search_results_file = self.file_handler.open_txt_file(self.search_results_filename)
-        # Get keywords from target info
-        keywords = self.file_handler.get_keywords_from_target_info()
         # Search google with given query and keyword, 10 results (10 per query & keyword).
         # tld could be changed to co.uk for better performance?
-        for query, keyword in zip(self.queries, keywords):
-            for url in search(query, tld="com", num=5, stop=5, pause=2):
+        for query in tqdm(self.queries, desc="Search google using generated queries"):
+            for url in search(query, tld="com", num=5, stop=5, pause=2,
+                              user_agent='auto-osint-v-web-scraper'):
                 self.file_handler.write_to_txt_file_remove_duplicates(search_results_file, url)
-            if keyword not in self.irrelevant_words:
-                for url in search(keyword, tld="com", num=5, stop=5, pause=2):
-                    self.file_handler.write_to_txt_file_remove_duplicates(search_results_file, url)
+        for url in search(f"{' '.join(self.keywords).replace(' ', '%20OR%20')}", tld="com", num=5,
+                          stop=5, pause=2, user_agent='auto-osint-v-web-scraper'):
+            # write url to file
+            self.file_handler.write_to_txt_file_remove_duplicates(search_results_file,
+                                                                  url)
         self.file_handler.close_file(search_results_file)
 
     # Social Media Search
@@ -103,32 +103,45 @@ class SourceAggregator:
         """
         # open or create txt file to store search results
         search_results_file = self.file_handler.open_txt_file(self.search_results_filename)
-        # Get keywords
-        keywords = self.file_handler.get_keywords_from_target_info()
-        # we can also specify more parameters for focusing on a particular location
+        # can also specify more parameters for focusing on a particular location
         # see googlesearch.search()
-        for query, site, keyword in zip(self.queries, self.social_media_sites, keywords):
-            for url in search(f"{query} site:{site}", tld="com", num=5, stop=5, pause=2):
-                # do operation with url
-                self.file_handler.write_to_txt_file_remove_duplicates(search_results_file, url)
-            if keyword not in self.irrelevant_words:
-                for url in search(f"{keyword} site:{site}", tld="com", num=5, stop=5, pause=2):
-                    # do operation with url
+        for site in tqdm(self.social_media_sites, desc="Searching social media sites"):
+            """
+            for query in self.queries:
+                for url in search(f"{query} site:{site}", tld="com", num=5, stop=5, pause=2):
+                    # write url to file
                     self.file_handler.write_to_txt_file_remove_duplicates(search_results_file, url)
-
+            """
+            for url in search(f"{' '.join(self.keywords).replace(' ', '%20OR%20')} site:{site}",
+                              tld="com", num=5, stop=5, pause=2,
+                              user_agent='auto-osint-v-web-scraper'):
+                # write url to file
+                self.file_handler.write_to_txt_file_remove_duplicates(search_results_file,
+                                                                      url)
         self.file_handler.close_file(search_results_file)
 
     def run_searches(self):
+        """
+        Runs the various search operations
+        Note: keep the number of queries to a minimum in order to avoid getting IP blocked by google
+        for too many requests.
+        :return:
+        """
         self.file_handler.clean_data_file(self.search_results_filename)
+        # in both methods reduce number of queries
+        # to search using a list of keywords put '%20OR%20' in between each element and search
+        # this is a Google dorks technique to search for keyword OR next keyword etc.
         self.google_search()
         self.social_media_search()
 
-    # Video Processor
+    # Media Processor
+    # interrogate each link and return a description of the media
+    # i.e. text, video, image, sound, etc.
+    # all media but text should go through the media processor
+    # then retrieve the metadata for the media (if available)
 
-    # Semantic analysis of whole document
-
-    # Key information generator (likely using BERT QA)
-    # Should try to make reusable (key info from statement and key info from sources)
+    # Key information generator (likely using a BERT QA model)
+    # need to keep in mind the resource cost of processing, given we have already attempted to
 
     # Sentiment analysis of key information and headlines
     # Very poor scores will lead to the source being discarded

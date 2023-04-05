@@ -63,9 +63,6 @@ if __name__ == '__main__':
     print("\nAggregating Sources:")
     source_aggregator = SourceAggregator(intel_file, file_handler)
     # generates 10 queries and stores it in the source_aggregator object
-    print("Generating queries...")
     source_aggregator.search_query_generator()
     # Searches google and social media sites using the queries stored in source_aggregator object
-    print("Searching google...")
-    print("Searching social media sites:\n", source_aggregator.get_social_media_sites())
     source_aggregator.run_searches()
