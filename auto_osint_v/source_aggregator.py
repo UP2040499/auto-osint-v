@@ -5,7 +5,7 @@ This includes using search engines (Google) and searching social media websites
 """
 from tqdm import tqdm
 from transformers import T5Tokenizer, T5ForConditionalGeneration
-from googlesearch import search
+from googleapiclient.discovery import build
 
 
 class SourceAggregator:
@@ -28,6 +28,9 @@ class SourceAggregator:
         self.file_handler = file_handler_object
         self.search_results_filename = "search_results.txt"
         self.queries = []
+        # Google custom search engine API key and engine ID
+        self.api_key = "AIzaSyCgsni4yZyp4Bla9J7a2TE-lxmzVagcjEo"
+        self.cse_id = "d76b2d8504d104aa8"
         # list of social media sites - to add more insert the domain name here.
         self.social_media_sites = ["www.instagram.com", "www.tiktok.com", "www.facebook.com",
                                    "www.youtube.com", "www.reddit.com", "www.twitter.com",
@@ -62,7 +65,7 @@ class SourceAggregator:
         # below.
 
         input_ids = tokenizer.encode(self.intel_statement, return_tensors='pt')
-        num_queries = 10
+        num_queries = 10    # number of queries to generate
         outputs = model.generate(
             input_ids=input_ids,
             max_length=128,  # default = 64
@@ -74,6 +77,22 @@ class SourceAggregator:
             query = tokenizer.decode(output, skip_special_tokens=True)
             self.queries.append(str(query))
 
+    # the searcher method to search using a custom programmable search engine
+    def searcher(self, search_term, **kwargs):
+        service = build("customsearch", "v1", developerKey=self.api_key)
+        res = service.cse().list(q=search_term, cx=self.cse_id, **kwargs).execute()
+        try:
+            return res['items']
+        except KeyError:
+            return []
+
+    def write_url_to_txt_file(self, result, search_results_file):
+        try:
+            self.file_handler.write_to_txt_file_remove_duplicates(search_results_file,
+                                                              result['link'])
+        except KeyError:
+            pass
+
     # Google Search
     def google_search(self):
         """
@@ -83,15 +102,16 @@ class SourceAggregator:
         search_results_file = self.file_handler.open_txt_file(self.search_results_filename)
         # Search google with given query and keyword, 10 results (10 per query & keyword).
         # tld could be changed to co.uk for better performance?
-        for query in tqdm(self.queries, desc="Search google using generated queries"):
-            for url in search(query, tld="com", num=5, stop=5, pause=2,
-                              user_agent='auto-osint-v-web-scraper'):
-                self.file_handler.write_to_txt_file_remove_duplicates(search_results_file, url)
-        for url in search(f"{' '.join(self.keywords).replace(' ', '%20OR%20')}", tld="com", num=5,
-                          stop=5, pause=2, user_agent='auto-osint-v-web-scraper'):
-            # write url to file
-            self.file_handler.write_to_txt_file_remove_duplicates(search_results_file,
-                                                                  url)
+        for query in tqdm(self.queries, desc="Search Google using generated queries"):
+            query_results = self.searcher(query, num=5)
+            for result in query_results:
+                self.write_url_to_txt_file(result, search_results_file)
+
+        join_keywords = '|'.join(f'"{word}"' for word in self.keywords)
+        keyword_results = self.searcher(f"(intext:{join_keywords})", num=10)
+        for result in keyword_results:
+            # write link to file
+            self.write_url_to_txt_file(result, search_results_file)
         self.file_handler.close_file(search_results_file)
 
     # Social Media Search
@@ -103,8 +123,12 @@ class SourceAggregator:
         """
         # open or create txt file to store search results
         search_results_file = self.file_handler.open_txt_file(self.search_results_filename)
+        # Separate the social media results from Google search results
+        self.file_handler.write_to_txt_file_remove_duplicates(search_results_file,
+                                                              "\n--- Social Media ---")
         # can also specify more parameters for focusing on a particular location
         # see googlesearch.search()
+        join_keywords = '|'.join(f'"{word}"' for word in self.keywords)
         for site in tqdm(self.social_media_sites, desc="Searching social media sites"):
             """
             for query in self.queries:
@@ -112,12 +136,10 @@ class SourceAggregator:
                     # write url to file
                     self.file_handler.write_to_txt_file_remove_duplicates(search_results_file, url)
             """
-            for url in search(f"{' '.join(self.keywords).replace(' ', '%20OR%20')} site:{site}",
-                              tld="com", num=5, stop=5, pause=2,
-                              user_agent='auto-osint-v-web-scraper'):
+            keyword_results = self.searcher(f"(site:{site}) (intext:{join_keywords})", num=10)
+            for result in keyword_results:
                 # write url to file
-                self.file_handler.write_to_txt_file_remove_duplicates(search_results_file,
-                                                                      url)
+                self.write_url_to_txt_file(result, search_results_file)
         self.file_handler.close_file(search_results_file)
 
     def run_searches(self):

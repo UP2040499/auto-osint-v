@@ -85,7 +85,7 @@ class FileHandler:
         :return: All the info stored in /target_info_files/
         """
         # List of words that have no meaning without context
-        irrelevant_words = ["it", "them", "they"]
+        irrelevant_words = ["it", "them", "they", "the", "he", "she"]
         # the directory to find the target info files
         target_files_dir = os.path.join(self.data_file_path, "target_info_files/")
         # list target info files
