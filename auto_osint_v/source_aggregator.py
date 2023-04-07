@@ -4,6 +4,8 @@ This includes using search engines (Google) and searching social media websites
 (Twitter, Reddit, etc.)
 """
 from tqdm import tqdm
+import requests
+from bs4 import BeautifulSoup
 from transformers import T5Tokenizer, T5ForConditionalGeneration
 from googleapiclient.discovery import build
 
@@ -170,9 +172,80 @@ class SourceAggregator:
 
     # Media Processor
     # interrogate each link and return a description of the media
-    # i.e. text, video, image, sound, etc.
+    # i.e. text, video, image.
     # all media but text should go through the media processor
     # then retrieve the metadata for the media (if available)
+    @staticmethod
+    def find_images(soup):
+        """
+        Finds images in a given HTML document
+        :param soup: Parsed HTML
+        :return:
+        """
+        image_urls = []
+        images = soup.find_all("img")
+        for image in images:
+            image_url = image.get("src")
+            image_urls.append(image_url)
+        return image_urls
+
+    @staticmethod
+    def find_videos(soup):
+        """
+        Finds images in a given HTML document
+        :param soup: Parsed HTML
+        :return:
+        """
+        video_urls = []
+        videos = soup.find_all("video")
+        for video in videos:
+            video_url = video.get("src")
+            video_urls.append(video_url)
+        return video_urls
+
+    def source_descriptor(self, url):
+        """
+        Describes the given website and returns its title, description, and any videos and images
+        in the website.
+        :param url: The URL for the website
+        :return: The info we want: website title, description, images & videos
+        """
+        response = requests.get(url)
+        soup = BeautifulSoup(response.text, "html.parser")
+        # finding common tags
+        title = soup.find("title").text
+        description = soup.find("meta", attrs={"name": "description"})["content"]
+        # image and video tags may not be in the website.
+        try:
+            images = self.find_images(soup)
+        except KeyError:
+            images = []
+        try:
+            videos = self.find_videos(soup)
+        except KeyError:
+            videos = []
+        return url, title, description, images, videos
+
+    def media_processor(self):
+        """
+        Processes each URL and creates a dictionary that stores relevant information about it.
+        :return:
+        """
+        urls = self.file_handler.read_file(self.search_results_filename)
+        website_dict = {}
+        for i, url in enumerate(urls):
+            url, title, description, images, videos = self.source_descriptor(url.strip())
+            # create dictionary from these variables
+            # add this dictionary to website_dict under key i
+            website_dict[i] = {"URL": url, "title": title, "description": description,
+                               "image_links": images, "video_links": videos}
+        return website_dict
+
+    # It may be impossible but if there is a way to find any website's 'last-updated' date
+    # This would be a helpful metric for determining relevance.
+    # Currently, I do not think this is possible for *any* website but it may work for some.
+    # It is also possible to change the searching methods to only find results from a given date
+    # interval.
 
     # Key information generator (likely using a BERT QA model)
     # need to keep in mind the resource cost of processing, given time and resource costs are
