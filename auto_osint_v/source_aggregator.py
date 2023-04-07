@@ -73,12 +73,18 @@ class SourceAggregator:
             top_p=0.95,  # default = 0.95
             num_return_sequences=num_queries)  # Returns x queries, default = 3
 
-        for i, output in enumerate(tqdm(outputs, desc="Generating Queries", total=num_queries)):
+        for i, output in enumerate(outputs):
             query = tokenizer.decode(output, skip_special_tokens=True)
             self.queries.append(str(query))
 
     # the searcher method to search using a custom programmable search engine
     def searcher(self, search_term, **kwargs):
+        """
+        Using the Google Custom Search Engine to search for results to the search_term.
+        :param search_term: The keyword/query to search for
+        :param kwargs: Extra arguments to pass to service.cse().list
+        :return:
+        """
         service = build("customsearch", "v1", developerKey=self.api_key)
         res = service.cse().list(q=search_term, cx=self.cse_id, **kwargs).execute()
         try:
@@ -96,19 +102,23 @@ class SourceAggregator:
     # Google Search
     def google_search(self):
         """
-
+        Searches google using both the generated queries, and the extracted keywords.
+        Limits the number of queries sent to google where possible.
+        Uses the Google Custom Search Engine
         :return:
         """
         search_results_file = self.file_handler.open_txt_file(self.search_results_filename)
-        # Search google with given query and keyword, 10 results (10 per query & keyword).
-        # tld could be changed to co.uk for better performance?
+        # searches google using the generated queries
         for query in tqdm(self.queries, desc="Search Google using generated queries"):
+            # one search per query
             query_results = self.searcher(query, num=5)
             for result in query_results:
                 self.write_url_to_txt_file(result, search_results_file)
-
+        # Join the list of keywords/phrases into one string seperated by '|' and surrounded by ""
         join_keywords = '|'.join(f'"{word}"' for word in self.keywords)
+        # Get the results from one query using the list of keywords
         keyword_results = self.searcher(f"(intext:{join_keywords})", num=10)
+        # loop through results
         for result in keyword_results:
             # write link to file
             self.write_url_to_txt_file(result, search_results_file)
@@ -126,9 +136,9 @@ class SourceAggregator:
         # Separate the social media results from Google search results
         self.file_handler.write_to_txt_file_remove_duplicates(search_results_file,
                                                               "\n--- Social Media ---")
-        # can also specify more parameters for focusing on a particular location
-        # see googlesearch.search()
+        # Join the list of keywords/phrases into one string seperated by '|' and surrounded by ""
         join_keywords = '|'.join(f'"{word}"' for word in self.keywords)
+        # Loop through list of social media sites
         for site in tqdm(self.social_media_sites, desc="Searching social media sites"):
             """
             for query in self.queries:
@@ -136,7 +146,9 @@ class SourceAggregator:
                     # write url to file
                     self.file_handler.write_to_txt_file_remove_duplicates(search_results_file, url)
             """
+            # search for the keywords using one google query
             keyword_results = self.searcher(f"(site:{site}) (intext:{join_keywords})", num=10)
+            # loop through results
             for result in keyword_results:
                 # write url to file
                 self.write_url_to_txt_file(result, search_results_file)
