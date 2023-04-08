@@ -28,7 +28,6 @@ class SourceAggregator:
         """
         self.intel_statement = intel_statement
         self.file_handler = file_handler_object
-        self.search_results_filename = "search_results.txt"
         self.queries = []
         # Google custom search engine API key and engine ID
         self.api_key = "AIzaSyCgsni4yZyp4Bla9J7a2TE-lxmzVagcjEo"
@@ -42,6 +41,9 @@ class SourceAggregator:
                                    "bitbucket.org", "www.dailymotion.com", "news.ycombinator.com"]
         # Keywords here because they are used throughout the class
         self.keywords = self.file_handler.get_keywords_from_target_info()
+        # create the dictionary using given keys
+        self.results_dict = {"url": [], "title": [], "description": [], "page_type": [],
+                             "time_published": [], "image_links": [], "video_links": []}
 
     # For searching, I think the key information needs to be extracted from the intel statement
     # Don't want to search using just the intel statement itself.
@@ -67,7 +69,7 @@ class SourceAggregator:
         # below.
 
         input_ids = tokenizer.encode(self.intel_statement, return_tensors='pt')
-        num_queries = 10    # number of queries to generate
+        num_queries = 10  # number of queries to generate
         outputs = model.generate(
             input_ids=input_ids,
             max_length=128,  # default = 64
@@ -97,7 +99,7 @@ class SourceAggregator:
     def write_url_to_txt_file(self, result, search_results_file):
         try:
             self.file_handler.write_to_txt_file_remove_duplicates(search_results_file,
-                                                              result['link'])
+                                                                  result['link'])
         except KeyError:
             pass
 
@@ -107,37 +109,34 @@ class SourceAggregator:
         Searches google using both the generated queries, and the extracted keywords.
         Limits the number of queries sent to google where possible.
         Uses the Google Custom Search Engine
-        :return:
+        :return: dictionary of Google search results
         """
-        search_results_file = self.file_handler.open_txt_file(self.search_results_filename)
+        # define dictionary index used to store results
+        dict_index = 0
         # searches google using the generated queries
         for query in tqdm(self.queries, desc="Search Google using generated queries"):
             # one search per query
             query_results = self.searcher(query, num=5)
             for result in query_results:
-                self.write_url_to_txt_file(result, search_results_file)
+                # write link to dict
+                self.process_result(result)
         # Join the list of keywords/phrases into one string seperated by '|' and surrounded by ""
         join_keywords = '|'.join(f'"{word}"' for word in self.keywords)
         # Get the results from one query using the list of keywords
         keyword_results = self.searcher(f"(intext:{join_keywords})", num=10)
         # loop through results
-        for result in keyword_results:
-            # write link to file
-            self.write_url_to_txt_file(result, search_results_file)
-        self.file_handler.close_file(search_results_file)
+        for result in tqdm(keyword_results, desc="Search Google using extracted keywords"):
+            # write link to dict
+            self.process_result(result)
 
     # Social Media Search
     # reuse file_handler.write_to_txt_file_remove_duplicates method
     def social_media_search(self):
         """
 
-        :return:
+        :return: dictionary storing the social media results
         """
-        # open or create txt file to store search results
-        search_results_file = self.file_handler.open_txt_file(self.search_results_filename)
-        # Separate the social media results from Google search results
-        self.file_handler.write_to_txt_file_remove_duplicates(search_results_file,
-                                                              "\n--- Social Media ---")
+        # define dictionary to store results
         # Join the list of keywords/phrases into one string seperated by '|' and surrounded by ""
         join_keywords = '|'.join(f'"{word}"' for word in self.keywords)
         # Loop through list of social media sites
@@ -152,9 +151,38 @@ class SourceAggregator:
             keyword_results = self.searcher(f"(site:{site}) (intext:{join_keywords})", num=10)
             # loop through results
             for result in keyword_results:
-                # write url to file
-                self.write_url_to_txt_file(result, search_results_file)
-        self.file_handler.close_file(search_results_file)
+                # get process the result
+                self.process_result(result)
+        # return # dict
+
+    def process_result(self, result):
+        """
+        Takes the result from the search, extracts information and saves it all in a dictionary.
+        :param result: Result type from Google Search API
+        :return: nothing, stores info in instance dictionary variable
+        """
+        link = result['link']
+        title = result['title']
+        snippet = result['snippet']
+        try:
+            page_type = result['pagemap']['metatags'][0]['og:type']
+        except KeyError:
+            page_type = ""
+        try:
+            publish_time = result['pagemap']['metatags'][0]['article:published_time']
+        except KeyError:
+            publish_time = ""
+        try:
+            images, videos = self.media_finder(link)
+        except requests.exceptions.SSLError:
+            images, videos = [], []
+        self.results_dict["url"].append(link)
+        self.results_dict["title"].append(title)
+        self.results_dict["description"].append(snippet)
+        self.results_dict["page_type"].append(page_type)
+        self.results_dict["time_published"].append(publish_time)
+        self.results_dict["image_links"].append(images)
+        self.results_dict["video_links"].append(videos)
 
     def run_searches(self):
         """
@@ -163,7 +191,6 @@ class SourceAggregator:
         for too many requests.
         :return:
         """
-        self.file_handler.clean_data_file(self.search_results_filename)
         # in both methods reduce number of queries
         # to search using a list of keywords put '%20OR%20' in between each element and search
         # this is a Google dorks technique to search for keyword OR next keyword etc.
@@ -203,18 +230,15 @@ class SourceAggregator:
             video_urls.append(video_url)
         return video_urls
 
-    def source_descriptor(self, url):
+    def media_finder(self, url):
         """
-        Describes the given website and returns its title, description, and any videos and images
-        in the website.
+        Finds media in the HTML from the given URL. This finds images and videos.
         :param url: The URL for the website
         :return: The info we want: website title, description, images & videos
         """
+        # retrieve html from URL
         response = requests.get(url)
         soup = BeautifulSoup(response.text, "html.parser")
-        # finding common tags
-        title = soup.find("title").text
-        description = soup.find("meta", attrs={"name": "description"})["content"]
         # image and video tags may not be in the website.
         try:
             images = self.find_images(soup)
@@ -224,26 +248,11 @@ class SourceAggregator:
             videos = self.find_videos(soup)
         except KeyError:
             videos = []
-        return url, title, description, images, videos
-
-    def media_processor(self):
-        """
-        Processes each URL and creates a dictionary that stores relevant information about it.
-        :return:
-        """
-        urls = self.file_handler.read_file(self.search_results_filename)
-        website_dict = {}
-        for i, url in enumerate(urls):
-            url, title, description, images, videos = self.source_descriptor(url.strip())
-            # create dictionary from these variables
-            # add this dictionary to website_dict under key i
-            website_dict[i] = {"URL": url, "title": title, "description": description,
-                               "image_links": images, "video_links": videos}
-        return website_dict
+        return images, videos
 
     # It may be impossible but if there is a way to find any website's 'last-updated' date
     # This would be a helpful metric for determining relevance.
-    # Currently, I do not think this is possible for *any* website but it may work for some.
+    # Currently, I do not think this is possible for *any* website, but it may work for some.
     # It is also possible to change the searching methods to only find results from a given date
     # interval.
 
