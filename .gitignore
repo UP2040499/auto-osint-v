@@ -129,4 +129,16 @@ dmypy.json
 .pyre/
 
 # irrelevant NER models
-NER_training_testing/train/model/model-last
+auto_osint_v/NER_training_testing/train/model/model-last
+
+# auto-generated data files
+auto_osint_v/data_files/target_info_files
+auto_osint_v/data_files/bias_sources.csv
+auto_osint_v/data_files/evidence_file.csv
+auto_osint_v/data_files/intelligence_file.txt
+auto_osint_v/data_files/search_results.txt
+auto_osint_v/data_files/potential_corroboration.csv
+
+# Google cookies
+.google-cookie
+
