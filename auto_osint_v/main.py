@@ -61,11 +61,10 @@ if __name__ == '__main__':
     analyse_sentiment_object.statement_analyser()
     # Source aggregation below
     print("\nAggregating Sources:")
-    source_aggregator = SourceAggregator(intel_file, file_handler)
+    source_aggregator = SourceAggregator(intel_file, file_handler, analyse_sentiment_object)
     # generates 10 queries and stores it in the source_aggregator object
     print("Generating queries...")
     source_aggregator.search_query_generator()
     # Searches google and social media sites using the queries stored in source_aggregator object
     # search results will be stored in a dictionary in the source_aggregator Object.
-    source_aggregator.run_searches()
-    print(source_aggregator.__getattribute__("results_dict"))
+    source_aggregator.find_sources()

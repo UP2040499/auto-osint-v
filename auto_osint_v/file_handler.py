@@ -212,7 +212,6 @@ class FileHandler:
             with open(evidence_file_path, "x", encoding="utf-8") as evidence_file:
                 # Creation of csv file
                 writer = csv.DictWriter(evidence_file, fieldnames)
-                # enter source type and key information
                 writer.writeheader()
                 # Write info to csv
                 self.write_to_given_csv_file(evidence_file, to_write)
@@ -220,3 +219,24 @@ class FileHandler:
             with open(evidence_file_path, "a", encoding="utf-8") as evidence_file:
                 # Append info to csv
                 self.write_to_given_csv_file(evidence_file, to_write)
+
+    def create_potential_corroboration_file(self, sources_list_of_dicts):
+        """
+        Creates the potential corroboration source store.
+        Writes the list of dictionaries to a csv file.
+        :param sources_list_of_dicts: Must be a list of dictionaries ( list[dict[x,y]] )
+        :return: nothing, outputs to file
+        """
+        sources_file_path = self.data_file_path + "potential_corroboration.csv"
+        try:
+            self.clean_data_file("potential_corroboration.csv")
+        except FileNotFoundError:
+            pass
+        # get keys of dictionary and store as fieldnames
+        fieldnames = sources_list_of_dicts[0].keys()
+        with open(sources_file_path, "x", newline="", encoding="utf-8") as sources_file:
+            # create writer object
+            writer = csv.DictWriter(sources_file, fieldnames)
+            writer.writeheader()
+            # write the dictionary to csv
+            writer.writerows(sources_list_of_dicts)

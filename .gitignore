@@ -137,6 +137,8 @@ auto_osint_v/data_files/bias_sources.csv
 auto_osint_v/data_files/evidence_file.csv
 auto_osint_v/data_files/intelligence_file.txt
 auto_osint_v/data_files/search_results.txt
+auto_osint_v/data_files/potential_corroboration.csv
 
 # Google cookies
 .google-cookie
+

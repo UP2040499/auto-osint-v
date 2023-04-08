@@ -6,7 +6,8 @@ This includes using search engines (Google) and searching social media websites
 from tqdm import tqdm
 import requests
 from bs4 import BeautifulSoup
-from transformers import T5Tokenizer, T5ForConditionalGeneration
+from transformers import T5Tokenizer, T5ForConditionalGeneration, AutoModelForSeq2SeqLM, \
+    AutoTokenizer
 from googleapiclient.discovery import build
 
 
@@ -20,13 +21,14 @@ class SourceAggregator:
     """
 
     # Initialise object
-    def __init__(self, intel_statement, file_handler_object):
+    def __init__(self, intel_statement, file_handler_object, sentiment_analyser_object):
         """
         Initialises the SourceAggregator object
         :param intel_statement: The original intel statement
         :param file_handler_object: The FileHandler object passed from main.py
         """
         self.intel_statement = intel_statement
+        self.sentiment_analyser = sentiment_analyser_object
         self.file_handler = file_handler_object
         self.queries = []
         # Google custom search engine API key and engine ID
@@ -41,9 +43,8 @@ class SourceAggregator:
                                    "bitbucket.org", "www.dailymotion.com", "news.ycombinator.com"]
         # Keywords here because they are used throughout the class
         self.keywords = self.file_handler.get_keywords_from_target_info()
-        # create the dictionary using given keys
-        self.results_dict = {"url": [], "title": [], "description": [], "page_type": [],
-                             "time_published": [], "image_links": [], "video_links": []}
+        # create the list of dictionaries
+        self.results_list_dict = []
 
     # For searching, I think the key information needs to be extracted from the intel statement
     # Don't want to search using just the intel statement itself.
@@ -158,12 +159,24 @@ class SourceAggregator:
     def process_result(self, result):
         """
         Takes the result from the search, extracts information and saves it all in a dictionary.
+        This is the main processing step.
+        Sentiment analysis is done to filter bias and inflammatory sources.
+        By adjusting max_sentiment_threshold you may filter more sources
+        (that are bias or inflammatory). Only change this if you find that sources retrieved appear
+        bias or inflammatory, and vice versa, if it is filtering sources that do not appear very
+        biased or inflammatory.
         :param result: Result type from Google Search API
         :return: nothing, stores info in instance dictionary variable
         """
         link = result['link']
-        title = result['title']
-        snippet = result['snippet']
+        try:
+            title = result['pagemap']['metatags'][0]['og:title']
+        except KeyError:
+            title = result['title']
+        try:
+            desc = result['pagemap']['metatags'][0]['og:description']
+        except KeyError:
+            desc = result['snippet']
         try:
             page_type = result['pagemap']['metatags'][0]['og:type']
         except KeyError:
@@ -176,15 +189,23 @@ class SourceAggregator:
             images, videos = self.media_finder(link)
         except requests.exceptions.SSLError:
             images, videos = [], []
-        self.results_dict["url"].append(link)
-        self.results_dict["title"].append(title)
-        self.results_dict["description"].append(snippet)
-        self.results_dict["page_type"].append(page_type)
-        self.results_dict["time_published"].append(publish_time)
-        self.results_dict["image_links"].append(images)
-        self.results_dict["video_links"].append(videos)
+        """
+        if page_type == "article":
+            website_summary = self.web_summary(link)
+            self.results_dict["website_summary"].append(website_summary)
+        """
+        # sentiment analysis check - will discard headlines that appear inflammatory or bias
+        # keep threshold relatively high (>0.8), see process_result() documentation.
+        max_sentiment_threshold = 0.9
+        label, score = self.sentiment_analyser.headline_analyser(title)
+        # Very poor scores will lead to the source being discarded
+        if not (label != "neutral" and score > max_sentiment_threshold):
+            self.results_list_dict.append({"url": link, "title": title, "description": desc,
+                                           "page_type": page_type, "time_published": publish_time,
+                                           "image_links": images, "video_links": videos,
+                                           "title_sentiment": f"{label} sentiment, score={score}"})
 
-    def run_searches(self):
+    def find_sources(self):
         """
         Runs the various search operations
         Note: keep the number of queries to a minimum in order to avoid getting IP blocked by google
@@ -192,10 +213,10 @@ class SourceAggregator:
         :return:
         """
         # in both methods reduce number of queries
-        # to search using a list of keywords put '%20OR%20' in between each element and search
-        # this is a Google dorks technique to search for keyword OR next keyword etc.
         self.google_search()
         self.social_media_search()
+        # store potentially corroborating sources in .csv file
+        self.file_handler.create_potential_corroboration_file(self.results_list_dict)
 
     # Media Processor
     # interrogate each link and return a description of the media
@@ -250,18 +271,37 @@ class SourceAggregator:
             videos = []
         return images, videos
 
-    # It may be impossible but if there is a way to find any website's 'last-updated' date
-    # This would be a helpful metric for determining relevance.
-    # Currently, I do not think this is possible for *any* website, but it may work for some.
-    # It is also possible to change the searching methods to only find results from a given date
-    # interval.
-
     # Key information generator (likely using a BERT QA model)
     # need to keep in mind the resource cost of processing, given time and resource costs are
     # already high.
 
-    # Sentiment analysis of key information and headlines
-    # Very poor scores will lead to the source being discarded
-    # Finally, store all potentially corroborating sources.
+    # discarded for now as processing cost is too high, causes each URL lookup to take over a minute
+    # *per url*, therefore these methods cannot be included in their current state.
+    @staticmethod
+    def url_get_text(url):
+        """
+        Gets the text from a website with given url
+        :param url: the url to get the text from
+        :return: the text from the website given by the url
+        """
+        page = requests.get(url)
+        soup = BeautifulSoup(page.content, "html.parser")
+        return soup.get_text(strip=True)
 
-    # Will need a 'find_sources' method that runs all methods in this class.
+    def web_summary(self, url):
+        """
+        Generates a summary of a given website.
+        Summarisation code from HuggingFace Pegasus documentation.
+        :return: the summary text
+        """
+        text = self.url_get_text(url)
+        tokenizer = AutoTokenizer.from_pretrained("google/pegasus-large")
+        model = AutoModelForSeq2SeqLM.from_pretrained("google/pegasus-large")
+
+        inputs = tokenizer(text, truncation=True, return_tensors="pt")
+
+        # Generate summary
+        summary_ids = model.generate(inputs["input_ids"], max_new_tokens=1024)
+        summary = tokenizer.batch_decode(summary_ids, skip_special_tokens=True,
+                                         clean_up_tokenization_spaces=False)[0]
+        return summary
