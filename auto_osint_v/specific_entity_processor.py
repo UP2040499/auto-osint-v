@@ -1,38 +1,40 @@
-"""
-This module will identify specific entities in the intelligence statement and 
-store them in appropriate stores.
+"""This module will identify specific entities
+
+These entities are extracted from the intelligence statement and
+stored in appropriate stores.
 Subprocesses to this module attempt to interrogate some of this information.
 """
 
-# Named Entity Recognition (NER) using NLP
-
-import os
 import spacy
 
 
 # Load the best model trained using Google Colab
-NER = spacy.load(os.getcwd() +
-                 "/NER_training_testing/train/model/model-best-from-colab")
+NER = spacy.load("auto_osint_v/NER_training_testing/train/model/model-best-from-colab")
 
 
 class EntityProcessor:
-    """
-    This class provides methods for recognising the individual entities in a statement and storing
+    """This class extracts the entities from a given statement
+
+    It provides methods for recognising the individual entities in a statement and storing
     them appropriately.
     """
     def __init__(self, read_statement, file_handler_object):
-        """
-        Initialises variables to be used in this object.
-        :param read_statement:
+        """Initialises variables to be used in this object.
+
+        Args:
+         read_statement: the statement read from a text file
         """
         self.statement = read_statement
         self.file_handler = file_handler_object
 
     def store_words_from_label(self):
-        """
-        This function stores recognised words in csv files that are relevant to the label given to
+        """This function stores recognised words in csv files
+
+        These files are associated with the label given to
         the word.
-        :return: Nothing - stores info in files
+
+        Returns
+         Nothing - stores info in files
         """
         # Clean any leftover files from previous runs
         self.file_handler.clean_directory("data_files/target_info_files")

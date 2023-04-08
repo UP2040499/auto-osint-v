@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.10.0" />
 <title>auto_osint_v.main API documentation</title>
-<meta name="description" content="This module forms the main part of the program, where other modules are run from." />
+<meta name="description" content="This module forms the main part of the program, where other modules are run from …" />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
 <link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
@@ -23,28 +23,32 @@
 </header>
 <section id="section-intro">
 <p>This module forms the main part of the program, where other modules are run from.</p>
+<p>Run this file to run the tool.</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">&#34;&#34;&#34;
-This module forms the main part of the program, where other modules are run from.
+<pre><code class="python">&#34;&#34;&#34;This module forms the main part of the program, where other modules are run from.
+
+Run this file to run the tool.
 &#34;&#34;&#34;
 
 import os
 import sys
-from specific_entity_processor import EntityProcessor
-from file_handler import FileHandler
-from semantic_analyser import SemanticAnalyser
+from auto_osint_v.specific_entity_processor import EntityProcessor
+from auto_osint_v.file_handler import FileHandler
+from auto_osint_v.sentiment_analyser import SemanticAnalyser
+from auto_osint_v.source_aggregator import SourceAggregator
 
 data_file_path = os.getcwd() + &#34;/data_files/&#34;
 sys.path.append(
     &#34;/auto_osint_v/main.py&#34;)
 
+os.environ[&#34;PYTORCH_CUDA_ALLOC_CONF&#34;] = &#34;max_split_size_mb:128&#34;
+
 
 def input_intelligence():
-    &#34;&#34;&#34;
-    This method creates a text file for the user to input their intelligence statement into.
+    &#34;&#34;&#34;This method creates a text file for the user to input their intelligence statement into.
     &#34;&#34;&#34;
     print(&#34;A notepad window will now open in your default text editor.&#34;)
     print(&#34;Please enter the intelligence statement in there and save the file.\n&#34;)
@@ -52,8 +56,7 @@ def input_intelligence():
 
 
 def input_bias_sources():
-    &#34;&#34;&#34;
-    This function will create a csv file for the bias sources to be stored in.
+    &#34;&#34;&#34;This function will create a csv file for the bias sources to be stored in.
     &#34;&#34;&#34;
     print(&#34;Enter a Bias Source&#34;)
     print(&#34;You will now be asked to enter any sources you believe are important to compare to.&#34;)
@@ -72,17 +75,28 @@ if __name__ == &#39;__main__&#39;:
     input(&#34;\nPress ENTER to continue...\n&#34;)
     input_bias_sources()
     # Read intelligence file
+    print(&#34;Reading intelligence file...&#34;)
     intel_file = file_handler.read_file(&#34;intelligence_file.txt&#34;)
     # Entity Processor - identifies specific entities mentioned in intel statement
+    print(&#34;Processing entities...&#34;)
     process_entities = EntityProcessor(intel_file, file_handler)
     process_entities.store_words_from_label()
+
     # Clean evidence_file.csv
-    os.remove(data_file_path+&#34;evidence_file.csv&#34;)
-    # call to semantic analyser - sentiment analysis on intel statement
+    file_handler.clean_data_file(data_file_path + &#34;evidence_file.csv&#34;)
+    # call to sentiment analyser - sentiment analysis on intel statement
+    print(&#34;Analysing sentiment of intelligence statement...&#34;)
     analyse_sentiment_object = SemanticAnalyser(intel_file, &#34;intelligence_statement&#34;, file_handler)
     analyse_sentiment_object.statement_analyser()
     # Source aggregation below
-    </code></pre>
+    print(&#34;\nAggregating Sources:&#34;)
+    source_aggregator = SourceAggregator(intel_file, file_handler, analyse_sentiment_object)
+    # generates 10 queries and stores it in the source_aggregator object
+    print(&#34;Generating queries...&#34;)
+    source_aggregator.search_query_generator()
+    # Searches google and social media sites using the queries stored in source_aggregator object
+    # search results will be stored in a dictionary in the source_aggregator Object.
+    source_aggregator.find_sources()</code></pre>
 </details>
 </section>
 <section>
@@ -102,8 +116,7 @@ if __name__ == &#39;__main__&#39;:
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def input_bias_sources():
-    &#34;&#34;&#34;
-    This function will create a csv file for the bias sources to be stored in.
+    &#34;&#34;&#34;This function will create a csv file for the bias sources to be stored in.
     &#34;&#34;&#34;
     print(&#34;Enter a Bias Source&#34;)
     print(&#34;You will now be asked to enter any sources you believe are important to compare to.&#34;)
@@ -124,8 +137,7 @@ if __name__ == &#39;__main__&#39;:
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def input_intelligence():
-    &#34;&#34;&#34;
-    This method creates a text file for the user to input their intelligence statement into.
+    &#34;&#34;&#34;This method creates a text file for the user to input their intelligence statement into.
     &#34;&#34;&#34;
     print(&#34;A notepad window will now open in your default text editor.&#34;)
     print(&#34;Please enter the intelligence statement in there and save the file.\n&#34;)

@@ -1,5 +1,6 @@
-"""
-This module forms the main part of the program, where other modules are run from.
+"""This module forms the main part of the program, where other modules are run from.
+
+Run this file to run the tool.
 """
 
 import os
@@ -17,8 +18,7 @@ os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:128"
 
 
 def input_intelligence():
-    """
-    This method creates a text file for the user to input their intelligence statement into.
+    """This method creates a text file for the user to input their intelligence statement into.
     """
     print("A notepad window will now open in your default text editor.")
     print("Please enter the intelligence statement in there and save the file.\n")
@@ -26,8 +26,7 @@ def input_intelligence():
 
 
 def input_bias_sources():
-    """
-    This function will create a csv file for the bias sources to be stored in.
+    """This function will create a csv file for the bias sources to be stored in.
     """
     print("Enter a Bias Source")
     print("You will now be asked to enter any sources you believe are important to compare to.")

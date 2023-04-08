@@ -5,9 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.10.0" />
 <title>auto_osint_v.specific_entity_processor API documentation</title>
-<meta name="description" content="This module will identify specific entities in the intelligence statement and
-store them in appropriate stores.
-Subprocesses to this module attempt …" />
+<meta name="description" content="This module will identify specific entities …" />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
 <link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
@@ -24,56 +22,75 @@ Subprocesses to this module attempt …" />
 <h1 class="title">Module <code>auto_osint_v.specific_entity_processor</code></h1>
 </header>
 <section id="section-intro">
-<p>This module will identify specific entities in the intelligence statement and
-store them in appropriate stores.
+<p>This module will identify specific entities</p>
+<p>These entities are extracted from the intelligence statement and
+stored in appropriate stores.
 Subprocesses to this module attempt to interrogate some of this information.</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">&#34;&#34;&#34;
-This module will identify specific entities in the intelligence statement and 
-store them in appropriate stores.
+<pre><code class="python">&#34;&#34;&#34;This module will identify specific entities
+
+These entities are extracted from the intelligence statement and
+stored in appropriate stores.
 Subprocesses to this module attempt to interrogate some of this information.
 &#34;&#34;&#34;
 
-# Named Entity Recognition (NER) using NLP
-
 import spacy
-import os
+
 
 # Load the best model trained using Google Colab
-NER = spacy.load(os.getcwd() +
-                 &#34;/NER_training_testing/train/model/model-best-from-colab&#34;)
+NER = spacy.load(&#34;auto_osint_v/NER_training_testing/train/model/model-best-from-colab&#34;)
 
 
 class EntityProcessor:
-    &#34;&#34;&#34;
-    This class provides methods for recognising the individual entities in a statement and storing
+    &#34;&#34;&#34;This class extracts the entities from a given statement
+
+    It provides methods for recognising the individual entities in a statement and storing
     them appropriately.
     &#34;&#34;&#34;
     def __init__(self, read_statement, file_handler_object):
-        &#34;&#34;&#34;
-        Initialises variables to be used in this object.
-        :param read_statement:
+        &#34;&#34;&#34;Initialises variables to be used in this object.
+
+        Args:
+         read_statement: the statement read from a text file
         &#34;&#34;&#34;
         self.statement = read_statement
         self.file_handler = file_handler_object
 
     def store_words_from_label(self):
-        &#34;&#34;&#34;
-        This function stores recognised words in csv files that are relevant to the label given to
+        &#34;&#34;&#34;This function stores recognised words in csv files
+
+        These files are associated with the label given to
         the word.
-        :return: Nothing - stores info in files
+
+        Returns
+         Nothing - stores info in files
         &#34;&#34;&#34;
         # Clean any leftover files from previous runs
         self.file_handler.clean_directory(&#34;data_files/target_info_files&#34;)
         text1 = NER(self.statement)
+
+        # changes added to eliminate duplicates and count number of mentions
+        # define list of words present
+        words_present = {}
+
         for word in text1.ents:
             # prints the entity and its label. e.g., &#34;MARS LOC&#34;
             # print(word.text, &#34;LABEL: &#34;, word.label_)
+            # append the word to the list of words
+            key = word.text
+            # see python EAFP
+            try:
+                words_present[key][1] += 1
+            except KeyError:
+                words_present[key] = [word.label_, 1]
+
+        for text, [label, mentions] in words_present.items():
             # Opens the relevant (based on word label) csv file and store the word text
-            self.file_handler.open_label_file(word.label_, word.text, alias=&#34;&#34;)</code></pre>
+            # and number of mentions.
+            self.file_handler.open_label_file(label, text, mentions=mentions)</code></pre>
 </details>
 </section>
 <section>
@@ -90,41 +107,63 @@ class EntityProcessor:
 <span>(</span><span>read_statement, file_handler_object)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>This class provides methods for recognising the individual entities in a statement and storing
+<div class="desc"><p>This class extracts the entities from a given statement</p>
+<p>It provides methods for recognising the individual entities in a statement and storing
 them appropriately.</p>
-<p>Initialises variables to be used in this object.
-:param read_statement:</p></div>
+<p>Initialises variables to be used in this object.</p>
+<p>Args:
+read_statement: the statement read from a text file</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class EntityProcessor:
-    &#34;&#34;&#34;
-    This class provides methods for recognising the individual entities in a statement and storing
+    &#34;&#34;&#34;This class extracts the entities from a given statement
+
+    It provides methods for recognising the individual entities in a statement and storing
     them appropriately.
     &#34;&#34;&#34;
     def __init__(self, read_statement, file_handler_object):
-        &#34;&#34;&#34;
-        Initialises variables to be used in this object.
-        :param read_statement:
+        &#34;&#34;&#34;Initialises variables to be used in this object.
+
+        Args:
+         read_statement: the statement read from a text file
         &#34;&#34;&#34;
         self.statement = read_statement
         self.file_handler = file_handler_object
 
     def store_words_from_label(self):
-        &#34;&#34;&#34;
-        This function stores recognised words in csv files that are relevant to the label given to
+        &#34;&#34;&#34;This function stores recognised words in csv files
+
+        These files are associated with the label given to
         the word.
-        :return: Nothing - stores info in files
+
+        Returns
+         Nothing - stores info in files
         &#34;&#34;&#34;
         # Clean any leftover files from previous runs
         self.file_handler.clean_directory(&#34;data_files/target_info_files&#34;)
         text1 = NER(self.statement)
+
+        # changes added to eliminate duplicates and count number of mentions
+        # define list of words present
+        words_present = {}
+
         for word in text1.ents:
             # prints the entity and its label. e.g., &#34;MARS LOC&#34;
             # print(word.text, &#34;LABEL: &#34;, word.label_)
+            # append the word to the list of words
+            key = word.text
+            # see python EAFP
+            try:
+                words_present[key][1] += 1
+            except KeyError:
+                words_present[key] = [word.label_, 1]
+
+        for text, [label, mentions] in words_present.items():
             # Opens the relevant (based on word label) csv file and store the word text
-            self.file_handler.open_label_file(word.label_, word.text, alias=&#34;&#34;)</code></pre>
+            # and number of mentions.
+            self.file_handler.open_label_file(label, text, mentions=mentions)</code></pre>
 </details>
 <h3>Methods</h3>
 <dl>
@@ -132,27 +171,47 @@ them appropriately.</p>
 <span>def <span class="ident">store_words_from_label</span></span>(<span>self)</span>
 </code></dt>
 <dd>
-<div class="desc"><p>This function stores recognised words in csv files that are relevant to the label given to
-the word.
-:return: Nothing - stores info in files</p></div>
+<div class="desc"><p>This function stores recognised words in csv files</p>
+<p>These files are associated with the label given to
+the word.</p>
+<p>Returns
+Nothing - stores info in files</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">def store_words_from_label(self):
-    &#34;&#34;&#34;
-    This function stores recognised words in csv files that are relevant to the label given to
+    &#34;&#34;&#34;This function stores recognised words in csv files
+
+    These files are associated with the label given to
     the word.
-    :return: Nothing - stores info in files
+
+    Returns
+     Nothing - stores info in files
     &#34;&#34;&#34;
     # Clean any leftover files from previous runs
     self.file_handler.clean_directory(&#34;data_files/target_info_files&#34;)
     text1 = NER(self.statement)
+
+    # changes added to eliminate duplicates and count number of mentions
+    # define list of words present
+    words_present = {}
+
     for word in text1.ents:
         # prints the entity and its label. e.g., &#34;MARS LOC&#34;
         # print(word.text, &#34;LABEL: &#34;, word.label_)
+        # append the word to the list of words
+        key = word.text
+        # see python EAFP
+        try:
+            words_present[key][1] += 1
+        except KeyError:
+            words_present[key] = [word.label_, 1]
+
+    for text, [label, mentions] in words_present.items():
         # Opens the relevant (based on word label) csv file and store the word text
-        self.file_handler.open_label_file(word.label_, word.text, alias=&#34;&#34;)</code></pre>
+        # and number of mentions.
+        self.file_handler.open_label_file(label, text, mentions=mentions)</code></pre>
 </details>
 </dd>
 </dl>

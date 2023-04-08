@@ -8,3 +8,9 @@ dependencies:
   - spacy-model-en_core_web_sm
   - spacy-transformers
   - filelock
+  - pylint
+  - beautifulsoup4
+  - pip
+  - pip:
+      - -r requirements.txt
+prefix: C:\Users\petec\anaconda3\envs\auto-osint-v-python38

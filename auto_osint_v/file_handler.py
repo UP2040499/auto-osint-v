@@ -1,5 +1,4 @@
-"""
-This module handles all our data files. CSV or TXT.
+"""This module handles all our data files. CSV or TXT.
 """
 
 import csv
@@ -9,25 +8,28 @@ import pandas as pd
 
 
 class FileHandler:
-    """
-    FileHandler class handles anything file related for the whole tool.
+    """FileHandler class handles anything file related for the whole tool.
+
     This can be created as an object once and reused multiple times.
     """
     def __init__(self, data_file):
-        """
-        Initialises the FileHandler object
-        :param data_file: the file path for all data files - likely './data_files/'.
+        """Initialises the FileHandler object
+
+        Args:
+            data_file: the file path for all data files - likely './data_files/'.
         """
         # empty list to hold unique urls present after searching
         self.urls_present = []
         self.data_file_path = data_file
 
     def write_bias_file(self):
-        """
-        Creates and writes to the bias information file.
+        """Creates and writes to the bias information file.
+
         This bias information is only useful for the user if they want to include information that
         the tool cannot use, but may be relevant to their analysis or conclusions.
-        :return: nothing - output to file
+
+        Returns:
+            nothing - output to file
         """
         bias_file_path = str(os.path.join(self.data_file_path, "bias_sources.csv"))
         with open(bias_file_path, "w", encoding="utf-8") as bfile:
@@ -47,10 +49,12 @@ class FileHandler:
             bfile.close()
 
     def write_intel_file(self):
-        """
-        Creates and writes a file for the intelligence statement to be stored in.
+        """Creates and writes a file for the intelligence statement to be stored in.
+
         This opens the file in the text editor for easier statement writing.
-        :return: nothing - output to file
+
+        Returns:
+            nothing - output to file
         """
         intel_file_path = str(os.path.join(self.data_file_path, "intelligence_file.txt"))
         if os.path.isfile(intel_file_path):
@@ -68,10 +72,13 @@ class FileHandler:
             webbrowser.open(intel_file_path)  # edit in chosen text editor
 
     def read_file(self, filename):
-        """
-        Reads the given file. Reads any file, extension is included in filename.
-        :param filename: includes the file extension.
-        :return: the contents of the file
+        """Reads the given file. Reads any file, extension is included in filename.
+
+        Args:
+            filename: includes the file extension.
+
+        Returns:
+            the contents of the file
         """
         file_path = str(os.path.join(self.data_file_path, filename))
         with open(file_path, "r", encoding="utf-8") as file:
@@ -80,9 +87,10 @@ class FileHandler:
             return temp
 
     def get_keywords_from_target_info(self):
-        """
-        Gets all the information that is stored in the 'Info' field in each target info file.
-        :return: All the info stored in /target_info_files/
+        """Gets all the information that is stored in the 'Info' field in each target info file.
+
+        Returns:
+            All the info stored in /target_info_files/
         """
         # List of words that have no meaning without context
         irrelevant_words = ["it", "them", "they", "the", "he", "she"]
@@ -106,29 +114,30 @@ class FileHandler:
 
     @staticmethod
     def clean_directory(directory):
-        """
-        Cleans the given directory. Removes all files inside.
-        :return:
+        """Cleans the given directory. Removes all files inside.
         """
         for file in os.listdir(directory):
             os.remove(os.path.join(directory, file))
 
     def clean_data_file(self, filename):
-        """
-        Removes all data in given file
-        :param filename: name of file, can be path relative to 'data_files' directory
-        :return:
+        """Removes all data in given file
+
+        Args:
+            filename: name of file, can be path relative to 'data_files' directory
         """
         os.remove(os.path.join(self.data_file_path, filename))
 
     @staticmethod
     def write_to_given_csv_file(file_object, to_write):
-        """
-        Writes given text to a given file object.
-        :param to_write: iterable to write to the csv file
-        :param file_object: the file object, created when opening a file (e.g.,
-        "with open(file) as file_object:")
-        :return: Nothing
+        """Writes given text to a given file object.
+
+        Args:
+            to_write: iterable to write to the csv file
+            file_object: the file object, created when opening a file
+                (e.g., "with open(file) as file_object:")
+
+        Returns:
+            Nothing
         """
         try:
             writer = csv.writer(file_object, delimiter=',')
@@ -139,12 +148,11 @@ class FileHandler:
                 from exc
 
     def write_to_txt_file_remove_duplicates(self, file_object, to_write):
-        """
-        Writes the given text to a given file object *and* ensures any duplicates are not written
-        to the file.
-        :param file_object: File object passed from opening the file.
-        :param to_write: The text to write.
-        :return: nothing
+        """Writes the given text and ensures no duplicates are written.
+
+        Args:
+            file_object: File object passed from opening the file.
+            to_write: The text to write.
         """
         # check whether lines are unique
         if to_write not in self.urls_present:
@@ -154,11 +162,15 @@ class FileHandler:
             self.urls_present.append(to_write)
 
     def open_txt_file(self, filename):
-        """
-        Opens a file or creates one if it does not exist, returns the fileIO object.
+        """Opens a file or creates one if it does not exist, returns the fileIO object.
+
         Clean every temp file created here by using clean_directory.
-        :param filename: name of file to open
-        :return: file object
+
+        Args:
+            filename: name of file to open
+
+        Returns:
+            file object
         """
         try:
             return open(os.path.join(self.data_file_path, filename), "a", encoding="utf-8")
@@ -167,16 +179,27 @@ class FileHandler:
 
     @staticmethod
     def close_file(file_object):
+        """Closes a given file.
+
+        Args:
+            file_object: The file object for the file to be closed
+
+        Returns:
+            nothing, just closes a file.
+        """
         file_object.close()
 
     def open_label_file(self, label, text, mentions):
-        """
-        Creates/Opens label file directory and the label file itself
-        :param text: The labelled word
-        :param mentions: The number of times the text has appeared.
-        :param label: This will be the name for the label file. This is the label associated with a
-        word
-        :return: Nothing - output to file
+        """Creates/Opens label file directory and the label file itself.
+
+        Args:
+            text: The labelled word
+            mentions: The number of times the text has appeared.
+            label: This will be the name for the label file. This is the label associated with a
+                word
+
+        Returns:
+            Nothing - output to file
         """
         label_files_directory = self.data_file_path + "target_info_files"
         try:
@@ -201,10 +224,13 @@ class FileHandler:
                 self.write_to_given_csv_file(label_file, to_write)
 
     def open_evidence_file(self, to_write):
-        """
-        Creates/Opens evidence file and writes to it.
-        :type to_write: List of elements to write to file
-        :return: Nothing - output to file
+        """Creates/Opens evidence file and writes to it.
+
+        Args:
+            to_write: List of elements to write to file
+
+        Returns:
+            Nothing - output to file
         """
         evidence_file_path = self.data_file_path + "evidence_file.csv"
         fieldnames = ["evidence type", "info", "extra info", "score", "source link"]
@@ -221,11 +247,15 @@ class FileHandler:
                 self.write_to_given_csv_file(evidence_file, to_write)
 
     def create_potential_corroboration_file(self, sources_list_of_dicts):
-        """
-        Creates the potential corroboration source store.
+        """Creates the potential corroboration source store.
+
         Writes the list of dictionaries to a csv file.
-        :param sources_list_of_dicts: Must be a list of dictionaries ( list[dict[x,y]] )
-        :return: nothing, outputs to file
+
+        Args:
+            sources_list_of_dicts: Must be a list of dictionaries ( list[dict[x,y]] )
+
+        Returns:
+            nothing, outputs to file
         """
         sources_file_path = self.data_file_path + "potential_corroboration.csv"
         try:

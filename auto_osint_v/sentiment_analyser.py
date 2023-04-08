@@ -1,5 +1,5 @@
-"""
-This module's primary role is to analyse the semantics of the intelligence statement.
+"""This module's primary role is to analyse the semantics of the intelligence statement.
+
 This module will likely be reused/modified within source aggregation.
 """
 
@@ -7,18 +7,18 @@ from transformers import pipeline
 
 
 class SemanticAnalyser:
-    """
-    This class provides methods for conducting semantic analysis on a given document.
+    """This class provides methods for conducting semantic analysis on a given document.
+
     This document could be the intelligence statement or a different document.
     """
 
     def __init__(self, read_statement, statement_title, file_handler_object):
-        """
-        Initialises variables to be used in this object.
-        :param read_statement: This is the statement input in main.py and read by
-        FileHandler.read_file()
-        :param statement_title: This is the source title or filename.
-        :param file_handler_object: The file handler object passed to the class for reuse
+        """Initialises variables to be used in this object.
+
+        Args:
+            read_statement: This is the statement input in main.py and read by FileHandler.read_file()
+            statement_title: This is the source title or filename.
+            file_handler_object: The file handler object passed to the class for reuse
         """
         self.statement = read_statement
         self.file_name = statement_title
@@ -29,11 +29,13 @@ class SemanticAnalyser:
                                            model="Souvikcmsa/BERT_sentiment_analysis")
 
     def statement_analyser(self):
-        """
-        This method analyses the intelligence statement.
+        """This method analyses the intelligence statement.
+
         (or it may be used to analyse other statements)
         This code is all from the Hugging Face documentation.
-        :return:
+
+        Returns:
+            Nothing - outputs to file
         """
         classification = self.sentiment_analysis(self.statement)
         # print(classification)
@@ -62,9 +64,10 @@ class SemanticAnalyser:
                                                  )
 
     def headline_analyser(self, headline):
-        """
-        Runs sentiment analysis on a given headline.
-        :return: the sentiment label (positive, negative, neutral) and the confidence score.
+        """Runs sentiment analysis on a given headline.
+
+        Returns:
+            the sentiment label (positive, negative, neutral) and the confidence score.
         """
         headline = headline.strip()
         classification = self.sentiment_analysis(headline)
