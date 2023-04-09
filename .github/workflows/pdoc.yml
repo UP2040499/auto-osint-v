@@ -25,7 +25,10 @@ jobs:
           environment-file: environment.yml
           auto-activate-base: false
       # ADJUST THIS: install all dependencies (including pdoc)
-      - run: pip install pdoc
+      - name: Install dependencies
+        run: |
+          pip install pdoc
+          pip install pandas
       # ADJUST THIS: build your documentation into docs/.
       # We use a custom build script for pdoc itself, ideally you just run `pdoc -o docs/ ...` here.
       - run: python -m pdoc auto_osint_v -o docs/
