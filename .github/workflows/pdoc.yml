@@ -19,10 +19,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
+      - uses: conda-incubator/setup-miniconda@v2
         with:
-          python-version: '3.8'
-
+          activate-environment: auto-osint-v-python38
+          environment-file: environment.yml
+          auto-activate-base: false
       # ADJUST THIS: install all dependencies (including pdoc)
       - run: pip install pdoc
       # ADJUST THIS: build your documentation into docs/.
