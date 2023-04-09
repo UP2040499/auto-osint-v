@@ -1,0 +1,52 @@
+name: Pylint and Deploy Documentation
+
+on: 
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -l {0}
+    strategy:
+      matrix:
+        python-version: ["3.8"]
+    steps:
+    - uses: actions/checkout@v3
+    - uses: conda-incubator/setup-miniconda@v2
+      with:
+        activate-environment: auto-osint-v-python38
+        environment-file: environment.yml
+        auto-activate-base: false
+    - name: Install dependencies
+      run: |
+        conda install pylint
+        pip install pdoc
+        pip install pandas
+    - name: Analysing the code with pylint
+      run: |
+        pylint --fail-under 8 $(git ls-files '*.py')
+    - name: Creating Docs and Upload to gh pages
+      run: python -m pdoc auto_osint_v -o docs/
+
+    - uses: actions/upload-pages-artifact@v1
+      with:
+        path: docs/
+
+  # Deploy the artifact to GitHub pages.
+  # This is a separate job so that only actions/deploy-pages has the necessary permissions.
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v2
