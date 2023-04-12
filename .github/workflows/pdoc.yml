@@ -18,21 +18,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: conda-incubator/setup-miniconda@v2
-        with:
-          activate-environment: auto-osint-v-python38
-          environment-file: environment.yml
-          auto-activate-base: false
-      # ADJUST THIS: install all dependencies (including pdoc)
-      - name: Install dependencies
-        run: |
-          pip install pdoc
-          pip install pandas
-      # ADJUST THIS: build your documentation into docs/.
-      # We use a custom build script for pdoc itself, ideally you just run `pdoc -o docs/ ...` here.
-      - run: python -m pdoc auto_osint_v -o docs/
-
       - uses: actions/upload-pages-artifact@v1
         with:
           path: docs/
