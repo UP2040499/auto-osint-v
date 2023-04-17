@@ -16,7 +16,6 @@ jobs:
         python-version: ["3.8"]
     steps:
     - uses: actions/checkout@v3
-    - uses: actions/upload-pages-artifact@v1
     - uses: conda-incubator/setup-miniconda@v2
       with:
         activate-environment: auto-osint-v-python38
@@ -30,7 +29,8 @@ jobs:
     - name: Analysing the code with pylint
       run: |
         pylint --fail-under 8 $(git ls-files '*.py')
-    - uses: actions/upload-pages-artifact@v1
+    - name: Uploading Docs
+      uses: actions/upload-pages-artifact@v1
       with:
         path: docs/auto_osint_v
 
