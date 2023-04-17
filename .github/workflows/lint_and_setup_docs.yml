@@ -29,9 +29,7 @@ jobs:
     - name: Analysing the code with pylint
       run: |
         pylint --fail-under 8 $(git ls-files '*.py')
-    - name: Creating Docs and Upload to gh pages
-      run: python -m pdoc auto_osint_v -o docs/
-
+    - name: Upload Documentation
     - uses: actions/upload-pages-artifact@v1
       with:
         path: docs/auto_osint_v
