@@ -28,8 +28,8 @@ def input_intelligence():
 def input_bias_sources():
     """This function will create a csv file for the bias sources to be stored in.
     """
-    print("Enter a Bias Source")
-    print("You will now be asked to enter any sources you believe are important to compare to.")
+    print("Enter a source for your intelligence statement")
+    print("Your source can be of any form.")
     print("This allows other sources of intelligence"
           "(such as closed or classified sources) to be compared.")
     option = str(input("Press ENTER to continue or press 'X' to skip this step. >>> "))

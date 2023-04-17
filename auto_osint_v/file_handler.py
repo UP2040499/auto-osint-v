@@ -33,17 +33,18 @@ class FileHandler:
         """
         bias_file_path = str(os.path.join(self.data_file_path, "bias_sources.csv"))
         with open(bias_file_path, "w", encoding="utf-8") as bfile:
-            fieldnames = ['Type', 'Key_Info']
+            fieldnames = ['Type/Link', 'Key_Info']
             writer = csv.DictWriter(bfile, fieldnames)
             # enter source type and key information
             writer.writeheader()
             option = ""
             while option not in {"x", "X"}:
-                source_type = str(input("Enter the source/intelligence type, "
-                                        "for example HUMINT, SIGINT, etc.\n>>> "))
+                source_type = str(input("If a closed/classified source, please enter the source "
+                                        "type (HUMINT, SIGINT, etc.)"
+                                        "If it is an open source, please enter the URL.\n>>> "))
                 key_info = str(input("Enter the key information proffered "
                                      "from this source/intelligence\n>>> "))
-                writer.writerow({"Type": source_type, "Key_Info": key_info})
+                writer.writerow({"Type/Link": source_type, "Key_Info": key_info})
                 option = str(input("Enter 'X' to finish entering sources. "
                                    "Press ENTER to add another source>>> "))
             bfile.close()
