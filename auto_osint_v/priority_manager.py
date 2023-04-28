@@ -39,7 +39,7 @@ class PriorityManager:
                 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) '
                 'Chrome/112.0.0.0 Safari/537.36'}
         # request the webpage
-        response = requests.get(url, headers)
+        response = requests.get(url, headers, timeout=5)
         # check if we are wasting our time with a broken or inaccessible website
         try:
             response.raise_for_status()
@@ -77,8 +77,8 @@ class PriorityManager:
         entities = self.file_handler.get_keywords_from_target_info()
 
         # Count number of appearances in each source
-        for i, source in enumerate(tqdm(sources, desc="Counting target entity appearances in "
-                                                      "sources")):
+        for source in tqdm(sources, desc="Counting target entity appearances in "
+                                                      "sources"):
             # get the text from the source
             text = self.get_text_from_site(source["url"])
             # assign score based on entity appearance count

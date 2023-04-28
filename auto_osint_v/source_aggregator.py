@@ -315,30 +315,3 @@ class SourceAggregator:
         except KeyError:
             iframes = []
         return images, videos, iframes
-
-    # Key information generator (likely using a BERT QA model)
-    # need to keep in mind the resource cost of processing, given time and resource costs are
-    # already high.
-
-    # discarded for now as processing cost is too high, causes each URL lookup to take over a minute
-    # *per url*, therefore these methods cannot be included in their current state.
-    """
-    @staticmethod
-    def url_get_text(url):
-        page = requests.get(url, timeout=10)
-        soup = BeautifulSoup(page.content, "html.parser")
-        return soup.get_text(strip=True)
-
-    def web_summary(self, url):
-        text = self.url_get_text(url)
-        tokenizer = AutoTokenizer.from_pretrained("google/pegasus-large")
-        model = AutoModelForSeq2SeqLM.from_pretrained("google/pegasus-large")
-
-        inputs = tokenizer(text, truncation=True, return_tensors="pt")
-
-        # Generate summary
-        summary_ids = model.generate(inputs["input_ids"], max_new_tokens=1024)
-        summary = tokenizer.batch_decode(summary_ids, skip_special_tokens=True,
-                                         clean_up_tokenization_spaces=False)[0]
-        return summary
-        """

@@ -8,10 +8,11 @@ from auto_osint_v.priority_manager import PriorityManager
 
 
 class TestPriorityManager(TestCase):
+    """Unit test for the PriorityManager class"""
     def test_target_info_scorer(self):
+        """Unit test for the target_info_scorer method"""
         fh_object = FileHandler(
-            "C:\\Users\\petec\\OneDrive\\Documents\\UniWork\\Year3\\FYP\\auto-osint-v"
-            "\\auto_osint_v\\data_files\\")
+            "..\\auto_osint_v\\data_files\\")
         pm_object = PriorityManager(fh_object)
         frame = pd.read_csv(os.getcwd() +
                             "/potential_corroboration_example.csv",
