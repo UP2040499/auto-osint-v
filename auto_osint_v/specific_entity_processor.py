@@ -5,9 +5,7 @@ stored in appropriate stores.
 Subprocesses to this module attempt to interrogate some of this information.
 """
 import os
-
 import spacy
-
 
 # Load the best model trained using Google Colab
 NER = spacy.load(os.getcwd() + "/NER_training_testing/train/model/model-best-from-colab")

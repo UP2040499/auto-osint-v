@@ -149,7 +149,7 @@ class SourceAggregator:
         # Join the list of keywords/phrases into one string seperated by '|' and surrounded by ""
         # it appears that the max number of comparisons is between 7 and 10.
         # google documentation says it should be 10
-        join_keywords = '|'.join(f'"{word}"' for word in self.keywords)
+        # join_keywords = '|'.join(f'"{word}"' for word in self.keywords)
         # Loop through list of social media sites
         for site in tqdm(social_media_sites, desc="Searching Social Media Sites"):
             # this for loop is clearly inefficient, I don't know how to improve it

@@ -1,27 +1,24 @@
+"""Finds entities (information) that is popular amongst the potentially corroborating sources.
 """
-Finds entities (information) that is popular amongst the potentially corroborating sources.
-"""
-import requests
 import itertools
+import requests
 from bs4 import BeautifulSoup
 from tqdm import tqdm
 
 
 class PopularInformationFinder:
-    """
+    """Finds the popular information amongst given sources
+
     Class that provides methods that get text from sources and compares the number of times a
     particular entity is mentioned.
     """
 
     def __init__(self, file_handler_object, entity_processor_object):
-        """
+        """Initialises the PopularInformationFinder object.
 
         Args:
             file_handler_object: gives the class access to the file_handler object.
             entity_processor_object: gives the class access to the entity_processor object.
-
-        Returns:
-
         """
         self.file_handler = file_handler_object
         self.entity_processor = entity_processor_object
@@ -45,7 +42,7 @@ class PopularInformationFinder:
                 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) '
                 'Chrome/112.0.0.0 Safari/537.36'}
         # request the webpage
-        response = requests.get(url, headers)
+        response = requests.get(url, headers, timeout=5)
         # check if we are wasting our time with a broken or inaccessible website
         try:
             response.raise_for_status()
@@ -95,7 +92,7 @@ class PopularInformationFinder:
         """
         entities = {}
 
-        for i, source in enumerate(tqdm(sources, desc="Getting text and finding entities")):
+        for source in tqdm(sources, desc="Getting text and finding entities"):
             # get the text from each source and find the entities
             entities = self.get_text_process_entities(source["url"], entities)
 

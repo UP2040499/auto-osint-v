@@ -2,7 +2,6 @@
 
 Run this file to run the tool.
 """
-import asyncio
 import os
 import sys
 from auto_osint_v.specific_entity_processor import EntityProcessor
