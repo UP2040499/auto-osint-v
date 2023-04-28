@@ -94,7 +94,8 @@ class FileHandler:
             All the info stored in /target_info_files/
         """
         # List of words that have no meaning without context
-        irrelevant_words = ["it", "them", "they", "the", "he", "she"]
+        irrelevant_words = ["it", "them", "they", "the", "he", "she", "his", "her", "we", "i",
+                            "us", "me", "my", "here", "our"]
         # the directory to find the target info files
         target_files_dir = os.path.join(self.data_file_path, "target_info_files/")
         # list target info files
@@ -107,9 +108,10 @@ class FileHandler:
             frame = pd.read_csv(filepath, index_col=False)
             # appends every entry in the 'info' column to the 'info_all' list unless
             # it is irrelevant
-            value = frame["Info"].values.tolist()
-            if value not in irrelevant_words:
-                info_all.extend(value)
+            values = frame["Info"].values.tolist()
+            info_all.extend(values)
+        # remove irrelevant words
+        info_all = [word for word in info_all if word not in irrelevant_words]
         # return list after each file has been examined
         return info_all
 
