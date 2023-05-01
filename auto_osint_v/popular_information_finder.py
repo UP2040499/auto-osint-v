@@ -41,8 +41,11 @@ class PopularInformationFinder:
             'User-Agent':
                 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) '
                 'Chrome/112.0.0.0 Safari/537.36'}
-        # request the webpage
-        response = requests.get(url, headers, timeout=5)
+        # request the webpage. If source website timeout, return the current list of entities.
+        try:
+            response = requests.get(url, headers, timeout=5)
+        except requests.exceptions.ReadTimeout:
+            return entities
         # check if we are wasting our time with a broken or inaccessible website
         try:
             response.raise_for_status()
