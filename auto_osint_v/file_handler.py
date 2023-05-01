@@ -70,7 +70,7 @@ class FileHandler:
                                  "- Be sure to save the file before continuing.")
             fout.write(statement_help)
             fout.close()
-            webbrowser.open(intel_file_path)  # edit in chosen text editor
+            webbrowser.open(intel_file_path)  # edit in default text editor
 
     def read_file(self, filename):
         """Reads the given file. Reads any file, extension is included in filename.
