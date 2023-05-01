@@ -38,8 +38,11 @@ class PriorityManager:
             'User-Agent':
                 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) '
                 'Chrome/112.0.0.0 Safari/537.36'}
-        # request the webpage
-        response = requests.get(url, headers, timeout=5)
+        # request the webpage - if timeout, move on to next source
+        try:
+            response = requests.get(url, headers, timeout=5)
+        except requests.exceptions.ReadTimeout:
+            return text
         # check if we are wasting our time with a broken or inaccessible website
         try:
             response.raise_for_status()
@@ -78,11 +81,11 @@ class PriorityManager:
 
         # Count number of appearances in each source
         for source in tqdm(sources, desc="Counting target entity appearances in "
-                                                      "sources"):
+                                         "sources"):
             # get the text from the source
             text = self.get_text_from_site(source["url"])
             # assign score based on entity appearance count
-            score = self.count_entities(entities, text)*self.target_entity_multiplier
+            score = self.count_entities(entities, text) * self.target_entity_multiplier
             # save score to the source dictionary
             source["target_entity_score"] = score
         # Return the updated 'sources' list of dictionaries
