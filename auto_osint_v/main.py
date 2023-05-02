@@ -9,6 +9,7 @@ from auto_osint_v.file_handler import FileHandler
 from auto_osint_v.sentiment_analyser import SemanticAnalyser
 from auto_osint_v.source_aggregator import SourceAggregator
 from auto_osint_v.popular_information_finder import PopularInformationFinder
+from auto_osint_v.priority_manager import PriorityManager
 
 data_file_path = os.getcwd() + "/data_files/"
 sys.path.append(
@@ -67,8 +68,8 @@ if __name__ == '__main__':
     # Searches google and social media sites using the queries stored in source_aggregator object
     # search results will be stored in a dictionary in the source_aggregator Object.
     potential_sources = source_aggregator.find_sources()
-    # Popular information finder - using potential_corroboration.csv
-    popular_information_finder = PopularInformationFinder(file_handler, process_entities)
+    # Initialise the Priority Manager
+    priority_manager = PriorityManager(file_handler, sources_list)
 
     # get the popular information - this is a costly search (on 170 sources it takes ~15 minutes).
     print(popular_information_finder.find_entities(potential_sources))

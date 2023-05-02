@@ -10,16 +10,31 @@ class PriorityManager:
     """Provides methods for assigning source scores based on relevancy to the user's statement.
     """
 
-    def __init__(self, fh_object):
+    def __init__(self, fh_object, potential_corroboration):
         """Initialises the PriorityManager object.
 
         Args:
             fh_object: file handler object to use for extracting info from data files.
+            potential_corroboration: list of dictionaries of source information.
         """
-        self.target_entity_multiplier = 10
+        self._target_entity_multiplier = 10  # multiplier for mentions of target info
+        self._popular_entity_multiplier = 5  # multiplier for mentions of popular info
         self.file_handler = fh_object
+        self.sources = potential_corroboration
 
-    def get_text_from_site(self, url):
+    def manager(self):
+        self.target_info_scorer()  # generates a score for each source
+        # remove sources with 0 score (or could remove bottom x% of sources)
+        # file_handler method
+
+        # generate a popular info score for each source
+        self.popular_info_scorer()
+        # sort sources by score in descending order
+
+        # return scored sources list(dict)
+
+    @staticmethod
+    def get_text_from_site(url):
         """Gets the body text from each source using its URL.
 
         Uses requests and BeautifulSoup to retrieve and parse the webpage's HTML into a readable
@@ -63,35 +78,51 @@ class PriorityManager:
         chunks = (phrase.strip() for line in lines for phrase in line.split("  "))
         # drop blank lines
         text = '\n'.join(chunk for chunk in chunks if chunk)
-
+        # return string text formatted and with line breaks
         return text
 
-    def target_info_scorer(self, sources):
+    def target_info_scorer(self):
         """Assigns scores based on the amount of target entities identified.
 
-        Args:
-            sources: list of dictionaries of potential corroboration
-
-        Returns:
-            Returns the sources list of dictionaries, with an additional
-            'target_entity_count' key-value pair.
+        Updates the 'self.sources' public variable
         """
         # Gather saved target entities
         entities = self.file_handler.get_keywords_from_target_info()
 
         # Count number of appearances in each source
-        for source in tqdm(sources, desc="Counting target entity appearances in "
-                                         "sources"):
+        for source in tqdm(self.sources, desc="Counting target entity appearances in "
+                                              "sources"):
             # get the text from the source
             text = self.get_text_from_site(source["url"])
             # assign score based on entity appearance count
-            score = self.count_entities(entities, text) * self.target_entity_multiplier
-            # save score to the source dictionary
-            source["target_entity_score"] = score
-        # Return the updated 'sources' list of dictionaries
-        return sources
+            score = self.count_entities(entities, text) * self._target_entity_multiplier
+            # adds score to the source dictionary
+            try:
+                source["score"] += score
+            except KeyError:
+                source["score"] = score
+        # Updated 'self.sources' list of dictionaries
 
-    def count_entities(self, entities, source_text):
+    def popular_info_scorer(self):
+        """Assigns scores to each source based on the amount of popular entities identified"""
+        # Gather popular entities
+        entities = []  # popular entity finder
+        # Count number of appearances in each source
+        for source in tqdm(self.sources, desc="Counting popular entity appearances in "
+                                              "sources"):
+            # get the text from the source
+            text = self.get_text_from_site(source["url"])
+            # assign score based on entity appearance count
+            score = self.count_entities(entities, text) * self._popular_entity_multiplier
+            # adds score to the source dictionary
+            try:
+                source["score"] += score
+            except KeyError:
+                source["score"] = score
+        # Updated 'self.sources' list of dictionaries
+
+    @staticmethod
+    def count_entities(entities, source_text):
         """Counts the number of entities appearing in a given source.
 
         Args:
