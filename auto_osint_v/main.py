@@ -2,13 +2,13 @@
 
 Run this file to run the tool.
 """
-
 import os
 import sys
 from auto_osint_v.specific_entity_processor import EntityProcessor
 from auto_osint_v.file_handler import FileHandler
 from auto_osint_v.sentiment_analyser import SemanticAnalyser
 from auto_osint_v.source_aggregator import SourceAggregator
+from auto_osint_v.popular_information_finder import PopularInformationFinder
 
 data_file_path = os.getcwd() + "/data_files/"
 sys.path.append(
@@ -49,8 +49,8 @@ if __name__ == '__main__':
     intel_file = file_handler.read_file("intelligence_file.txt")
     # Entity Processor - identifies specific entities mentioned in intel statement
     print("Processing entities...")
-    process_entities = EntityProcessor(intel_file, file_handler)
-    process_entities.store_words_from_label()
+    process_entities = EntityProcessor(file_handler)
+    process_entities.store_words_from_label(intel_file)
 
     # Clean evidence_file.csv
     file_handler.clean_data_file(data_file_path + "evidence_file.csv")
@@ -66,4 +66,9 @@ if __name__ == '__main__':
     source_aggregator.search_query_generator()
     # Searches google and social media sites using the queries stored in source_aggregator object
     # search results will be stored in a dictionary in the source_aggregator Object.
-    source_aggregator.find_sources()
+    potential_sources = source_aggregator.find_sources()
+    # Popular information finder - using potential_corroboration.csv
+    popular_information_finder = PopularInformationFinder(file_handler, process_entities)
+
+    # get the popular information - this is a costly search (on 170 sources it takes ~15 minutes).
+    print(popular_information_finder.find_entities(potential_sources))
