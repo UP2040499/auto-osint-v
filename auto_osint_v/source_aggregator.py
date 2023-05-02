@@ -229,8 +229,8 @@ class SourceAggregator:
     def find_sources(self):
         """Runs the various search operations.
 
-        Note: keep the number of queries to a minimum in order to avoid getting IP blocked by google
-        for too many requests.
+        Returns:
+            results in the form of a list of dictionaries
         """
         # in both methods reduce number of queries
         self.google_search()

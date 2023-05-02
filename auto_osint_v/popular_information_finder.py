@@ -106,8 +106,8 @@ class PopularInformationFinder:
         sorted_entities = sorted(entities.items(), key=lambda x: x[1], reverse=True)
         # keep top 2.5% of words - this is an arbitrary value, not sure what value is best.
         # using itertools to slice the dictionary
-        cut_off_value = int(len(sorted_entities) * 0.025)
-        sorted_entities = itertools.islice(sorted_entities, cut_off_value)
+        cut_off_index = int(len(sorted_entities) * 0.025)
+        sorted_entities = itertools.islice(sorted_entities, cut_off_index)
         # return the list of words
         sorted_entities_words = list(word for (word, count) in sorted_entities)
 
