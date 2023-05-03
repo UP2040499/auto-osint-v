@@ -100,6 +100,7 @@ class PopularInformationFinder:
             # get the text from each source and find the entities
             #entities = self.get_text_process_entities(source["url"])
         with multiprocessing.Pool() as p:
+            sources = tqdm(sources)  # add a progress bar
             entities_retrieved = list(p.map(self.get_text_process_entities, sources))
         # entities = dict(map(self.get_text_process_entities, sources, entities))
 
