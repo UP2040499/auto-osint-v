@@ -8,7 +8,11 @@ import os
 import spacy
 
 # Load the best model trained using Google Colab
-NER = spacy.load(os.getcwd() + "/NER_training_testing/train/model/model-best-from-colab")
+try:
+    NER = spacy.load(os.getcwd() + "/NER_training_testing/train/model/model-best-from-colab")
+except OSError:
+    os.chdir("../auto_osint_v/")
+    NER = spacy.load("NER_training_testing/train/model/model-best-from-colab")
 NER.add_pipe('sentencizer')
 
 
@@ -25,7 +29,7 @@ class EntityProcessor:
          file_handler_object: the file handler to be used for file IO operations
         """
         self.file_handler = file_handler_object
-        self.irrelevant_words = ["it", "them", "they", "the", "he", "she", "his", "her" "we", "i",
+        self.irrelevant_words = ["it", "them", "they", "the", "he", "she", "his", "her", "we", "i",
                                  "us", "me", "my", "here", "our"]
 
     def store_words_from_label(self, read_statement):
@@ -77,9 +81,9 @@ class EntityProcessor:
             entity_dict modified with new entries.
         """
         texts_length = len(text)
-
-        # split the text by factors of 100,000
-        split_text = [text[i:i + 100000] for i in range(0, len(text), 100000)]
+        print(texts_length)
+        # split the text by factors of 50,000
+        split_text = [text[i:i + 50000] for i in range(0, len(text), 50000)]
         entity_dict = self.add_entities_to_dict(entity_dict, split_text)
 
         return entity_dict

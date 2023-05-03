@@ -69,7 +69,7 @@ if __name__ == '__main__':
     # search results will be stored in a dictionary in the source_aggregator Object.
     potential_sources = source_aggregator.find_sources()
     # Initialise the Priority Manager
-    priority_manager = PriorityManager(file_handler, sources_list)
+    priority_manager = PriorityManager(file_handler, potential_sources)
 
     # get the popular information - this is a costly search (on 170 sources it takes ~15 minutes).
-    print(popular_information_finder.find_entities(potential_sources))
+    # print(popular_information_finder.find_entities(potential_sources))

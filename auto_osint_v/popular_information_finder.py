@@ -1,6 +1,7 @@
 """Finds entities (information) that is popular amongst the potentially corroborating sources.
 """
 import itertools
+import multiprocessing
 import requests
 from bs4 import BeautifulSoup
 from tqdm import tqdm
@@ -20,22 +21,23 @@ class PopularInformationFinder:
             file_handler_object: gives the class access to the file_handler object.
             entity_processor_object: gives the class access to the entity_processor object.
         """
+        self.entities = {}
         self.file_handler = file_handler_object
         self.entity_processor = entity_processor_object
 
-    def get_text_process_entities(self, url, entities):
+    def get_text_process_entities(self, source):
         """Gets the body text from each source using its URL.
 
         Uses requests and BeautifulSoup to retrieve and parse the webpage's HTML into a readable
         format for entity recognition.
 
-        Args:
-            entities: the dictionary of entities.
-            url: url fetched from sources dictionary.
+        This method updates the 'self.sources' dictionary.
 
-        Returns:
-            The content of the webpage in UTF-8 format.
+        Args:
+            source: the individual source from the dictionary of sources.
         """
+        # define the url
+        url = source["url"]
         # set headers to try to avoid 403 errors
         headers = {
             'User-Agent':
@@ -45,12 +47,12 @@ class PopularInformationFinder:
         try:
             response = requests.get(url, headers, timeout=5)
         except requests.exceptions.ReadTimeout:
-            return entities
+            return -1
         # check if we are wasting our time with a broken or inaccessible website
         try:
             response.raise_for_status()
         except requests.HTTPError:
-            return entities
+            return -1
         # get the html from the response
         html = response.text
         # parse HTML using BeautifulSoup
@@ -73,10 +75,9 @@ class PopularInformationFinder:
 
         if len(text) <= 100000:
             # run the text through the entity processor. stores entities in namesake variable
-            entities = self.entity_processor.get_entities_and_count(text, entities)
-        # else print/save source that has been skipped
-
-        return entities
+            self.entities = self.entity_processor.get_entities_and_count(text, self.entities)
+        # else print source that has been skipped
+        return 1
 
     def find_entities(self, sources):
         """Finds entities in the given text.
@@ -93,17 +94,18 @@ class PopularInformationFinder:
         Returns:
             A list of the most popular words amongst all the sources.
         """
-        entities = {}
+        self.entities = {}
 
-        for source in tqdm(sources, desc="Getting text and finding entities"):
+        #for source in tqdm(sources, desc="Getting text and finding entities"):
             # get the text from each source and find the entities
-            entities = self.get_text_process_entities(source["url"], entities)
-
+            #entities = self.get_text_process_entities(source["url"])
+        with multiprocessing.Pool() as p:
+            entities_retrieved = list(p.map(self.get_text_process_entities, sources))
         # entities = dict(map(self.get_text_process_entities, sources, entities))
 
-        # sort dictionary by highest no. of mentions.
+        # sort list of dictionaries by highest no. of mentions.
         # lambda function specifies sorted to use the values of the dictionary in desc. order
-        sorted_entities = sorted(entities.items(), key=lambda x: x[1], reverse=True)
+        sorted_entities = sorted(self.entities.items(), key=lambda x: x[1], reverse=True)
         # keep top 2.5% of words - this is an arbitrary value, not sure what value is best.
         # using itertools to slice the dictionary
         cut_off_index = int(len(sorted_entities) * 0.025)
