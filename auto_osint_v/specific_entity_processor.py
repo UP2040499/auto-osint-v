@@ -81,14 +81,23 @@ class EntityProcessor:
             entity_dict modified with new entries.
         """
         texts_length = len(text)
-        print(texts_length)
+
         # split the text by factors of 50,000 to reduce memory load
         split_text = [text[i:i + 50000] for i in range(0, len(text), 50000)]
         entity_dict = self.add_entities_to_dict(entity_dict, split_text)
 
-        return entity_dict
+        return list(entity_dict.items())
 
     def add_entities_to_dict(self, entity_dict, texts):
+        """Uses the NER.pipe to add entities to a given dictionary.
+
+        Args:
+            entity_dict: the given dictionary to add entities to.
+            texts: list of texts to process
+
+        Returns:
+            entity_dict, the given dictionary with added entities.
+        """
         words_present = []
         # just add entities to dictionary as each key needs to be unique.
         for doc in NER.pipe(texts):

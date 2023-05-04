@@ -1,10 +1,13 @@
 """This module assigns scores to each source, prioritising the most relevant sources.
 """
+import inspect
 
 import requests
 import multiprocessing
 from tqdm import tqdm
 from bs4 import BeautifulSoup
+from typing import List
+
 from auto_osint_v.popular_information_finder import PopularInformationFinder
 
 
@@ -12,7 +15,7 @@ class PriorityManager:
     """Provides methods for assigning source scores based on relevancy to the user's statement.
     """
 
-    def __init__(self, fh_object, entity_processor_object, potential_corroboration):
+    def __init__(self, fh_object, entity_processor_object, potential_corroboration: List[dict]):
         """Initialises the PriorityManager object.
 
         Args:
@@ -22,6 +25,7 @@ class PriorityManager:
         """
         self._target_entity_multiplier = 10  # multiplier for mentions of target info
         self._popular_entity_multiplier = 5  # multiplier for mentions of popular info
+        self._entities = []
         self.file_handler = fh_object
         self.entity_processor = entity_processor_object
         self.sources = potential_corroboration
@@ -93,45 +97,56 @@ class PriorityManager:
     def target_info_scorer(self):
         """Assigns scores based on the amount of target entities identified.
 
-        Updates the 'self.sources' public variable
+        Updates the 'self.sources' list of dicts
         """
         # Gather saved target entities
-        entities = self.file_handler.get_keywords_from_target_info()
+        self._entities = self.file_handler.get_keywords_from_target_info()
 
         # Count number of appearances in each source
-        for source in tqdm(self.sources, desc="Counting target entity appearances in "
-                                              "sources"):
-            # get the text from the source
-            text = self.get_text_from_site(source["url"])
-            # assign score based on entity appearance count
-            score = self.count_entities(entities, text) * self._target_entity_multiplier
-            # adds score to the source dictionary
-            try:
-                source["score"] += score
-            except KeyError:
-                source["score"] = score
+        # for source in tqdm(self.sources, desc="Counting target entity appearances in "
+        #                                      "sources"):
+        with multiprocessing.Pool() as p:
+            # temp = tqdm(self.sources)
+            self.sources = list(tqdm(p.imap(self.get_text_assign_score, self.sources),
+                                     total=len(self.sources)))
         # Updated 'self.sources' list of dictionaries
 
     def popular_info_scorer(self):
-        """Assigns scores to each source based on the amount of popular entities identified"""
+        """Assigns scores to each source based on the amount of popular entities identified
+
+        Updates the 'self.sources' list of dicts.
+        """
         # initialise popular info finder object
         popular_ent_finder = PopularInformationFinder(self.file_handler, self.entity_processor)
         # Gather popular entities
-        entities = popular_ent_finder.find_entities(self.sources)
+        self._entities = popular_ent_finder.find_entities(self.sources)
         # Count number of appearances in each source
-        #for source in tqdm(self.sources, desc="Counting popular entity appearances in "
+        # for source in tqdm(self.sources, desc="Counting popular entity appearances in "
         #                                      "sources"):
         #    self.get_text_assign_score(entities, source)
         # new approach using multiprocessing map function
         with multiprocessing.Pool() as p:
-            self.sources = list(p.map(self.get_text_assign_score, entities, self.sources))
+            # temp = tqdm(self.sources)
+            self.sources = list(tqdm(p.imap(self.get_text_assign_score, self.sources),
+                                     total=len(self.sources)))
         # Updated 'self.sources' list of dictionaries
 
-    def get_text_assign_score(self, entities, source):
+    def get_text_assign_score(self, source):
+        """Gets the text from the source URL and examines it to count the number of entities.
+
+        Args:
+            source: the individual source dictionary of information.
+        """
         # get the text from the source
         text = self.get_text_from_site(source["url"])
         # assign score based on entity appearance count
-        score = self.count_entities(entities, text) * self._popular_entity_multiplier
+        # use different multiplier depending on which method has called 'get_text_assign_score()'
+        if inspect.stack()[1].function == "target_info_scorer()":
+            score = self.count_entities(self._entities, text) * self._target_entity_multiplier
+        elif inspect.stack()[1].function == "popular_info_scorer()":
+            score = self.count_entities(self._entities, text) * self._popular_entity_multiplier
+        else:
+            score = 0
         # adds score to the source dictionary
         try:
             source["score"] += score
@@ -166,4 +181,4 @@ class PriorityManager:
         """Sorts the 'self.sources' list of dicts in descending order based on score."""
         # sort sources list of dictionaries by highest score.
         # lambda function specifies sorted to use the values of the dictionary in desc. order
-        self.sources = sorted(self.sources.items(), key=lambda x: x["score"], reverse=True)
+        self.sources.sort(key=lambda x: x["score"], reverse=True)

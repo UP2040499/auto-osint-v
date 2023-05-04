@@ -35,7 +35,13 @@ class PopularInformationFinder:
 
         Args:
             source: the individual source from the dictionary of sources.
+
+        Returns:
+            A list of key-value pairs (tuples).
+            Note: key-value pairs are required for the map function to construct a dictionary from.
         """
+        # define entities variable
+        entities = []
         # define the url
         url = source["url"]
         # set headers to try to avoid 403 errors
@@ -47,12 +53,12 @@ class PopularInformationFinder:
         try:
             response = requests.get(url, headers, timeout=5)
         except requests.exceptions.ReadTimeout:
-            return -1
+            return entities
         # check if we are wasting our time with a broken or inaccessible website
         try:
             response.raise_for_status()
         except requests.HTTPError:
-            return -1
+            return entities
         # get the html from the response
         html = response.text
         # parse HTML using BeautifulSoup
@@ -75,9 +81,9 @@ class PopularInformationFinder:
 
         if len(text) <= 100000:
             # run the text through the entity processor. stores entities in namesake variable
-            self.entities = self.entity_processor.get_entities_and_count(text, self.entities)
-        # else print source that has been skipped
-        return 1
+            entities = self.entity_processor.get_entities_and_count(text, self.entities)
+
+        return entities
 
     def find_entities(self, sources):
         """Finds entities in the given text.
@@ -94,21 +100,22 @@ class PopularInformationFinder:
         Returns:
             A list of the most popular words amongst all the sources.
         """
-        self.entities = {}
-
         #for source in tqdm(sources, desc="Getting text and finding entities"):
             # get the text from each source and find the entities
             #entities = self.get_text_process_entities(source["url"])
-        with multiprocessing.Pool() as p:
-            sources = tqdm(sources)  # add a progress bar
-            entities_retrieved = list(p.map(self.get_text_process_entities, sources))
+        with multiprocessing.Manager() as manager:
+            self.entities = manager.dict()
+            with multiprocessing.Pool() as p:
+                sources = tqdm(sources)  # add a progress bar
+                tmp = p.map(self.get_text_process_entities, sources)
+                flattened_non_empty = [tpl for sublist in tmp for tpl in sublist if tpl]
+                self.entities = dict(flattened_non_empty)
         # entities = dict(map(self.get_text_process_entities, sources, entities))
 
         # sort list of dictionaries by highest no. of mentions.
         # lambda function specifies sorted to use the values of the dictionary in desc. order
         sorted_entities = sorted(self.entities.items(), key=lambda x: x[1], reverse=True)
         # keep top 2.5% of words - this is an arbitrary value, not sure what value is best.
-        # using itertools to slice the dictionary
         cut_off_index = int(len(sorted_entities) * 0.025)
         sorted_entities = itertools.islice(sorted_entities, cut_off_index)
         # return the list of words
