@@ -115,10 +115,12 @@ class PopularInformationFinder:
         # sort list of dictionaries by highest no. of mentions.
         # lambda function specifies sorted to use the values of the dictionary in desc. order
         sorted_entities = sorted(self.entities.items(), key=lambda x: x[1], reverse=True)
-        # keep top 2.5% of words - this is an arbitrary value, not sure what value is best.
-        cut_off_index = int(len(sorted_entities) * 0.025)
+        # keep top 10% of popular entities, and no greater than 30 entities.
+        cut_off_index = len(sorted_entities) * 0.10
+        if cut_off_index > 30:
+            cut_off_index = 30
+        # truncate the list based on cut_off_index
         sorted_entities = itertools.islice(sorted_entities, cut_off_index)
-        # return the list of words
         sorted_entities_words = list(word for (word, count) in sorted_entities)
 
         return sorted_entities_words
