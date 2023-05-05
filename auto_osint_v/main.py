@@ -69,7 +69,8 @@ if __name__ == '__main__':
     # search results will be stored in a dictionary in the source_aggregator Object.
     potential_sources = source_aggregator.find_sources()
     # Initialise the Priority Manager
-    priority_manager = PriorityManager(file_handler, potential_sources)
-
-    # get the popular information - this is a costly search (on 170 sources it takes ~15 minutes).
-    # print(popular_information_finder.find_entities(potential_sources))
+    priority_manager = PriorityManager(file_handler, process_entities, potential_sources)
+    # Check the relevance of sources, filter out those that are not relevant.
+    # Assign higher priority (order) to sources that are most relevant.
+    sources = priority_manager.manager()
+    print([f"url: {source['url']}, score: {source['score']}" for source in sources])
