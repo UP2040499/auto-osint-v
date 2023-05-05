@@ -1,7 +1,7 @@
 """Finds entities (information) that is popular amongst the potentially corroborating sources.
 """
 import itertools
-import multiprocessing
+from multiprocessing import Pool, Manager
 import requests
 from bs4 import BeautifulSoup
 from tqdm import tqdm
@@ -21,7 +21,12 @@ class PopularInformationFinder:
             file_handler_object: gives the class access to the file_handler object.
             entity_processor_object: gives the class access to the entity_processor object.
         """
-        self.entities = {}
+        # Lazy creation of class attribute.
+        try:
+            manager = getattr(type(self), 'manager')
+        except AttributeError:
+            manager = type(self).manager = Manager()
+        self.entities = manager.dict()
         self.file_handler = file_handler_object
         self.entity_processor = entity_processor_object
 
@@ -52,7 +57,7 @@ class PopularInformationFinder:
         # request the webpage. If source website timeout, return the current list of entities.
         try:
             response = requests.get(url, headers, timeout=5)
-        except requests.exceptions.ReadTimeout:
+        except (requests.exceptions.ReadTimeout, requests.exceptions.ConnectionError):
             return entities
         # check if we are wasting our time with a broken or inaccessible website
         try:
@@ -100,17 +105,17 @@ class PopularInformationFinder:
         Returns:
             A list of the most popular words amongst all the sources.
         """
-        #for source in tqdm(sources, desc="Getting text and finding entities"):
-            # get the text from each source and find the entities
-            #entities = self.get_text_process_entities(source["url"])
-        with multiprocessing.Manager() as manager:
-            self.entities = manager.dict()
-            with multiprocessing.Pool() as p:
-                sources = tqdm(sources)  # add a progress bar
-                tmp = p.map(self.get_text_process_entities, sources)
-                flattened_non_empty = [tpl for sublist in tmp for tpl in sublist if tpl]
-                self.entities = dict(flattened_non_empty)
-        # entities = dict(map(self.get_text_process_entities, sources, entities))
+        with Pool() as p:
+            # sources = tqdm(sources)  # add a progress bar
+            # calculate an even chunksize for the imap function
+            chunksize = len(sources) / len(p._pool)
+            if int(chunksize) < chunksize:
+                chunksize = int(chunksize) + 1
+            else:
+                chunksize = int(chunksize)
+            tmp = tqdm(p.imap_unordered(self.get_text_process_entities, sources, chunksize),
+                       total=len(sources))
+            self.entities.update([tpl for sublist in tmp for tpl in sublist if tpl])
 
         # sort list of dictionaries by highest no. of mentions.
         # lambda function specifies sorted to use the values of the dictionary in desc. order

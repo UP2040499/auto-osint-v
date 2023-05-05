@@ -23,3 +23,29 @@ class TestPriorityManager(TestCase):
         pm_object = PriorityManager(fh_object, ep_object, potential_corroboration)
         sources = pm_object.manager()
         print([f"url: {source['url']}, score: {source['score']}" for source in sources])
+
+    def test_target_info_scorer(self):
+        fh_object = FileHandler(
+            "..\\auto_osint_v\\data_files\\")
+        ep_object = EntityProcessor(fh_object)
+        os.chdir("../unit_tests/")
+        frame = pd.read_csv(os.getcwd() +
+                            "/potential_corroboration_example.csv",
+                            index_col=False)
+        potential_corroboration = frame.to_dict("records")
+        pm_object = PriorityManager(fh_object, ep_object, potential_corroboration)
+        pm_object.target_info_scorer()
+        print(pm_object.get_sources())
+
+    def test_popular_info_scorer(self):
+        fh_object = FileHandler(
+            "..\\auto_osint_v\\data_files\\")
+        ep_object = EntityProcessor(fh_object)
+        os.chdir("../unit_tests/")
+        frame = pd.read_csv(os.getcwd() +
+                            "/potential_corroboration_example2.csv",
+                            index_col=False)
+        potential_corroboration = frame.to_dict("records")
+        pm_object = PriorityManager(fh_object, ep_object, potential_corroboration)
+        pm_object.popular_info_scorer()
+        print(pm_object.get_sources())
