@@ -1,13 +1,12 @@
 """This module assigns scores to each source, prioritising the most relevant sources.
 """
 import inspect
-import itertools
-
+from typing import List
+from multiprocessing import Pool
 import requests
-from multiprocessing import Pool, Manager
 from tqdm import tqdm
 from bs4 import BeautifulSoup
-from typing import List
+
 
 from auto_osint_v.popular_information_finder import PopularInformationFinder
 
@@ -69,6 +68,7 @@ class PriorityManager:
         return self.sources
 
     def get_sources(self):
+        """Method for getting the list of source dictionaries."""
         return self.sources
 
     @staticmethod
@@ -130,9 +130,9 @@ class PriorityManager:
         # Count number of appearances in each source
         # for source in tqdm(self.sources, desc="Counting target entity appearances in "
         #                                      "sources"):
-        with Pool() as p:
-            self.sources = list(tqdm(p.imap_unordered(self.get_text_get_score_target_inf,
-                                                      self.sources), total=len(self.sources)))
+        with Pool() as pool:
+            self.sources = list(tqdm(pool.imap_unordered(self.get_text_get_score_target_inf,
+                                                         self.sources), total=len(self.sources)))
         # Updated 'self.sources' list of dictionaries
 
     def popular_info_scorer(self):
@@ -147,9 +147,9 @@ class PriorityManager:
         self._entities = entities
         # Count number of appearances in each source
         # new approach using multiprocessing map function
-        with Pool() as p:
-            self.sources = list(tqdm(p.imap_unordered(self.get_text_get_score_pop_inf,
-                                                      self.sources), total=len(self.sources)))
+        with Pool() as pool:
+            self.sources = list(tqdm(pool.imap_unordered(self.get_text_get_score_pop_inf,
+                                                         self.sources), total=len(self.sources)))
         # Updated 'self.sources' list of dictionaries
 
     def get_text_get_score_target_inf(self, source):

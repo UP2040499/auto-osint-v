@@ -80,8 +80,6 @@ class EntityProcessor:
         Returns:
             entity_dict modified with new entries.
         """
-        texts_length = len(text)
-
         # split the text by factors of 50,000 to reduce memory load
         split_text = [text[i:i + 50000] for i in range(0, len(text), 50000)]
         entity_dict = self.add_entities_to_dict(entity_dict, split_text)

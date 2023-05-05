@@ -9,7 +9,7 @@ from auto_osint_v.priority_manager import PriorityManager
 
 
 class TestPriorityManager(TestCase):
-    """Unit test for the PriorityManager class"""
+    """Provides test cases for the PriorityManager class"""
     def test_manager(self):
         """Unit test for the target_info_scorer method"""
         os.chdir("../unit_tests/")
@@ -25,6 +25,7 @@ class TestPriorityManager(TestCase):
         print([f"url: {source['url']}, score: {source['score']}" for source in sources])
 
     def test_target_info_scorer(self):
+        """Runs the 'target_info_scorer' in unit test"""
         fh_object = FileHandler(
             "..\\auto_osint_v\\data_files\\")
         ep_object = EntityProcessor(fh_object)
@@ -38,6 +39,7 @@ class TestPriorityManager(TestCase):
         print(pm_object.get_sources())
 
     def test_popular_info_scorer(self):
+        """Runs the 'popular_info_scorer' in unit test"""
         fh_object = FileHandler(
             "..\\auto_osint_v\\data_files\\")
         ep_object = EntityProcessor(fh_object)

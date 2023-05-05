@@ -8,7 +8,6 @@ from auto_osint_v.specific_entity_processor import EntityProcessor
 from auto_osint_v.file_handler import FileHandler
 from auto_osint_v.sentiment_analyser import SemanticAnalyser
 from auto_osint_v.source_aggregator import SourceAggregator
-from auto_osint_v.popular_information_finder import PopularInformationFinder
 from auto_osint_v.priority_manager import PriorityManager
 
 data_file_path = os.getcwd() + "/data_files/"

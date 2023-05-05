@@ -8,7 +8,9 @@ from auto_osint_v.popular_information_finder import PopularInformationFinder
 
 
 class TestPopularInformationFinder(TestCase):
+    """Provides test cases for the PopularInformationFinder class"""
     def test_find_entities(self):
+        """Constructs the PopularInformationFinder object, executes the 'find_entities' method."""
         fh_object = FileHandler(
             "..\\auto_osint_v\\data_files\\")
         ep_object = EntityProcessor(fh_object)

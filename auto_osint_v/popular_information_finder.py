@@ -105,15 +105,15 @@ class PopularInformationFinder:
         Returns:
             A list of the most popular words amongst all the sources.
         """
-        with Pool() as p:
+        with Pool() as pool:
             # sources = tqdm(sources)  # add a progress bar
-            # calculate an even chunksize for the imap function
-            chunksize = len(sources) / len(p._pool)
+            # calculate an even chunksize for the imap function using pool size (max processes)
+            chunksize = len(sources) / len(pool._pool)
             if int(chunksize) < chunksize:
                 chunksize = int(chunksize) + 1
             else:
                 chunksize = int(chunksize)
-            tmp = tqdm(p.imap_unordered(self.get_text_process_entities, sources, chunksize),
+            tmp = tqdm(pool.imap_unordered(self.get_text_process_entities, sources, chunksize),
                        total=len(sources))
             self.entities.update([tpl for sublist in tmp for tpl in sublist if tpl])
 
@@ -122,8 +122,7 @@ class PopularInformationFinder:
         sorted_entities = sorted(self.entities.items(), key=lambda x: x[1], reverse=True)
         # keep top 10% of popular entities, and no greater than 30 entities.
         cut_off_index = len(sorted_entities) * 0.10
-        if cut_off_index > 30:
-            cut_off_index = 30
+        cut_off_index = int(min(cut_off_index, 30))
         # truncate the list based on cut_off_index
         sorted_entities = itertools.islice(sorted_entities, cut_off_index)
         sorted_entities_words = list(word for (word, count) in sorted_entities)
