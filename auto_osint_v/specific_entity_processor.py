@@ -11,8 +11,12 @@ import spacy
 try:
     NER = spacy.load(os.getcwd() + "/NER_training_testing/train/model/model-best-from-colab")
 except OSError:
-    os.chdir("../auto_osint_v/")
-    NER = spacy.load("NER_training_testing/train/model/model-best-from-colab")
+    try:
+        os.chdir("../auto_osint_v/")
+        NER = spacy.load("NER_training_testing/train/model/model-best-from-colab")
+    except FileNotFoundError:
+        os.chdir("/auto_osint_v/")
+        NER = spacy.load("NER_training_testing/train/model/model-best-from-colab")
 NER.add_pipe('sentencizer')
 
 
