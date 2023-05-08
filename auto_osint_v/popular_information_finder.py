@@ -66,8 +66,15 @@ class PopularInformationFinder:
             return entities
         # get the html from the response
         html = response.text
-        # parse HTML using BeautifulSoup
-        soup = BeautifulSoup(html, "html.parser")
+        # get the content type
+        content_type = response.headers['Content-Type']
+        # if xml use xml parser
+        if content_type == "text/xml" or content_type == "application/xml":
+            # use xml parser
+            soup = BeautifulSoup(response.text, "xml")
+        else:
+            # parse using the lxml html parser
+            soup = BeautifulSoup(response.text, "lxml")
 
         # kill all script and style elements
         for script in soup(["script", "style"]):
@@ -75,8 +82,6 @@ class PopularInformationFinder:
 
         # get text
         text = soup.get_text()
-
-        # this doesn't work getting random webpage bits in the entities
         # break into lines and remove leading and trailing space on each
         lines = (line.strip() for line in text.splitlines())
         # break multi-headlines into a line each

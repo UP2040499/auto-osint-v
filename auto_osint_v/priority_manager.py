@@ -103,8 +103,15 @@ class PriorityManager:
             return text
         # get the html from the response
         html = response.text
-        # parse HTML using BeautifulSoup
-        soup = BeautifulSoup(html, "html.parser")
+        # get the content type
+        content_type = response.headers['Content-Type']
+        # if xml use xml parser
+        if content_type == "text/xml" or content_type == "application/xml":
+            # use xml parser
+            soup = BeautifulSoup(response.text, "xml")
+        else:
+            # parse using the lxml html parser
+            soup = BeautifulSoup(response.text, "lxml")
         # kill all script and style elements
         for script in soup(["script", "style"]):
             script.extract()  # rip it out
