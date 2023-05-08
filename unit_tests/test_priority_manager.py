@@ -11,7 +11,7 @@ from auto_osint_v.priority_manager import PriorityManager
 class TestPriorityManager(TestCase):
     """Provides test cases for the PriorityManager class"""
     def test_manager(self):
-        """Unit test for the target_info_scorer method"""
+        """Unit test for manager method"""
         os.chdir("../unit_tests/")
         fh_object = FileHandler(
             "..\\auto_osint_v\\data_files\\")
@@ -45,7 +45,7 @@ class TestPriorityManager(TestCase):
         ep_object = EntityProcessor(fh_object)
         os.chdir("../unit_tests/")
         frame = pd.read_csv(os.getcwd() +
-                            "/potential_corroboration_example2.csv",
+                            "/potential_corroboration_example.csv",
                             index_col=False)
         potential_corroboration = frame.to_dict("records")
         pm_object = PriorityManager(fh_object, ep_object, potential_corroboration)
