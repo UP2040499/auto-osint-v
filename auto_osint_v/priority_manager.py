@@ -115,7 +115,7 @@ class PriorityManager:
         except KeyError:
             # except on KeyError if no 'content-type' header exists
             soup = BeautifulSoup(response.text, "lxml")
-        
+
         # kill all script and style elements
         for script in soup(["script", "style"]):
             script.extract()  # rip it out

@@ -13,8 +13,9 @@ from auto_osint_v.priority_manager import PriorityManager
 data_file_path = os.getcwd() + "/data_files/"
 sys.path.append(
     "/auto_osint_v/main.py")
-
+# modify environment variables
 os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:128"
+os.environ['TOKENIZERS_PARALLELISM'] = 'false'
 
 
 def input_intelligence():
