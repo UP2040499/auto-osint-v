@@ -90,10 +90,12 @@ class PopularInformationFinder:
         chunks = (phrase.strip() for line in lines for phrase in line.split("  "))
         # drop blank lines
         text = '\n'.join(chunk for chunk in chunks if chunk)
+        # split into list
+        textlist = text.split('\n')
 
         if len(text) <= 100000:
             # run the text through the entity processor. stores entities in namesake variable
-            entities = self.entity_processor.get_entities_and_count(text, self.entities)
+            entities = self.entity_processor.get_entities_and_count(textlist, self.entities)
 
         return entities
 

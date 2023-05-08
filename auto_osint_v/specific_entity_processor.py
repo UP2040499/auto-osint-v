@@ -72,21 +72,21 @@ class EntityProcessor:
             # and number of mentions.
             self.file_handler.open_label_file(label, text, mentions=mentions)
 
-    def get_entities_and_count(self, text, entity_dict):
+    def get_entities_and_count(self, text_list, entity_dict):
         """Finds the entities from the given text. If they appear multiple times, increment value.
 
         This only increments words one time per source. Only count independent mentions of entities.
 
         Args:
-            text: The text to find and count entities from.
+            text_list: The text to find and count entities from.
             entity_dict: The dictionary to store these entities and their respective counts in.
 
         Returns:
             entity_dict modified with new entries.
         """
         # split the text by factors of 50,000 to reduce memory load
-        split_text = [text[i:i + 50000] for i in range(0, len(text), 50000)]
-        entity_dict = self.add_entities_to_dict(entity_dict, split_text)
+        #split_text = [text[i:i + 50000] for i in range(0, len(text), 50000)]
+        entity_dict = self.add_entities_to_dict(entity_dict, text_list)
 
         return list(entity_dict.items())
 
