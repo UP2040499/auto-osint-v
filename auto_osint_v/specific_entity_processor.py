@@ -15,7 +15,7 @@ except OSError:
         os.chdir("../auto_osint_v/")
         NER = spacy.load("NER_training_testing/train/model/model-best-from-colab")
     except FileNotFoundError:
-        os.chdir("/auto_osint_v/")
+        os.chdir(os.getcwd() + "/auto_osint_v/")
         NER = spacy.load("NER_training_testing/train/model/model-best-from-colab")
 NER.add_pipe('sentencizer')
 
@@ -49,7 +49,10 @@ class EntityProcessor:
             Nothing - stores info in files
         """
         # Clean any leftover files from previous runs
-        self.file_handler.clean_directory("data_files/target_info_files")
+        try:
+            self.file_handler.clean_directory("data_files/target_info_files")
+        except FileNotFoundError:
+            pass    # no need to clean dir
         text1 = NER(read_statement)
 
         # changes added to eliminate duplicates and count number of mentions
