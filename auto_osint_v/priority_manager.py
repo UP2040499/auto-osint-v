@@ -101,17 +101,21 @@ class PriorityManager:
             response.raise_for_status()
         except requests.HTTPError:
             return text
-        # get the html from the response
-        html = response.text
+
         # get the content type
-        content_type = response.headers['Content-Type']
-        # if xml use xml parser
-        if content_type == "text/xml" or content_type == "application/xml":
-            # use xml parser
-            soup = BeautifulSoup(response.text, "xml")
-        else:
-            # parse using the lxml html parser
+        try:
+            content_type = response.headers['Content-Type']
+            # if xml use xml parser
+            if content_type == "text/xml" or content_type == "application/xml":
+                # use xml parser
+                soup = BeautifulSoup(response.text, "xml")
+            else:
+                # parse using the lxml html parser
+                soup = BeautifulSoup(response.text, "lxml")
+        except KeyError:
+            # except on KeyError if no 'content-type' header exists
             soup = BeautifulSoup(response.text, "lxml")
+        
         # kill all script and style elements
         for script in soup(["script", "style"]):
             script.extract()  # rip it out
