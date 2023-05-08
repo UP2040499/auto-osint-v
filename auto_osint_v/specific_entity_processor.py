@@ -49,10 +49,7 @@ class EntityProcessor:
             Nothing - stores info in files
         """
         # Clean any leftover files from previous runs
-        try:
-            self.file_handler.clean_directory("data_files/target_info_files")
-        except FileNotFoundError:
-            pass    # no need to clean dir
+        self.file_handler.clean_directory("data_files/target_info_files")
         text1 = NER(read_statement)
 
         # changes added to eliminate duplicates and count number of mentions

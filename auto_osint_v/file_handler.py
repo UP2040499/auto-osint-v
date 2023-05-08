@@ -119,8 +119,11 @@ class FileHandler:
     def clean_directory(directory):
         """Cleans the given directory. Removes all files inside.
         """
-        for file in os.listdir(directory):
-            os.remove(os.path.join(directory, file))
+        try:
+            for file in os.listdir(directory):
+                os.remove(os.path.join(directory, file))
+        except FileNotFoundError:
+            pass
 
     def clean_data_file(self, filename):
         """Removes all data in given file
@@ -128,7 +131,10 @@ class FileHandler:
         Args:
             filename: name of file, can be path relative to 'data_files' directory
         """
-        os.remove(os.path.join(self.data_file_path, filename))
+        try:
+            os.remove(os.path.join(self.data_file_path, filename))
+        except FileNotFoundError:
+            pass
 
     @staticmethod
     def write_to_given_csv_file(file_object, to_write):
