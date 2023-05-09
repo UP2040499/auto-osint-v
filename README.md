@@ -1,37 +1,36 @@
 # auto-osint-v #
 
----
 *An automated tool for Validating OSINT. This forms part of the final step of OSINT production as 
 detailed by NATO's open source handbook (2001). This is a research artefact for my Dissertation at 
 the University of Portsmouth*
 
-## Installation
+## :file_folder: Installation
 
----
 > **Note**
-> First, please attempt to use the Google Colab, more info [below](#google-colab).
+> First, please attempt to use the Google Colab, more info [below](#mortar_board-google-colab).
 
 
 ### Linux / Windows
 
----
 - Clone this GitHub repository ```git clone https://github.com/UP2040499/auto-osint-v.git```
 - Install conda (mamba also works) 
   - [Conda installation guide](https://conda.io/projects/conda/en/latest/user-guide/install/index.html)
 - Check conda is installed by checking the version: ```conda --version```
+- Move into the repo
+    ```bash
+    cd ~/<install directory>/auto-osint-v 
+    ```
 - Create a conda OR mamba environment and install dependencies:
   - Install dependencies with conda:
     ```bash
-    cd ~/<install directory>/auto-osint-v 
     conda env create -f environment.yml -n auto-osint-v-python38
     ```
   - Install dependencies using mamba
     ```bash
-    cd ~/<install directory>/auto-osint-v 
     mamba env create -f environment.yml
     ```
-- Activate conda environment
-    #### Linux (bash)
+- Activate conda environment and run the tool.
+    ### Linux (bash)
     ```bash
     eval "$(conda shell.bash hook)" #copy conda command to shell
     conda activate auto-osint-v-python38
@@ -42,14 +41,12 @@ the University of Portsmouth*
     ```powershell
     conda init powershell
     conda activate auto-osint-v-python38
-    cd /content/auto-osint-v
     python -m auto_osint_v.main
     ```
 
-## Usage
+## :rocket: Usage
 
-***
-### Google Colab
+### :mortar_board: Google Colab
 I strongly recommend using Google Colab to run this tool. However, the default machine in the Google
 Colab performs worse than most local machines would (this is likely to do with CPU limits in place).
 
@@ -62,19 +59,21 @@ available resources (CPU, RAM) will be utilised by the tool.
 Use Google Colab to avoid hogging your computer's resources.
 
 ---
-### Command line instructions:
+### :computer: Command line instructions:
 ```shell
 python -m auto_osint_v.main <ARGS>
 ```
 
----
-### Arguments
+#### :construction: Arguments :construction:
 ```
 arg1:
 arg2:
 ...
 ```
 
+### Example usage:
+```bash
+python -m auto_osint_v.main -arg1 -arg2
+```
 
 
----
