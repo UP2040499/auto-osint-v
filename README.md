@@ -37,7 +37,7 @@ the University of Portsmouth*
     python -m auto_osint_v.main
     ```
     ### Windows
-    > :warning: Open an 'Anaconda Powershell Prompt' from Start Menu, then run the following.
+    > :warning: Open an 'Anaconda Powershell Prompt' from Start Menu, then run the following:
     ```powershell
     conda init powershell
     conda activate auto-osint-v-python38
