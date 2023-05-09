@@ -2,19 +2,20 @@
 
 Run this file to run the tool.
 """
-
 import os
 import sys
 from auto_osint_v.specific_entity_processor import EntityProcessor
 from auto_osint_v.file_handler import FileHandler
 from auto_osint_v.sentiment_analyser import SemanticAnalyser
 from auto_osint_v.source_aggregator import SourceAggregator
+from auto_osint_v.priority_manager import PriorityManager
 
 data_file_path = os.getcwd() + "/data_files/"
 sys.path.append(
     "/auto_osint_v/main.py")
-
+# modify environment variables
 os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:128"
+os.environ['TOKENIZERS_PARALLELISM'] = 'false'
 
 
 def input_intelligence():
@@ -49,8 +50,8 @@ if __name__ == '__main__':
     intel_file = file_handler.read_file("intelligence_file.txt")
     # Entity Processor - identifies specific entities mentioned in intel statement
     print("Processing entities...")
-    process_entities = EntityProcessor(intel_file, file_handler)
-    process_entities.store_words_from_label()
+    process_entities = EntityProcessor(file_handler)
+    process_entities.store_words_from_label(intel_file)
 
     # Clean evidence_file.csv
     file_handler.clean_data_file(data_file_path + "evidence_file.csv")
@@ -66,4 +67,25 @@ if __name__ == '__main__':
     source_aggregator.search_query_generator()
     # Searches google and social media sites using the queries stored in source_aggregator object
     # search results will be stored in a dictionary in the source_aggregator Object.
-    source_aggregator.find_sources()
+    potential_sources = source_aggregator.find_sources()
+    # Initialise the Priority Manager
+    priority_manager = PriorityManager(file_handler, process_entities, potential_sources)
+    # Check the relevance of sources, filter out those that are not relevant.
+    # Assign higher priority (order) to sources that are most relevant.
+    sources = priority_manager.manager()
+    print([f"url: {source['url']}, score: {source['score']}" for source in sources])
+    # TODO:
+    #   ~~~~~ High Priority ~~~~~
+    #   Add the similarity checker
+    #   Add nice formatting to output (tabular, colour optional)
+    #   Reformat the 'bias source checker' so that it asks for any sources of the intelligence
+    #   ~~~~~ Low Priority ~~~~~
+    #   Attempt to fix sentence indices out of range warning (popular info finder).
+    #   Attempt to solve the imgur sitemap problem (easy way: remove links to xml)
+    #   Solve issues with irrelevant output (possibly change formatting of source text)
+    #   Allow auto_osint_v.main to be called from command line, with the intelligence file as param.
+    #       This means either input through command line or ask for them to modify the file.
+    #       I believe that input into the command line will be difficult, so stick with modifying
+    #       file in their editor. Ask for user to modify file on first run.
+    #       This could mean having a 'silent' or 'no_editor' mode for the user to run if they have
+    #       already changed the intelligence file.
