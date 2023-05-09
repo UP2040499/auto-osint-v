@@ -45,7 +45,7 @@ class TestPriorityManager(TestCase):
         ep_object = EntityProcessor(fh_object)
         os.chdir("../unit_tests/")
         frame = pd.read_csv(os.getcwd() +
-                            "/potential_corroboration_example.csv",
+                            "/potential_corroboration_example2.csv",
                             index_col=False)
         potential_corroboration = frame.to_dict("records")
         pm_object = PriorityManager(fh_object, ep_object, potential_corroboration)

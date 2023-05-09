@@ -74,3 +74,18 @@ if __name__ == '__main__':
     # Assign higher priority (order) to sources that are most relevant.
     sources = priority_manager.manager()
     print([f"url: {source['url']}, score: {source['score']}" for source in sources])
+    # TODO:
+    #   ~~~~~ High Priority ~~~~~
+    #   Add the similarity checker
+    #   Add nice formatting to output (tabular, colour optional)
+    #   Reformat the 'bias source checker' so that it asks for any sources of the intelligence
+    #   ~~~~~ Low Priority ~~~~~
+    #   Attempt to fix sentence indices out of range warning (popular info finder).
+    #   Attempt to solve the imgur sitemap problem (easy way: remove links to xml)
+    #   Solve issues with irrelevant output (possibly change formatting of source text)
+    #   Allow auto_osint_v.main to be called from command line, with the intelligence file as param.
+    #       This means either input through command line or ask for them to modify the file.
+    #       I believe that input into the command line will be difficult, so stick with modifying
+    #       file in their editor. Ask for user to modify file on first run.
+    #       This could mean having a 'silent' or 'no_editor' mode for the user to run if they have
+    #       already changed the intelligence file.

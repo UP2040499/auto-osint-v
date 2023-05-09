@@ -6,6 +6,7 @@ Subprocesses to this module attempt to interrogate some of this information.
 """
 import os
 import spacy
+from spacy.tokens import DocBin
 
 # Load the best model trained using Google Colab
 try:
@@ -84,8 +85,14 @@ class EntityProcessor:
         Returns:
             entity_dict modified with new entries.
         """
-        # split the text by factors of 50,000 to reduce memory load
-        #split_text = [text[i:i + 50000] for i in range(0, len(text), 50000)]
+        # split the text
+        for i, sentence in enumerate(text_list):
+            # if you see 'token indices sequence length is longer' warning
+            if len(sentence) > 512:    # reduce this value
+                # split the sentence every 500 chars
+                text_list[i] = [sentence[j:j + 500] for j in range(0, len(sentence), 500)]
+                # flatten resulting list
+                text_list = [item for sublist in text_list for item in sublist]
         entity_dict = self.add_entities_to_dict(entity_dict, text_list)
 
         return list(entity_dict.items())
