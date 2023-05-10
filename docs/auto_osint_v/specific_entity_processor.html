@@ -36,12 +36,21 @@ These entities are extracted from the intelligence statement and
 stored in appropriate stores.
 Subprocesses to this module attempt to interrogate some of this information.
 &#34;&#34;&#34;
-
+import os
 import spacy
-
+from spacy.tokens import DocBin
 
 # Load the best model trained using Google Colab
-NER = spacy.load(&#34;auto_osint_v/NER_training_testing/train/model/model-best-from-colab&#34;)
+try:
+    NER = spacy.load(os.getcwd() + &#34;/NER_training_testing/train/model/model-best-from-colab&#34;)
+except OSError:
+    try:
+        os.chdir(&#34;../auto_osint_v/&#34;)
+        NER = spacy.load(&#34;NER_training_testing/train/model/model-best-from-colab&#34;)
+    except FileNotFoundError:
+        os.chdir(os.getcwd() + &#34;/auto_osint_v/&#34;)
+        NER = spacy.load(&#34;NER_training_testing/train/model/model-best-from-colab&#34;)
+NER.add_pipe(&#39;sentencizer&#39;)
 
 
 class EntityProcessor:
@@ -50,27 +59,31 @@ class EntityProcessor:
     It provides methods for recognising the individual entities in a statement and storing
     them appropriately.
     &#34;&#34;&#34;
-    def __init__(self, read_statement, file_handler_object):
+    def __init__(self, file_handler_object):
         &#34;&#34;&#34;Initialises variables to be used in this object.
 
         Args:
-         read_statement: the statement read from a text file
+         file_handler_object: the file handler to be used for file IO operations
         &#34;&#34;&#34;
-        self.statement = read_statement
         self.file_handler = file_handler_object
+        self.irrelevant_words = [&#34;it&#34;, &#34;them&#34;, &#34;they&#34;, &#34;the&#34;, &#34;he&#34;, &#34;she&#34;, &#34;his&#34;, &#34;her&#34;, &#34;we&#34;, &#34;i&#34;,
+                                 &#34;us&#34;, &#34;me&#34;, &#34;my&#34;, &#34;here&#34;, &#34;our&#34;]
 
-    def store_words_from_label(self):
+    def store_words_from_label(self, read_statement):
         &#34;&#34;&#34;This function stores recognised words in csv files
 
         These files are associated with the label given to
         the word.
 
+        Args:
+            read_statement: the intelligence statement read into current python instance
+
         Returns
-         Nothing - stores info in files
+            Nothing - stores info in files
         &#34;&#34;&#34;
         # Clean any leftover files from previous runs
         self.file_handler.clean_directory(&#34;data_files/target_info_files&#34;)
-        text1 = NER(self.statement)
+        text1 = NER(read_statement)
 
         # changes added to eliminate duplicates and count number of mentions
         # define list of words present
@@ -90,7 +103,57 @@ class EntityProcessor:
         for text, [label, mentions] in words_present.items():
             # Opens the relevant (based on word label) csv file and store the word text
             # and number of mentions.
-            self.file_handler.open_label_file(label, text, mentions=mentions)</code></pre>
+            self.file_handler.open_label_file(label, text, mentions=mentions)
+
+    def get_entities_and_count(self, text_list, entity_dict):
+        &#34;&#34;&#34;Finds the entities from the given text. If they appear multiple times, increment value.
+
+        This only increments words one time per source. Only count independent mentions of entities.
+
+        Args:
+            text_list: The text to find and count entities from.
+            entity_dict: The dictionary to store these entities and their respective counts in.
+
+        Returns:
+            entity_dict modified with new entries.
+        &#34;&#34;&#34;
+        # split the text
+        for i, sentence in enumerate(text_list):
+            # if you see &#39;token indices sequence length is longer&#39; warning
+            if len(sentence) &gt; 512:    # reduce this value
+                # split the sentence every 500 chars
+                text_list[i] = [sentence[j:j + 500] for j in range(0, len(sentence), 500)]
+                # flatten resulting list
+                text_list = [item for sublist in text_list for item in sublist]
+        entity_dict = self.add_entities_to_dict(entity_dict, text_list)
+
+        return list(entity_dict.items())
+
+    def add_entities_to_dict(self, entity_dict, texts):
+        &#34;&#34;&#34;Uses the NER.pipe to add entities to a given dictionary.
+
+        Args:
+            entity_dict: the given dictionary to add entities to.
+            texts: list of texts to process
+
+        Returns:
+            entity_dict, the given dictionary with added entities.
+        &#34;&#34;&#34;
+        words_present = []
+        # just add entities to dictionary as each key needs to be unique.
+        for doc in NER.pipe(texts):
+            for ent in doc.ents:
+                # set to lowercase for easy comparison
+                key = ent.text.lower()
+                # if the entity has not already been counted and is not an irrelevant word
+                if (key not in words_present) and (key not in self.irrelevant_words):
+                    try:
+                        entity_dict[key] += 1
+                    except KeyError:
+                        entity_dict[key] = 1
+                    words_present.append(key)
+
+        return entity_dict</code></pre>
 </details>
 </section>
 <section>
@@ -104,7 +167,7 @@ class EntityProcessor:
 <dl>
 <dt id="auto_osint_v.specific_entity_processor.EntityProcessor"><code class="flex name class">
 <span>class <span class="ident">EntityProcessor</span></span>
-<span>(</span><span>read_statement, file_handler_object)</span>
+<span>(</span><span>file_handler_object)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>This class extracts the entities from a given statement</p>
@@ -112,7 +175,7 @@ class EntityProcessor:
 them appropriately.</p>
 <p>Initialises variables to be used in this object.</p>
 <p>Args:
-read_statement: the statement read from a text file</p></div>
+file_handler_object: the file handler to be used for file IO operations</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -123,27 +186,31 @@ read_statement: the statement read from a text file</p></div>
     It provides methods for recognising the individual entities in a statement and storing
     them appropriately.
     &#34;&#34;&#34;
-    def __init__(self, read_statement, file_handler_object):
+    def __init__(self, file_handler_object):
         &#34;&#34;&#34;Initialises variables to be used in this object.
 
         Args:
-         read_statement: the statement read from a text file
+         file_handler_object: the file handler to be used for file IO operations
         &#34;&#34;&#34;
-        self.statement = read_statement
         self.file_handler = file_handler_object
+        self.irrelevant_words = [&#34;it&#34;, &#34;them&#34;, &#34;they&#34;, &#34;the&#34;, &#34;he&#34;, &#34;she&#34;, &#34;his&#34;, &#34;her&#34;, &#34;we&#34;, &#34;i&#34;,
+                                 &#34;us&#34;, &#34;me&#34;, &#34;my&#34;, &#34;here&#34;, &#34;our&#34;]
 
-    def store_words_from_label(self):
+    def store_words_from_label(self, read_statement):
         &#34;&#34;&#34;This function stores recognised words in csv files
 
         These files are associated with the label given to
         the word.
 
+        Args:
+            read_statement: the intelligence statement read into current python instance
+
         Returns
-         Nothing - stores info in files
+            Nothing - stores info in files
         &#34;&#34;&#34;
         # Clean any leftover files from previous runs
         self.file_handler.clean_directory(&#34;data_files/target_info_files&#34;)
-        text1 = NER(self.statement)
+        text1 = NER(read_statement)
 
         # changes added to eliminate duplicates and count number of mentions
         # define list of words present
@@ -163,35 +230,182 @@ read_statement: the statement read from a text file</p></div>
         for text, [label, mentions] in words_present.items():
             # Opens the relevant (based on word label) csv file and store the word text
             # and number of mentions.
-            self.file_handler.open_label_file(label, text, mentions=mentions)</code></pre>
+            self.file_handler.open_label_file(label, text, mentions=mentions)
+
+    def get_entities_and_count(self, text_list, entity_dict):
+        &#34;&#34;&#34;Finds the entities from the given text. If they appear multiple times, increment value.
+
+        This only increments words one time per source. Only count independent mentions of entities.
+
+        Args:
+            text_list: The text to find and count entities from.
+            entity_dict: The dictionary to store these entities and their respective counts in.
+
+        Returns:
+            entity_dict modified with new entries.
+        &#34;&#34;&#34;
+        # split the text
+        for i, sentence in enumerate(text_list):
+            # if you see &#39;token indices sequence length is longer&#39; warning
+            if len(sentence) &gt; 512:    # reduce this value
+                # split the sentence every 500 chars
+                text_list[i] = [sentence[j:j + 500] for j in range(0, len(sentence), 500)]
+                # flatten resulting list
+                text_list = [item for sublist in text_list for item in sublist]
+        entity_dict = self.add_entities_to_dict(entity_dict, text_list)
+
+        return list(entity_dict.items())
+
+    def add_entities_to_dict(self, entity_dict, texts):
+        &#34;&#34;&#34;Uses the NER.pipe to add entities to a given dictionary.
+
+        Args:
+            entity_dict: the given dictionary to add entities to.
+            texts: list of texts to process
+
+        Returns:
+            entity_dict, the given dictionary with added entities.
+        &#34;&#34;&#34;
+        words_present = []
+        # just add entities to dictionary as each key needs to be unique.
+        for doc in NER.pipe(texts):
+            for ent in doc.ents:
+                # set to lowercase for easy comparison
+                key = ent.text.lower()
+                # if the entity has not already been counted and is not an irrelevant word
+                if (key not in words_present) and (key not in self.irrelevant_words):
+                    try:
+                        entity_dict[key] += 1
+                    except KeyError:
+                        entity_dict[key] = 1
+                    words_present.append(key)
+
+        return entity_dict</code></pre>
 </details>
 <h3>Methods</h3>
 <dl>
+<dt id="auto_osint_v.specific_entity_processor.EntityProcessor.add_entities_to_dict"><code class="name flex">
+<span>def <span class="ident">add_entities_to_dict</span></span>(<span>self, entity_dict, texts)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Uses the NER.pipe to add entities to a given dictionary.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>entity_dict</code></strong></dt>
+<dd>the given dictionary to add entities to.</dd>
+<dt><strong><code>texts</code></strong></dt>
+<dd>list of texts to process</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>entity_dict, the given dictionary with added entities.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def add_entities_to_dict(self, entity_dict, texts):
+    &#34;&#34;&#34;Uses the NER.pipe to add entities to a given dictionary.
+
+    Args:
+        entity_dict: the given dictionary to add entities to.
+        texts: list of texts to process
+
+    Returns:
+        entity_dict, the given dictionary with added entities.
+    &#34;&#34;&#34;
+    words_present = []
+    # just add entities to dictionary as each key needs to be unique.
+    for doc in NER.pipe(texts):
+        for ent in doc.ents:
+            # set to lowercase for easy comparison
+            key = ent.text.lower()
+            # if the entity has not already been counted and is not an irrelevant word
+            if (key not in words_present) and (key not in self.irrelevant_words):
+                try:
+                    entity_dict[key] += 1
+                except KeyError:
+                    entity_dict[key] = 1
+                words_present.append(key)
+
+    return entity_dict</code></pre>
+</details>
+</dd>
+<dt id="auto_osint_v.specific_entity_processor.EntityProcessor.get_entities_and_count"><code class="name flex">
+<span>def <span class="ident">get_entities_and_count</span></span>(<span>self, text_list, entity_dict)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Finds the entities from the given text. If they appear multiple times, increment value.</p>
+<p>This only increments words one time per source. Only count independent mentions of entities.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>text_list</code></strong></dt>
+<dd>The text to find and count entities from.</dd>
+<dt><strong><code>entity_dict</code></strong></dt>
+<dd>The dictionary to store these entities and their respective counts in.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>entity_dict modified with new entries.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_entities_and_count(self, text_list, entity_dict):
+    &#34;&#34;&#34;Finds the entities from the given text. If they appear multiple times, increment value.
+
+    This only increments words one time per source. Only count independent mentions of entities.
+
+    Args:
+        text_list: The text to find and count entities from.
+        entity_dict: The dictionary to store these entities and their respective counts in.
+
+    Returns:
+        entity_dict modified with new entries.
+    &#34;&#34;&#34;
+    # split the text
+    for i, sentence in enumerate(text_list):
+        # if you see &#39;token indices sequence length is longer&#39; warning
+        if len(sentence) &gt; 512:    # reduce this value
+            # split the sentence every 500 chars
+            text_list[i] = [sentence[j:j + 500] for j in range(0, len(sentence), 500)]
+            # flatten resulting list
+            text_list = [item for sublist in text_list for item in sublist]
+    entity_dict = self.add_entities_to_dict(entity_dict, text_list)
+
+    return list(entity_dict.items())</code></pre>
+</details>
+</dd>
 <dt id="auto_osint_v.specific_entity_processor.EntityProcessor.store_words_from_label"><code class="name flex">
-<span>def <span class="ident">store_words_from_label</span></span>(<span>self)</span>
+<span>def <span class="ident">store_words_from_label</span></span>(<span>self, read_statement)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>This function stores recognised words in csv files</p>
 <p>These files are associated with the label given to
 the word.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>read_statement</code></strong></dt>
+<dd>the intelligence statement read into current python instance</dd>
+</dl>
 <p>Returns
 Nothing - stores info in files</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def store_words_from_label(self):
+<pre><code class="python">def store_words_from_label(self, read_statement):
     &#34;&#34;&#34;This function stores recognised words in csv files
 
     These files are associated with the label given to
     the word.
 
+    Args:
+        read_statement: the intelligence statement read into current python instance
+
     Returns
-     Nothing - stores info in files
+        Nothing - stores info in files
     &#34;&#34;&#34;
     # Clean any leftover files from previous runs
     self.file_handler.clean_directory(&#34;data_files/target_info_files&#34;)
-    text1 = NER(self.statement)
+    text1 = NER(read_statement)
 
     # changes added to eliminate duplicates and count number of mentions
     # define list of words present
@@ -235,6 +449,8 @@ Nothing - stores info in files</p></div>
 <li>
 <h4><code><a title="auto_osint_v.specific_entity_processor.EntityProcessor" href="#auto_osint_v.specific_entity_processor.EntityProcessor">EntityProcessor</a></code></h4>
 <ul class="">
+<li><code><a title="auto_osint_v.specific_entity_processor.EntityProcessor.add_entities_to_dict" href="#auto_osint_v.specific_entity_processor.EntityProcessor.add_entities_to_dict">add_entities_to_dict</a></code></li>
+<li><code><a title="auto_osint_v.specific_entity_processor.EntityProcessor.get_entities_and_count" href="#auto_osint_v.specific_entity_processor.EntityProcessor.get_entities_and_count">get_entities_and_count</a></code></li>
 <li><code><a title="auto_osint_v.specific_entity_processor.EntityProcessor.store_words_from_label" href="#auto_osint_v.specific_entity_processor.EntityProcessor.store_words_from_label">store_words_from_label</a></code></li>
 </ul>
 </li>

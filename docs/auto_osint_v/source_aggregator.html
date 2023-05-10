@@ -114,7 +114,7 @@ class SourceAggregator:
         &#34;&#34;&#34;Using the Google Custom Search Engine to search for results to the search_term.
 
         Args:
-            search_term: The keyword/query to search for
+            search_term: The keyword/query to search for. This can be a string or a list of strings.
             kwargs: Extra arguments to pass to service.cse().list
 
         Returns:
@@ -124,7 +124,7 @@ class SourceAggregator:
         api_key = &#34;AIzaSyCgsni4yZyp4Bla9J7a2TE-lxmzVagcjEo&#34;
         cse_id = &#34;d76b2d8504d104aa8&#34;
         service = build(&#34;customsearch&#34;, &#34;v1&#34;, developerKey=api_key)
-        res = service.cse().list(q=search_term, cx=cse_id, **kwargs).execute()
+        res = service.cse().list(q=search_term, cx=cse_id, hl=&#39;en&#39;, **kwargs).execute()
         try:
             return res[&#39;items&#39;]
         except KeyError:
@@ -141,16 +141,17 @@ class SourceAggregator:
             dictionary of Google search results
         &#34;&#34;&#34;
         # searches google using the generated queries
-        for query in tqdm(self.queries, desc=&#34;Search Google using generated queries&#34;):
-            # one search per query
-            query_results = self.searcher(query, num=5)
-            for result in query_results:
-                # write link to dict
-                self.process_result(result)
-        # Join the list of keywords/phrases into one string seperated by &#39;|&#39; and surrounded by &#34;&#34;
-        join_keywords = &#39;|&#39;.join(f&#39;&#34;{word}&#34;&#39; for word in self.keywords)
-        # Get the results from one query using the list of keywords
-        keyword_results = self.searcher(f&#34;(intext:{join_keywords})&#34;, num=10)
+        query_results = self.searcher(self.queries, num=10)
+        for result in tqdm(query_results, desc=&#34;Search Google using generated queries&#34;):
+            # write link to dict
+            self.process_result(result)
+        # search for the keywords, only 7 at a time
+        keyword_results = []
+        length_of_split = 7
+        split_keywords = [self.keywords[i:i + length_of_split]
+                          for i in range(0, len(self.keywords), length_of_split)]
+        for keywords in split_keywords:
+            keyword_results += self.searcher(keywords, num=10//len(split_keywords))
         # loop through results
         for result in tqdm(keyword_results, desc=&#34;Search Google using extracted keywords&#34;):
             # write link to dict
@@ -163,14 +164,8 @@ class SourceAggregator:
 
         WARNING: To search using generated queries and extracted keywords, the code has nested for
         loops.
-        The &#39;num&#39; argument for self.searcher method must be kept as is, otherwise performance will
-        be impacted.
-        Default performance:
-        19 social media sites
-        5 generated queries
-        2 search results per query
-        10 search results for all extracted keywords
-        total iterations until completion = 19*((5*2)+10) = 380
+        Significant performance boost achieved by finding out that the &#39;q&#39; parameter for cse.list
+        takes lists as well as strings.
 
         Returns:
             dictionary storing the social media results
@@ -179,23 +174,31 @@ class SourceAggregator:
         social_media_sites = [&#34;www.instagram.com&#34;, &#34;www.tiktok.com&#34;, &#34;www.facebook.com&#34;,
                               &#34;www.youtube.com&#34;, &#34;www.reddit.com&#34;, &#34;www.twitter.com&#34;,
                               &#34;www.pinterest.com&#34;, &#34;www.github.com&#34;, &#34;www.tumblr.com&#34;,
-                              &#34;www.flickr.com&#34;, &#34;www.steamcommunity.com&#34;, &#34;vimeo.com&#34;,
+                              &#34;www.flickr.com&#34;, &#34;vimeo.com&#34;, &#34;www.telegram.com&#34;
                               &#34;medium.com&#34;, &#34;vk.com&#34;, &#34;imgur.com&#34;, &#34;www.patreon.com&#34;,
                               &#34;bitbucket.org&#34;, &#34;www.dailymotion.com&#34;, &#34;news.ycombinator.com&#34;]
         # Join the list of keywords/phrases into one string seperated by &#39;|&#39; and surrounded by &#34;&#34;
-        join_keywords = &#39;|&#39;.join(f&#39;&#34;{word}&#34;&#39; for word in self.keywords)
+        # it appears that the max number of comparisons is between 7 and 10.
+        # google documentation says it should be 10
+        # join_keywords = &#39;|&#39;.join(f&#39;&#34;{word}&#34;&#39; for word in self.keywords)
         # Loop through list of social media sites
         for site in tqdm(social_media_sites, desc=&#34;Searching Social Media Sites&#34;):
             # this for loop is clearly inefficient, I don&#39;t know how to improve it
-            for query in self.queries:
-                # one search per query
-                query_results = self.searcher(query, num=2)
-                for result in query_results:
-                    # write link to dict
-                    self.process_result(result)
-            # search for the keywords using one google query
-            keyword_results = self.searcher(f&#34;(site:{site}) (intext:{join_keywords})&#34;, num=10)
+            # I&#39;m unsure of this behaviour as the siteSearch parameter doesn&#39;t seem to work
+            query_results = self.searcher(self.queries, siteSearch=site, siteSearchFilter=&#39;i&#39;,
+                                          num=5)
             # loop through results
+            for result in query_results:
+                # write link to dict
+                self.process_result(result)
+            # search for the keywords, only 7 at a time
+            keyword_results = []
+            length_of_split = 7
+            split_keywords = [self.keywords[i:i + length_of_split]
+                              for i in range(0, len(self.keywords), length_of_split)]
+            for keywords in split_keywords:
+                keyword_results += self.searcher(keywords, siteSearch=site,
+                                                 siteSearchFilter=&#39;i&#39;, num=5)
             for result in keyword_results:
                 # get process the result
                 self.process_result(result)
@@ -257,14 +260,15 @@ class SourceAggregator:
     def find_sources(self):
         &#34;&#34;&#34;Runs the various search operations.
 
-        Note: keep the number of queries to a minimum in order to avoid getting IP blocked by google
-        for too many requests.
+        Returns:
+            results in the form of a list of dictionaries
         &#34;&#34;&#34;
         # in both methods reduce number of queries
         self.google_search()
         self.social_media_search()
         # store potentially corroborating sources in .csv file
         self.file_handler.create_potential_corroboration_file(self.results_list_dict)
+        return self.results_list_dict
 
     # Media Processor
     # interrogate each link and return a description of the media
@@ -329,9 +333,20 @@ class SourceAggregator:
             The info we want: website title, description, images &amp; videos
         &#34;&#34;&#34;
         # retrieve html from URL
-        response = requests.get(url, timeout=10)    # timeout 10 seconds
-
-        soup = BeautifulSoup(response.text, &#34;html.parser&#34;)
+        response = requests.get(url, timeout=10)  # timeout 10 seconds
+        # get the content type
+        try:
+            content_type = response.headers[&#39;Content-Type&#39;]
+            # if xml use xml parser
+            if content_type == &#34;text/xml&#34; or content_type == &#34;application/xml&#34;:
+                # use xml parser
+                soup = BeautifulSoup(response.text, &#34;xml&#34;)
+            else:
+                # parse using the lxml html parser
+                soup = BeautifulSoup(response.text, &#34;lxml&#34;)
+        except KeyError:
+            # except on KeyError if no &#39;content-type&#39; header exists
+            soup = BeautifulSoup(response.text, &#34;lxml&#34;)
         # image and video tags may not be in the website.
         try:
             images = self.find_images(soup)
@@ -345,34 +360,7 @@ class SourceAggregator:
             iframes = self.find_iframes(soup)
         except KeyError:
             iframes = []
-        return images, videos, iframes
-
-    # Key information generator (likely using a BERT QA model)
-    # need to keep in mind the resource cost of processing, given time and resource costs are
-    # already high.
-
-    # discarded for now as processing cost is too high, causes each URL lookup to take over a minute
-    # *per url*, therefore these methods cannot be included in their current state.
-    &#34;&#34;&#34;
-    @staticmethod
-    def url_get_text(url):
-        page = requests.get(url, timeout=10)
-        soup = BeautifulSoup(page.content, &#34;html.parser&#34;)
-        return soup.get_text(strip=True)
-
-    def web_summary(self, url):
-        text = self.url_get_text(url)
-        tokenizer = AutoTokenizer.from_pretrained(&#34;google/pegasus-large&#34;)
-        model = AutoModelForSeq2SeqLM.from_pretrained(&#34;google/pegasus-large&#34;)
-
-        inputs = tokenizer(text, truncation=True, return_tensors=&#34;pt&#34;)
-
-        # Generate summary
-        summary_ids = model.generate(inputs[&#34;input_ids&#34;], max_new_tokens=1024)
-        summary = tokenizer.batch_decode(summary_ids, skip_special_tokens=True,
-                                         clean_up_tokenization_spaces=False)[0]
-        return summary
-        &#34;&#34;&#34;</code></pre>
+        return images, videos, iframes</code></pre>
 </details>
 </section>
 <section>
@@ -479,7 +467,7 @@ Everything output will be put into a 'Potential Corroboration Store'.</p>
         &#34;&#34;&#34;Using the Google Custom Search Engine to search for results to the search_term.
 
         Args:
-            search_term: The keyword/query to search for
+            search_term: The keyword/query to search for. This can be a string or a list of strings.
             kwargs: Extra arguments to pass to service.cse().list
 
         Returns:
@@ -489,7 +477,7 @@ Everything output will be put into a 'Potential Corroboration Store'.</p>
         api_key = &#34;AIzaSyCgsni4yZyp4Bla9J7a2TE-lxmzVagcjEo&#34;
         cse_id = &#34;d76b2d8504d104aa8&#34;
         service = build(&#34;customsearch&#34;, &#34;v1&#34;, developerKey=api_key)
-        res = service.cse().list(q=search_term, cx=cse_id, **kwargs).execute()
+        res = service.cse().list(q=search_term, cx=cse_id, hl=&#39;en&#39;, **kwargs).execute()
         try:
             return res[&#39;items&#39;]
         except KeyError:
@@ -506,16 +494,17 @@ Everything output will be put into a 'Potential Corroboration Store'.</p>
             dictionary of Google search results
         &#34;&#34;&#34;
         # searches google using the generated queries
-        for query in tqdm(self.queries, desc=&#34;Search Google using generated queries&#34;):
-            # one search per query
-            query_results = self.searcher(query, num=5)
-            for result in query_results:
-                # write link to dict
-                self.process_result(result)
-        # Join the list of keywords/phrases into one string seperated by &#39;|&#39; and surrounded by &#34;&#34;
-        join_keywords = &#39;|&#39;.join(f&#39;&#34;{word}&#34;&#39; for word in self.keywords)
-        # Get the results from one query using the list of keywords
-        keyword_results = self.searcher(f&#34;(intext:{join_keywords})&#34;, num=10)
+        query_results = self.searcher(self.queries, num=10)
+        for result in tqdm(query_results, desc=&#34;Search Google using generated queries&#34;):
+            # write link to dict
+            self.process_result(result)
+        # search for the keywords, only 7 at a time
+        keyword_results = []
+        length_of_split = 7
+        split_keywords = [self.keywords[i:i + length_of_split]
+                          for i in range(0, len(self.keywords), length_of_split)]
+        for keywords in split_keywords:
+            keyword_results += self.searcher(keywords, num=10//len(split_keywords))
         # loop through results
         for result in tqdm(keyword_results, desc=&#34;Search Google using extracted keywords&#34;):
             # write link to dict
@@ -528,14 +517,8 @@ Everything output will be put into a 'Potential Corroboration Store'.</p>
 
         WARNING: To search using generated queries and extracted keywords, the code has nested for
         loops.
-        The &#39;num&#39; argument for self.searcher method must be kept as is, otherwise performance will
-        be impacted.
-        Default performance:
-        19 social media sites
-        5 generated queries
-        2 search results per query
-        10 search results for all extracted keywords
-        total iterations until completion = 19*((5*2)+10) = 380
+        Significant performance boost achieved by finding out that the &#39;q&#39; parameter for cse.list
+        takes lists as well as strings.
 
         Returns:
             dictionary storing the social media results
@@ -544,23 +527,31 @@ Everything output will be put into a 'Potential Corroboration Store'.</p>
         social_media_sites = [&#34;www.instagram.com&#34;, &#34;www.tiktok.com&#34;, &#34;www.facebook.com&#34;,
                               &#34;www.youtube.com&#34;, &#34;www.reddit.com&#34;, &#34;www.twitter.com&#34;,
                               &#34;www.pinterest.com&#34;, &#34;www.github.com&#34;, &#34;www.tumblr.com&#34;,
-                              &#34;www.flickr.com&#34;, &#34;www.steamcommunity.com&#34;, &#34;vimeo.com&#34;,
+                              &#34;www.flickr.com&#34;, &#34;vimeo.com&#34;, &#34;www.telegram.com&#34;
                               &#34;medium.com&#34;, &#34;vk.com&#34;, &#34;imgur.com&#34;, &#34;www.patreon.com&#34;,
                               &#34;bitbucket.org&#34;, &#34;www.dailymotion.com&#34;, &#34;news.ycombinator.com&#34;]
         # Join the list of keywords/phrases into one string seperated by &#39;|&#39; and surrounded by &#34;&#34;
-        join_keywords = &#39;|&#39;.join(f&#39;&#34;{word}&#34;&#39; for word in self.keywords)
+        # it appears that the max number of comparisons is between 7 and 10.
+        # google documentation says it should be 10
+        # join_keywords = &#39;|&#39;.join(f&#39;&#34;{word}&#34;&#39; for word in self.keywords)
         # Loop through list of social media sites
         for site in tqdm(social_media_sites, desc=&#34;Searching Social Media Sites&#34;):
             # this for loop is clearly inefficient, I don&#39;t know how to improve it
-            for query in self.queries:
-                # one search per query
-                query_results = self.searcher(query, num=2)
-                for result in query_results:
-                    # write link to dict
-                    self.process_result(result)
-            # search for the keywords using one google query
-            keyword_results = self.searcher(f&#34;(site:{site}) (intext:{join_keywords})&#34;, num=10)
+            # I&#39;m unsure of this behaviour as the siteSearch parameter doesn&#39;t seem to work
+            query_results = self.searcher(self.queries, siteSearch=site, siteSearchFilter=&#39;i&#39;,
+                                          num=5)
             # loop through results
+            for result in query_results:
+                # write link to dict
+                self.process_result(result)
+            # search for the keywords, only 7 at a time
+            keyword_results = []
+            length_of_split = 7
+            split_keywords = [self.keywords[i:i + length_of_split]
+                              for i in range(0, len(self.keywords), length_of_split)]
+            for keywords in split_keywords:
+                keyword_results += self.searcher(keywords, siteSearch=site,
+                                                 siteSearchFilter=&#39;i&#39;, num=5)
             for result in keyword_results:
                 # get process the result
                 self.process_result(result)
@@ -622,14 +613,15 @@ Everything output will be put into a 'Potential Corroboration Store'.</p>
     def find_sources(self):
         &#34;&#34;&#34;Runs the various search operations.
 
-        Note: keep the number of queries to a minimum in order to avoid getting IP blocked by google
-        for too many requests.
+        Returns:
+            results in the form of a list of dictionaries
         &#34;&#34;&#34;
         # in both methods reduce number of queries
         self.google_search()
         self.social_media_search()
         # store potentially corroborating sources in .csv file
         self.file_handler.create_potential_corroboration_file(self.results_list_dict)
+        return self.results_list_dict
 
     # Media Processor
     # interrogate each link and return a description of the media
@@ -694,9 +686,20 @@ Everything output will be put into a 'Potential Corroboration Store'.</p>
             The info we want: website title, description, images &amp; videos
         &#34;&#34;&#34;
         # retrieve html from URL
-        response = requests.get(url, timeout=10)    # timeout 10 seconds
-
-        soup = BeautifulSoup(response.text, &#34;html.parser&#34;)
+        response = requests.get(url, timeout=10)  # timeout 10 seconds
+        # get the content type
+        try:
+            content_type = response.headers[&#39;Content-Type&#39;]
+            # if xml use xml parser
+            if content_type == &#34;text/xml&#34; or content_type == &#34;application/xml&#34;:
+                # use xml parser
+                soup = BeautifulSoup(response.text, &#34;xml&#34;)
+            else:
+                # parse using the lxml html parser
+                soup = BeautifulSoup(response.text, &#34;lxml&#34;)
+        except KeyError:
+            # except on KeyError if no &#39;content-type&#39; header exists
+            soup = BeautifulSoup(response.text, &#34;lxml&#34;)
         # image and video tags may not be in the website.
         try:
             images = self.find_images(soup)
@@ -710,34 +713,7 @@ Everything output will be put into a 'Potential Corroboration Store'.</p>
             iframes = self.find_iframes(soup)
         except KeyError:
             iframes = []
-        return images, videos, iframes
-
-    # Key information generator (likely using a BERT QA model)
-    # need to keep in mind the resource cost of processing, given time and resource costs are
-    # already high.
-
-    # discarded for now as processing cost is too high, causes each URL lookup to take over a minute
-    # *per url*, therefore these methods cannot be included in their current state.
-    &#34;&#34;&#34;
-    @staticmethod
-    def url_get_text(url):
-        page = requests.get(url, timeout=10)
-        soup = BeautifulSoup(page.content, &#34;html.parser&#34;)
-        return soup.get_text(strip=True)
-
-    def web_summary(self, url):
-        text = self.url_get_text(url)
-        tokenizer = AutoTokenizer.from_pretrained(&#34;google/pegasus-large&#34;)
-        model = AutoModelForSeq2SeqLM.from_pretrained(&#34;google/pegasus-large&#34;)
-
-        inputs = tokenizer(text, truncation=True, return_tensors=&#34;pt&#34;)
-
-        # Generate summary
-        summary_ids = model.generate(inputs[&#34;input_ids&#34;], max_new_tokens=1024)
-        summary = tokenizer.batch_decode(summary_ids, skip_special_tokens=True,
-                                         clean_up_tokenization_spaces=False)[0]
-        return summary
-        &#34;&#34;&#34;</code></pre>
+        return images, videos, iframes</code></pre>
 </details>
 <h3>Static methods</h3>
 <dl>
@@ -848,7 +824,7 @@ def find_videos(soup):
 <h2 id="args">Args</h2>
 <dl>
 <dt><strong><code>search_term</code></strong></dt>
-<dd>The keyword/query to search for</dd>
+<dd>The keyword/query to search for. This can be a string or a list of strings.</dd>
 <dt><strong><code>kwargs</code></strong></dt>
 <dd>Extra arguments to pass to service.cse().list</dd>
 </dl>
@@ -863,7 +839,7 @@ def searcher(search_term, **kwargs):
     &#34;&#34;&#34;Using the Google Custom Search Engine to search for results to the search_term.
 
     Args:
-        search_term: The keyword/query to search for
+        search_term: The keyword/query to search for. This can be a string or a list of strings.
         kwargs: Extra arguments to pass to service.cse().list
 
     Returns:
@@ -873,7 +849,7 @@ def searcher(search_term, **kwargs):
     api_key = &#34;AIzaSyCgsni4yZyp4Bla9J7a2TE-lxmzVagcjEo&#34;
     cse_id = &#34;d76b2d8504d104aa8&#34;
     service = build(&#34;customsearch&#34;, &#34;v1&#34;, developerKey=api_key)
-    res = service.cse().list(q=search_term, cx=cse_id, **kwargs).execute()
+    res = service.cse().list(q=search_term, cx=cse_id, hl=&#39;en&#39;, **kwargs).execute()
     try:
         return res[&#39;items&#39;]
     except KeyError:
@@ -888,8 +864,8 @@ def searcher(search_term, **kwargs):
 </code></dt>
 <dd>
 <div class="desc"><p>Runs the various search operations.</p>
-<p>Note: keep the number of queries to a minimum in order to avoid getting IP blocked by google
-for too many requests.</p></div>
+<h2 id="returns">Returns</h2>
+<p>results in the form of a list of dictionaries</p></div>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -897,14 +873,15 @@ for too many requests.</p></div>
 <pre><code class="python">def find_sources(self):
     &#34;&#34;&#34;Runs the various search operations.
 
-    Note: keep the number of queries to a minimum in order to avoid getting IP blocked by google
-    for too many requests.
+    Returns:
+        results in the form of a list of dictionaries
     &#34;&#34;&#34;
     # in both methods reduce number of queries
     self.google_search()
     self.social_media_search()
     # store potentially corroborating sources in .csv file
-    self.file_handler.create_potential_corroboration_file(self.results_list_dict)</code></pre>
+    self.file_handler.create_potential_corroboration_file(self.results_list_dict)
+    return self.results_list_dict</code></pre>
 </details>
 </dd>
 <dt id="auto_osint_v.source_aggregator.SourceAggregator.google_search"><code class="name flex">
@@ -930,16 +907,17 @@ Uses the Google Custom Search Engine</p>
         dictionary of Google search results
     &#34;&#34;&#34;
     # searches google using the generated queries
-    for query in tqdm(self.queries, desc=&#34;Search Google using generated queries&#34;):
-        # one search per query
-        query_results = self.searcher(query, num=5)
-        for result in query_results:
-            # write link to dict
-            self.process_result(result)
-    # Join the list of keywords/phrases into one string seperated by &#39;|&#39; and surrounded by &#34;&#34;
-    join_keywords = &#39;|&#39;.join(f&#39;&#34;{word}&#34;&#39; for word in self.keywords)
-    # Get the results from one query using the list of keywords
-    keyword_results = self.searcher(f&#34;(intext:{join_keywords})&#34;, num=10)
+    query_results = self.searcher(self.queries, num=10)
+    for result in tqdm(query_results, desc=&#34;Search Google using generated queries&#34;):
+        # write link to dict
+        self.process_result(result)
+    # search for the keywords, only 7 at a time
+    keyword_results = []
+    length_of_split = 7
+    split_keywords = [self.keywords[i:i + length_of_split]
+                      for i in range(0, len(self.keywords), length_of_split)]
+    for keywords in split_keywords:
+        keyword_results += self.searcher(keywords, num=10//len(split_keywords))
     # loop through results
     for result in tqdm(keyword_results, desc=&#34;Search Google using extracted keywords&#34;):
         # write link to dict
@@ -975,9 +953,20 @@ Uses the Google Custom Search Engine</p>
         The info we want: website title, description, images &amp; videos
     &#34;&#34;&#34;
     # retrieve html from URL
-    response = requests.get(url, timeout=10)    # timeout 10 seconds
-
-    soup = BeautifulSoup(response.text, &#34;html.parser&#34;)
+    response = requests.get(url, timeout=10)  # timeout 10 seconds
+    # get the content type
+    try:
+        content_type = response.headers[&#39;Content-Type&#39;]
+        # if xml use xml parser
+        if content_type == &#34;text/xml&#34; or content_type == &#34;application/xml&#34;:
+            # use xml parser
+            soup = BeautifulSoup(response.text, &#34;xml&#34;)
+        else:
+            # parse using the lxml html parser
+            soup = BeautifulSoup(response.text, &#34;lxml&#34;)
+    except KeyError:
+        # except on KeyError if no &#39;content-type&#39; header exists
+        soup = BeautifulSoup(response.text, &#34;lxml&#34;)
     # image and video tags may not be in the website.
     try:
         images = self.find_images(soup)
@@ -1130,14 +1119,8 @@ accuracy but better performance.</p>
 <div class="desc"><p>Searches a variety of social media sites see 'social_media_sites' variable.</p>
 <p>WARNING: To search using generated queries and extracted keywords, the code has nested for
 loops.
-The 'num' argument for self.searcher method must be kept as is, otherwise performance will
-be impacted.
-Default performance:
-19 social media sites
-5 generated queries
-2 search results per query
-10 search results for all extracted keywords
-total iterations until completion = 19<em>((5</em>2)+10) = 380</p>
+Significant performance boost achieved by finding out that the 'q' parameter for cse.list
+takes lists as well as strings.</p>
 <h2 id="returns">Returns</h2>
 <p>dictionary storing the social media results</p></div>
 <details class="source">
@@ -1149,14 +1132,8 @@ total iterations until completion = 19<em>((5</em>2)+10) = 380</p>
 
     WARNING: To search using generated queries and extracted keywords, the code has nested for
     loops.
-    The &#39;num&#39; argument for self.searcher method must be kept as is, otherwise performance will
-    be impacted.
-    Default performance:
-    19 social media sites
-    5 generated queries
-    2 search results per query
-    10 search results for all extracted keywords
-    total iterations until completion = 19*((5*2)+10) = 380
+    Significant performance boost achieved by finding out that the &#39;q&#39; parameter for cse.list
+    takes lists as well as strings.
 
     Returns:
         dictionary storing the social media results
@@ -1165,23 +1142,31 @@ total iterations until completion = 19<em>((5</em>2)+10) = 380</p>
     social_media_sites = [&#34;www.instagram.com&#34;, &#34;www.tiktok.com&#34;, &#34;www.facebook.com&#34;,
                           &#34;www.youtube.com&#34;, &#34;www.reddit.com&#34;, &#34;www.twitter.com&#34;,
                           &#34;www.pinterest.com&#34;, &#34;www.github.com&#34;, &#34;www.tumblr.com&#34;,
-                          &#34;www.flickr.com&#34;, &#34;www.steamcommunity.com&#34;, &#34;vimeo.com&#34;,
+                          &#34;www.flickr.com&#34;, &#34;vimeo.com&#34;, &#34;www.telegram.com&#34;
                           &#34;medium.com&#34;, &#34;vk.com&#34;, &#34;imgur.com&#34;, &#34;www.patreon.com&#34;,
                           &#34;bitbucket.org&#34;, &#34;www.dailymotion.com&#34;, &#34;news.ycombinator.com&#34;]
     # Join the list of keywords/phrases into one string seperated by &#39;|&#39; and surrounded by &#34;&#34;
-    join_keywords = &#39;|&#39;.join(f&#39;&#34;{word}&#34;&#39; for word in self.keywords)
+    # it appears that the max number of comparisons is between 7 and 10.
+    # google documentation says it should be 10
+    # join_keywords = &#39;|&#39;.join(f&#39;&#34;{word}&#34;&#39; for word in self.keywords)
     # Loop through list of social media sites
     for site in tqdm(social_media_sites, desc=&#34;Searching Social Media Sites&#34;):
         # this for loop is clearly inefficient, I don&#39;t know how to improve it
-        for query in self.queries:
-            # one search per query
-            query_results = self.searcher(query, num=2)
-            for result in query_results:
-                # write link to dict
-                self.process_result(result)
-        # search for the keywords using one google query
-        keyword_results = self.searcher(f&#34;(site:{site}) (intext:{join_keywords})&#34;, num=10)
+        # I&#39;m unsure of this behaviour as the siteSearch parameter doesn&#39;t seem to work
+        query_results = self.searcher(self.queries, siteSearch=site, siteSearchFilter=&#39;i&#39;,
+                                      num=5)
         # loop through results
+        for result in query_results:
+            # write link to dict
+            self.process_result(result)
+        # search for the keywords, only 7 at a time
+        keyword_results = []
+        length_of_split = 7
+        split_keywords = [self.keywords[i:i + length_of_split]
+                          for i in range(0, len(self.keywords), length_of_split)]
+        for keywords in split_keywords:
+            keyword_results += self.searcher(keywords, siteSearch=site,
+                                             siteSearchFilter=&#39;i&#39;, num=5)
         for result in keyword_results:
             # get process the result
             self.process_result(result)</code></pre>

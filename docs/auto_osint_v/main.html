@@ -32,19 +32,20 @@
 
 Run this file to run the tool.
 &#34;&#34;&#34;
-
 import os
 import sys
 from auto_osint_v.specific_entity_processor import EntityProcessor
 from auto_osint_v.file_handler import FileHandler
 from auto_osint_v.sentiment_analyser import SemanticAnalyser
 from auto_osint_v.source_aggregator import SourceAggregator
+from auto_osint_v.priority_manager import PriorityManager
 
 data_file_path = os.getcwd() + &#34;/data_files/&#34;
 sys.path.append(
     &#34;/auto_osint_v/main.py&#34;)
-
+# modify environment variables
 os.environ[&#34;PYTORCH_CUDA_ALLOC_CONF&#34;] = &#34;max_split_size_mb:128&#34;
+os.environ[&#39;TOKENIZERS_PARALLELISM&#39;] = &#39;false&#39;
 
 
 def input_intelligence():
@@ -58,8 +59,8 @@ def input_intelligence():
 def input_bias_sources():
     &#34;&#34;&#34;This function will create a csv file for the bias sources to be stored in.
     &#34;&#34;&#34;
-    print(&#34;Enter a Bias Source&#34;)
-    print(&#34;You will now be asked to enter any sources you believe are important to compare to.&#34;)
+    print(&#34;Enter a source for your intelligence statement&#34;)
+    print(&#34;Your source can be of any form.&#34;)
     print(&#34;This allows other sources of intelligence&#34;
           &#34;(such as closed or classified sources) to be compared.&#34;)
     option = str(input(&#34;Press ENTER to continue or press &#39;X&#39; to skip this step. &gt;&gt;&gt; &#34;))
@@ -79,8 +80,8 @@ if __name__ == &#39;__main__&#39;:
     intel_file = file_handler.read_file(&#34;intelligence_file.txt&#34;)
     # Entity Processor - identifies specific entities mentioned in intel statement
     print(&#34;Processing entities...&#34;)
-    process_entities = EntityProcessor(intel_file, file_handler)
-    process_entities.store_words_from_label()
+    process_entities = EntityProcessor(file_handler)
+    process_entities.store_words_from_label(intel_file)
 
     # Clean evidence_file.csv
     file_handler.clean_data_file(data_file_path + &#34;evidence_file.csv&#34;)
@@ -96,7 +97,28 @@ if __name__ == &#39;__main__&#39;:
     source_aggregator.search_query_generator()
     # Searches google and social media sites using the queries stored in source_aggregator object
     # search results will be stored in a dictionary in the source_aggregator Object.
-    source_aggregator.find_sources()</code></pre>
+    potential_sources = source_aggregator.find_sources()
+    # Initialise the Priority Manager
+    priority_manager = PriorityManager(file_handler, process_entities, potential_sources)
+    # Check the relevance of sources, filter out those that are not relevant.
+    # Assign higher priority (order) to sources that are most relevant.
+    sources = priority_manager.manager()
+    print([f&#34;url: {source[&#39;url&#39;]}, score: {source[&#39;score&#39;]}&#34; for source in sources])
+    # TODO:
+    #   ~~~~~ High Priority ~~~~~
+    #   Add the similarity checker
+    #   Add nice formatting to output (tabular, colour optional)
+    #   Reformat the &#39;bias source checker&#39; so that it asks for any sources of the intelligence
+    #   ~~~~~ Low Priority ~~~~~
+    #   Attempt to fix sentence indices out of range warning (popular info finder).
+    #   Attempt to solve the imgur sitemap problem (easy way: remove links to xml)
+    #   Solve issues with irrelevant output (possibly change formatting of source text)
+    #   Allow auto_osint_v.main to be called from command line, with the intelligence file as param.
+    #       This means either input through command line or ask for them to modify the file.
+    #       I believe that input into the command line will be difficult, so stick with modifying
+    #       file in their editor. Ask for user to modify file on first run.
+    #       This could mean having a &#39;silent&#39; or &#39;no_editor&#39; mode for the user to run if they have
+    #       already changed the intelligence file.</code></pre>
 </details>
 </section>
 <section>
@@ -118,8 +140,8 @@ if __name__ == &#39;__main__&#39;:
 <pre><code class="python">def input_bias_sources():
     &#34;&#34;&#34;This function will create a csv file for the bias sources to be stored in.
     &#34;&#34;&#34;
-    print(&#34;Enter a Bias Source&#34;)
-    print(&#34;You will now be asked to enter any sources you believe are important to compare to.&#34;)
+    print(&#34;Enter a source for your intelligence statement&#34;)
+    print(&#34;Your source can be of any form.&#34;)
     print(&#34;This allows other sources of intelligence&#34;
           &#34;(such as closed or classified sources) to be compared.&#34;)
     option = str(input(&#34;Press ENTER to continue or press &#39;X&#39; to skip this step. &gt;&gt;&gt; &#34;))

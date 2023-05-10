@@ -62,17 +62,18 @@ class FileHandler:
         &#34;&#34;&#34;
         bias_file_path = str(os.path.join(self.data_file_path, &#34;bias_sources.csv&#34;))
         with open(bias_file_path, &#34;w&#34;, encoding=&#34;utf-8&#34;) as bfile:
-            fieldnames = [&#39;Type&#39;, &#39;Key_Info&#39;]
+            fieldnames = [&#39;Type/Link&#39;, &#39;Key_Info&#39;]
             writer = csv.DictWriter(bfile, fieldnames)
             # enter source type and key information
             writer.writeheader()
             option = &#34;&#34;
             while option not in {&#34;x&#34;, &#34;X&#34;}:
-                source_type = str(input(&#34;Enter the source/intelligence type, &#34;
-                                        &#34;for example HUMINT, SIGINT, etc.\n&gt;&gt;&gt; &#34;))
+                source_type = str(input(&#34;If a closed/classified source, please enter the source &#34;
+                                        &#34;type (HUMINT, SIGINT, etc.)&#34;
+                                        &#34;If it is an open source, please enter the URL.\n&gt;&gt;&gt; &#34;))
                 key_info = str(input(&#34;Enter the key information proffered &#34;
                                      &#34;from this source/intelligence\n&gt;&gt;&gt; &#34;))
-                writer.writerow({&#34;Type&#34;: source_type, &#34;Key_Info&#34;: key_info})
+                writer.writerow({&#34;Type/Link&#34;: source_type, &#34;Key_Info&#34;: key_info})
                 option = str(input(&#34;Enter &#39;X&#39; to finish entering sources. &#34;
                                    &#34;Press ENTER to add another source&gt;&gt;&gt; &#34;))
             bfile.close()
@@ -98,7 +99,7 @@ class FileHandler:
                                  &#34;- Be sure to save the file before continuing.&#34;)
             fout.write(statement_help)
             fout.close()
-            webbrowser.open(intel_file_path)  # edit in chosen text editor
+            webbrowser.open(intel_file_path)  # edit in default text editor
 
     def read_file(self, filename):
         &#34;&#34;&#34;Reads the given file. Reads any file, extension is included in filename.
@@ -122,7 +123,8 @@ class FileHandler:
             All the info stored in /target_info_files/
         &#34;&#34;&#34;
         # List of words that have no meaning without context
-        irrelevant_words = [&#34;it&#34;, &#34;them&#34;, &#34;they&#34;, &#34;the&#34;, &#34;he&#34;, &#34;she&#34;]
+        irrelevant_words = [&#34;it&#34;, &#34;them&#34;, &#34;they&#34;, &#34;the&#34;, &#34;he&#34;, &#34;she&#34;, &#34;his&#34;, &#34;her&#34;, &#34;we&#34;, &#34;i&#34;,
+                            &#34;us&#34;, &#34;me&#34;, &#34;my&#34;, &#34;here&#34;, &#34;our&#34;]
         # the directory to find the target info files
         target_files_dir = os.path.join(self.data_file_path, &#34;target_info_files/&#34;)
         # list target info files
@@ -135,9 +137,10 @@ class FileHandler:
             frame = pd.read_csv(filepath, index_col=False)
             # appends every entry in the &#39;info&#39; column to the &#39;info_all&#39; list unless
             # it is irrelevant
-            value = frame[&#34;Info&#34;].values.tolist()
-            if value not in irrelevant_words:
-                info_all.extend(value)
+            values = frame[&#34;Info&#34;].values.tolist()
+            info_all.extend(values)
+        # remove irrelevant words
+        info_all = [word for word in info_all if word not in irrelevant_words]
         # return list after each file has been examined
         return info_all
 
@@ -145,8 +148,11 @@ class FileHandler:
     def clean_directory(directory):
         &#34;&#34;&#34;Cleans the given directory. Removes all files inside.
         &#34;&#34;&#34;
-        for file in os.listdir(directory):
-            os.remove(os.path.join(directory, file))
+        try:
+            for file in os.listdir(directory):
+                os.remove(os.path.join(directory, file))
+        except FileNotFoundError:
+            pass
 
     def clean_data_file(self, filename):
         &#34;&#34;&#34;Removes all data in given file
@@ -154,7 +160,10 @@ class FileHandler:
         Args:
             filename: name of file, can be path relative to &#39;data_files&#39; directory
         &#34;&#34;&#34;
-        os.remove(os.path.join(self.data_file_path, filename))
+        try:
+            os.remove(os.path.join(self.data_file_path, filename))
+        except FileNotFoundError:
+            pass
 
     @staticmethod
     def write_to_given_csv_file(file_object, to_write):
@@ -353,17 +362,18 @@ class FileHandler:
         &#34;&#34;&#34;
         bias_file_path = str(os.path.join(self.data_file_path, &#34;bias_sources.csv&#34;))
         with open(bias_file_path, &#34;w&#34;, encoding=&#34;utf-8&#34;) as bfile:
-            fieldnames = [&#39;Type&#39;, &#39;Key_Info&#39;]
+            fieldnames = [&#39;Type/Link&#39;, &#39;Key_Info&#39;]
             writer = csv.DictWriter(bfile, fieldnames)
             # enter source type and key information
             writer.writeheader()
             option = &#34;&#34;
             while option not in {&#34;x&#34;, &#34;X&#34;}:
-                source_type = str(input(&#34;Enter the source/intelligence type, &#34;
-                                        &#34;for example HUMINT, SIGINT, etc.\n&gt;&gt;&gt; &#34;))
+                source_type = str(input(&#34;If a closed/classified source, please enter the source &#34;
+                                        &#34;type (HUMINT, SIGINT, etc.)&#34;
+                                        &#34;If it is an open source, please enter the URL.\n&gt;&gt;&gt; &#34;))
                 key_info = str(input(&#34;Enter the key information proffered &#34;
                                      &#34;from this source/intelligence\n&gt;&gt;&gt; &#34;))
-                writer.writerow({&#34;Type&#34;: source_type, &#34;Key_Info&#34;: key_info})
+                writer.writerow({&#34;Type/Link&#34;: source_type, &#34;Key_Info&#34;: key_info})
                 option = str(input(&#34;Enter &#39;X&#39; to finish entering sources. &#34;
                                    &#34;Press ENTER to add another source&gt;&gt;&gt; &#34;))
             bfile.close()
@@ -389,7 +399,7 @@ class FileHandler:
                                  &#34;- Be sure to save the file before continuing.&#34;)
             fout.write(statement_help)
             fout.close()
-            webbrowser.open(intel_file_path)  # edit in chosen text editor
+            webbrowser.open(intel_file_path)  # edit in default text editor
 
     def read_file(self, filename):
         &#34;&#34;&#34;Reads the given file. Reads any file, extension is included in filename.
@@ -413,7 +423,8 @@ class FileHandler:
             All the info stored in /target_info_files/
         &#34;&#34;&#34;
         # List of words that have no meaning without context
-        irrelevant_words = [&#34;it&#34;, &#34;them&#34;, &#34;they&#34;, &#34;the&#34;, &#34;he&#34;, &#34;she&#34;]
+        irrelevant_words = [&#34;it&#34;, &#34;them&#34;, &#34;they&#34;, &#34;the&#34;, &#34;he&#34;, &#34;she&#34;, &#34;his&#34;, &#34;her&#34;, &#34;we&#34;, &#34;i&#34;,
+                            &#34;us&#34;, &#34;me&#34;, &#34;my&#34;, &#34;here&#34;, &#34;our&#34;]
         # the directory to find the target info files
         target_files_dir = os.path.join(self.data_file_path, &#34;target_info_files/&#34;)
         # list target info files
@@ -426,9 +437,10 @@ class FileHandler:
             frame = pd.read_csv(filepath, index_col=False)
             # appends every entry in the &#39;info&#39; column to the &#39;info_all&#39; list unless
             # it is irrelevant
-            value = frame[&#34;Info&#34;].values.tolist()
-            if value not in irrelevant_words:
-                info_all.extend(value)
+            values = frame[&#34;Info&#34;].values.tolist()
+            info_all.extend(values)
+        # remove irrelevant words
+        info_all = [word for word in info_all if word not in irrelevant_words]
         # return list after each file has been examined
         return info_all
 
@@ -436,8 +448,11 @@ class FileHandler:
     def clean_directory(directory):
         &#34;&#34;&#34;Cleans the given directory. Removes all files inside.
         &#34;&#34;&#34;
-        for file in os.listdir(directory):
-            os.remove(os.path.join(directory, file))
+        try:
+            for file in os.listdir(directory):
+                os.remove(os.path.join(directory, file))
+        except FileNotFoundError:
+            pass
 
     def clean_data_file(self, filename):
         &#34;&#34;&#34;Removes all data in given file
@@ -445,7 +460,10 @@ class FileHandler:
         Args:
             filename: name of file, can be path relative to &#39;data_files&#39; directory
         &#34;&#34;&#34;
-        os.remove(os.path.join(self.data_file_path, filename))
+        try:
+            os.remove(os.path.join(self.data_file_path, filename))
+        except FileNotFoundError:
+            pass
 
     @staticmethod
     def write_to_given_csv_file(file_object, to_write):
@@ -606,8 +624,11 @@ class FileHandler:
 def clean_directory(directory):
     &#34;&#34;&#34;Cleans the given directory. Removes all files inside.
     &#34;&#34;&#34;
-    for file in os.listdir(directory):
-        os.remove(os.path.join(directory, file))</code></pre>
+    try:
+        for file in os.listdir(directory):
+            os.remove(os.path.join(directory, file))
+    except FileNotFoundError:
+        pass</code></pre>
 </details>
 </dd>
 <dt id="auto_osint_v.file_handler.FileHandler.close_file"><code class="name flex">
@@ -702,7 +723,10 @@ def write_to_given_csv_file(file_object, to_write):
     Args:
         filename: name of file, can be path relative to &#39;data_files&#39; directory
     &#34;&#34;&#34;
-    os.remove(os.path.join(self.data_file_path, filename))</code></pre>
+    try:
+        os.remove(os.path.join(self.data_file_path, filename))
+    except FileNotFoundError:
+        pass</code></pre>
 </details>
 </dd>
 <dt id="auto_osint_v.file_handler.FileHandler.create_potential_corroboration_file"><code class="name flex">
@@ -766,7 +790,8 @@ def write_to_given_csv_file(file_object, to_write):
         All the info stored in /target_info_files/
     &#34;&#34;&#34;
     # List of words that have no meaning without context
-    irrelevant_words = [&#34;it&#34;, &#34;them&#34;, &#34;they&#34;, &#34;the&#34;, &#34;he&#34;, &#34;she&#34;]
+    irrelevant_words = [&#34;it&#34;, &#34;them&#34;, &#34;they&#34;, &#34;the&#34;, &#34;he&#34;, &#34;she&#34;, &#34;his&#34;, &#34;her&#34;, &#34;we&#34;, &#34;i&#34;,
+                        &#34;us&#34;, &#34;me&#34;, &#34;my&#34;, &#34;here&#34;, &#34;our&#34;]
     # the directory to find the target info files
     target_files_dir = os.path.join(self.data_file_path, &#34;target_info_files/&#34;)
     # list target info files
@@ -779,9 +804,10 @@ def write_to_given_csv_file(file_object, to_write):
         frame = pd.read_csv(filepath, index_col=False)
         # appends every entry in the &#39;info&#39; column to the &#39;info_all&#39; list unless
         # it is irrelevant
-        value = frame[&#34;Info&#34;].values.tolist()
-        if value not in irrelevant_words:
-            info_all.extend(value)
+        values = frame[&#34;Info&#34;].values.tolist()
+        info_all.extend(values)
+    # remove irrelevant words
+    info_all = [word for word in info_all if word not in irrelevant_words]
     # return list after each file has been examined
     return info_all</code></pre>
 </details>
@@ -972,17 +998,18 @@ the tool cannot use, but may be relevant to their analysis or conclusions.</p>
     &#34;&#34;&#34;
     bias_file_path = str(os.path.join(self.data_file_path, &#34;bias_sources.csv&#34;))
     with open(bias_file_path, &#34;w&#34;, encoding=&#34;utf-8&#34;) as bfile:
-        fieldnames = [&#39;Type&#39;, &#39;Key_Info&#39;]
+        fieldnames = [&#39;Type/Link&#39;, &#39;Key_Info&#39;]
         writer = csv.DictWriter(bfile, fieldnames)
         # enter source type and key information
         writer.writeheader()
         option = &#34;&#34;
         while option not in {&#34;x&#34;, &#34;X&#34;}:
-            source_type = str(input(&#34;Enter the source/intelligence type, &#34;
-                                    &#34;for example HUMINT, SIGINT, etc.\n&gt;&gt;&gt; &#34;))
+            source_type = str(input(&#34;If a closed/classified source, please enter the source &#34;
+                                    &#34;type (HUMINT, SIGINT, etc.)&#34;
+                                    &#34;If it is an open source, please enter the URL.\n&gt;&gt;&gt; &#34;))
             key_info = str(input(&#34;Enter the key information proffered &#34;
                                  &#34;from this source/intelligence\n&gt;&gt;&gt; &#34;))
-            writer.writerow({&#34;Type&#34;: source_type, &#34;Key_Info&#34;: key_info})
+            writer.writerow({&#34;Type/Link&#34;: source_type, &#34;Key_Info&#34;: key_info})
             option = str(input(&#34;Enter &#39;X&#39; to finish entering sources. &#34;
                                &#34;Press ENTER to add another source&gt;&gt;&gt; &#34;))
         bfile.close()</code></pre>
@@ -1021,7 +1048,7 @@ the tool cannot use, but may be relevant to their analysis or conclusions.</p>
                              &#34;- Be sure to save the file before continuing.&#34;)
         fout.write(statement_help)
         fout.close()
-        webbrowser.open(intel_file_path)  # edit in chosen text editor</code></pre>
+        webbrowser.open(intel_file_path)  # edit in default text editor</code></pre>
 </details>
 </dd>
 <dt id="auto_osint_v.file_handler.FileHandler.write_to_txt_file_remove_duplicates"><code class="name flex">
