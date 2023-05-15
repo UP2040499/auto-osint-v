@@ -5,7 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.10.0" />
 <title>auto_osint_v API documentation</title>
-<meta name="description" content="" />
+<meta name="description" content="A tool for validating OSINT.
+auto-osint-v # …" />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
 <link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
@@ -22,6 +23,74 @@
 <h1 class="title">Package <code>auto_osint_v</code></h1>
 </header>
 <section id="section-intro">
+<p>A tool for validating OSINT.</p>
+<h1 id="auto-osint-v">auto-osint-v</h1>
+<p><em>An automated tool for Validating OSINT. This forms part of the final step of OSINT production as
+detailed by NATO's open source handbook (2001). This is a research artefact for my Dissertation at
+the University of Portsmouth</em></p>
+<h2 id="installation">📁 Installation</h2>
+<blockquote>
+<p><strong>Note</strong>
+First, please attempt to use the Google Colab, more info <a href="#mortar_board-google-colab">below</a>.</p>
+</blockquote>
+<h3 id="linux-windows">Linux / Windows</h3>
+<ul>
+<li>Clone this GitHub repository <code>git clone https://github.com/UP2040499/auto-osint-v.git</code></li>
+<li>Install conda (mamba also works) </li>
+<li><a href="https://conda.io/projects/conda/en/latest/user-guide/install/index.html">Conda installation guide</a></li>
+<li>Check conda is installed by checking the version: <code>conda --version</code></li>
+<li>Move into the repo
+<code>bash
+cd ~/&lt;install directory&gt;/auto-osint-v</code></li>
+<li>Create a conda OR mamba environment and install dependencies:</li>
+<li>Install dependencies with conda:
+<code>bash
+conda env create -f environment.yml -n auto-osint-v-python38</code></li>
+<li>Install dependencies using mamba
+<code>bash
+mamba env create -f environment.yml</code></li>
+<li>Activate conda environment and run the tool.
+### Linux (bash)
+<code>bash
+eval "$(conda shell.bash hook)" #copy conda command to shell
+conda activate auto-osint-v-python38
+python -m auto_osint_v.main</code>
+### Windows
+&gt; :warning: Open an 'Anaconda Powershell Prompt' from Start Menu, then run the following:
+<code>powershell
+conda init powershell
+conda activate auto-osint-v-python38
+python -m auto_osint_v.main</code></li>
+</ul>
+<h2 id="usage">🚀 Usage</h2>
+<h3 id="google-colab">🎓 Google Colab</h3>
+<p>I strongly recommend using Google Colab to run this tool. However, the default machine in the Google
+Colab performs worse than most local machines would (this is likely to do with CPU limits in place).</p>
+<p>The Google Colab can be found <a href="https://colab.research.google.com/drive/18_PY8sSLYn3ThPBJMMSAfrjj_CxXu1h1?usp=sharing">here</a></p>
+<p>The reason it is recommended to use Google Colab, is because it runs the tool remotely.
+While performance on a local machine may be better, it is likely that the majority of the machine's
+available resources (CPU, RAM) will be utilised by the tool. </p>
+<p>Use Google Colab to avoid hogging your computer's resources.</p>
+<hr>
+<h3 id="command-line-instructions">💻 Command line instructions:</h3>
+<pre><code class="language-shell">python -m auto_osint_v.main &lt;ARGS&gt;
+</code></pre>
+<h4 id="arguments">🚧 Arguments 🚧</h4>
+<pre><code>arg1:
+arg2:
+...
+</code></pre>
+<h3 id="example-usage">Example usage:</h3>
+<pre><code class="language-bash">python -m auto_osint_v.main -arg1 -arg2
+</code></pre>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">&#34;&#34;&#34;A tool for validating OSINT.
+.. include:: ../README.md
+&#34;&#34;&#34;</code></pre>
+</details>
 </section>
 <section>
 <h2 class="section-title" id="header-submodules">Sub-modules</h2>
@@ -33,6 +102,14 @@
 <dt><code class="name"><a title="auto_osint_v.main" href="main.html">auto_osint_v.main</a></code></dt>
 <dd>
 <div class="desc"><p>This module forms the main part of the program, where other modules are run from …</p></div>
+</dd>
+<dt><code class="name"><a title="auto_osint_v.popular_information_finder" href="popular_information_finder.html">auto_osint_v.popular_information_finder</a></code></dt>
+<dd>
+<div class="desc"><p>Finds entities (information) that is popular amongst the potentially corroborating sources.</p></div>
+</dd>
+<dt><code class="name"><a title="auto_osint_v.priority_manager" href="priority_manager.html">auto_osint_v.priority_manager</a></code></dt>
+<dd>
+<div class="desc"><p>This module assigns scores to each source, prioritising the most relevant sources.</p></div>
 </dd>
 <dt><code class="name"><a title="auto_osint_v.sentiment_analyser" href="sentiment_analyser.html">auto_osint_v.sentiment_analyser</a></code></dt>
 <dd>
@@ -58,13 +135,32 @@
 <nav id="sidebar">
 <h1>Index</h1>
 <div class="toc">
-<ul></ul>
+<ul>
+<li><a href="#auto-osint-v">auto-osint-v</a><ul>
+<li><a href="#installation">📁 Installation</a><ul>
+<li><a href="#linux-windows">Linux / Windows</a></li>
+</ul>
+</li>
+<li><a href="#usage">🚀 Usage</a><ul>
+<li><a href="#google-colab">🎓 Google Colab</a></li>
+<li><a href="#command-line-instructions">💻 Command line instructions:</a><ul>
+<li><a href="#arguments">🚧 Arguments 🚧</a></li>
+</ul>
+</li>
+<li><a href="#example-usage">Example usage:</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
 </div>
 <ul id="index">
 <li><h3><a href="#header-submodules">Sub-modules</a></h3>
 <ul>
 <li><code><a title="auto_osint_v.file_handler" href="file_handler.html">auto_osint_v.file_handler</a></code></li>
 <li><code><a title="auto_osint_v.main" href="main.html">auto_osint_v.main</a></code></li>
+<li><code><a title="auto_osint_v.popular_information_finder" href="popular_information_finder.html">auto_osint_v.popular_information_finder</a></code></li>
+<li><code><a title="auto_osint_v.priority_manager" href="priority_manager.html">auto_osint_v.priority_manager</a></code></li>
 <li><code><a title="auto_osint_v.sentiment_analyser" href="sentiment_analyser.html">auto_osint_v.sentiment_analyser</a></code></li>
 <li><code><a title="auto_osint_v.source_aggregator" href="source_aggregator.html">auto_osint_v.source_aggregator</a></code></li>
 <li><code><a title="auto_osint_v.specific_entity_processor" href="specific_entity_processor.html">auto_osint_v.specific_entity_processor</a></code></li>

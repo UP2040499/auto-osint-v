@@ -4,7 +4,7 @@
 detailed by NATO's open source handbook (2001). This is a research artefact for my Dissertation at 
 the University of Portsmouth*
 
-## :file_folder: Installation
+## 📁 Installation
 
 > **Note**
 > First, please attempt to use the Google Colab, more info [below](#mortar_board-google-colab).
@@ -37,16 +37,16 @@ the University of Portsmouth*
     python -m auto_osint_v.main
     ```
     ### Windows
-    > :warning: Open an 'Anaconda Powershell Prompt' from Start Menu, then run the following.
+    > :warning: Open an 'Anaconda Powershell Prompt' from Start Menu, then run the following:
     ```powershell
     conda init powershell
     conda activate auto-osint-v-python38
     python -m auto_osint_v.main
     ```
 
-## :rocket: Usage
+## 🚀 Usage
 
-### :mortar_board: Google Colab
+### 🎓 Google Colab
 I strongly recommend using Google Colab to run this tool. However, the default machine in the Google
 Colab performs worse than most local machines would (this is likely to do with CPU limits in place).
 
@@ -59,12 +59,12 @@ available resources (CPU, RAM) will be utilised by the tool.
 Use Google Colab to avoid hogging your computer's resources.
 
 ---
-### :computer: Command line instructions:
+### 💻 Command line instructions:
 ```shell
 python -m auto_osint_v.main <ARGS>
 ```
 
-#### :construction: Arguments :construction:
+#### 🚧 Arguments 🚧
 ```
 arg1:
 arg2:
