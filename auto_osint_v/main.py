@@ -42,7 +42,7 @@ def input_bias_sources():
         file_handler.write_bias_file()
 
 
-def similar(a, b, threshold=0.72):
+def similar(a, b, threshold=0.90):
     """Determines if two sources are similar to each other
     Args:
         a: first url to compare
@@ -154,7 +154,7 @@ if __name__ == '__main__':
     # similarity_check(sources) - does not work, unfortunately.
 
     # OUTPUT:
-    
+
 
     # TODO:
     #   ~~~~~ High Priority ~~~~~
