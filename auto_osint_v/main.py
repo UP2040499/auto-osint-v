@@ -4,6 +4,10 @@ Run this file to run the tool.
 """
 import os
 import sys
+from itertools import combinations
+from sentence_transformers import SentenceTransformer, util
+from tqdm import tqdm
+
 from auto_osint_v.specific_entity_processor import EntityProcessor
 from auto_osint_v.file_handler import FileHandler
 from auto_osint_v.sentiment_analyser import SemanticAnalyser
@@ -36,6 +40,79 @@ def input_bias_sources():
     option = str(input("Press ENTER to continue or press 'X' to skip this step. >>> "))
     if option not in {"x", "X"}:
         file_handler.write_bias_file()
+
+
+def similar(a, b, threshold=0.72):
+    """Determines if two sources are similar to each other
+    Args:
+        a: first url to compare
+        b: second url to compare
+        threshold: Optional max similarity threshold for documents
+
+    Returns:
+        Boolean True or False
+    """
+    priority_manager = PriorityManager
+    text1, text2 = map(priority_manager.get_text_from_site, (a, b))
+    # split the texts every 500 chars
+    text1_split = [text1[i:i + 500] for i in range(0, len(text1), 500)]
+    text2_split = [text2[i:i + 500] for i in range(0, len(text2), 500)]
+    # for each 'sentence' in both texts generate similarity scores
+    model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
+    embeddings1 = model.encode(text1_split, convert_to_tensor=True)
+    embeddings2 = model.encode(text2_split, convert_to_tensor=True)
+
+    cosine_scores = util.cos_sim(embeddings1, embeddings2)
+    # print(f"{embeddings1}\n{embeddings2}\n\n{cosine_scores}")
+    # get maximum similarity (see BERTscore paper)
+    # Find the pairs with the highest cosine similarity scores
+    pairs = []
+    for i in range(cosine_scores.shape[0]):
+        for j in range(cosine_scores.shape[1]):
+            pairs.append({'index': [i, j], 'score': cosine_scores[i][j]})
+
+    # Sort scores in decreasing order
+    pairs = sorted(pairs, key=lambda x: x['score'], reverse=True)
+    highest_score = pairs[0]
+    print(highest_score['score'])
+    if highest_score['score'] > threshold:
+        return True
+    else:
+        return False
+
+
+def similarity_check(sources):
+    """Check the similarity of the top sources that will be output.
+
+    If a source is similar to another, remove the source with the lowest score.
+
+    BROKEN: seems to make results distinct, but at the cost of relevance. (not acceptable)
+
+    Args:
+        sources: the list of sources to examine
+    """
+    output_sources = sources[:10]
+    sources = sources[10:]
+    for source_a, source_b in tqdm(combinations(output_sources, 2),
+                                   total=len(list(combinations(output_sources, 2))),
+                                   desc="Checking source similarity, removing similar sources."):
+        if similar(source_a['url'], source_b['url']):  # optional parameter threshold available
+            # assuming scores of source_a > scores of source_b
+            try:
+                output_sources.remove(source_b)  # remove the lowest scoring source
+            except ValueError:
+                return output_sources
+            next_source = sources[0]
+            i = 1
+            while similar(source_a['url'], next_source['url']):
+                next_source = sources[i]
+                sources = sources[i:]
+                i += 1
+                if i > len(sources):
+                    break
+            output_sources.append(next_source)  # add next highest source
+            sources = sources[1:]
+    return output_sources
 
 
 if __name__ == '__main__':
@@ -73,13 +150,20 @@ if __name__ == '__main__':
     # Check the relevance of sources, filter out those that are not relevant.
     # Assign higher priority (order) to sources that are most relevant.
     sources = priority_manager.manager()
-    print([f"url: {source['url']}, score: {source['score']}" for source in sources])
+    # print([f"url: {source['url']}, score: {source['score']}" for source in sources])
+    # similarity_check(sources) - does not work, unfortunately.
+
+    # OUTPUT:
+    
+
     # TODO:
     #   ~~~~~ High Priority ~~~~~
     #   Add the similarity checker
     #   Add nice formatting to output (tabular, colour optional)
     #   Reformat the 'bias source checker' so that it asks for any sources of the intelligence
+    #   Source similarity goes just before the output. These branches can be merged into one.
     #   ~~~~~ Low Priority ~~~~~
+    #   Assign scores to the bias sources too.
     #   Attempt to fix sentence indices out of range warning (popular info finder).
     #   Attempt to solve the imgur sitemap problem (easy way: remove links to xml)
     #   Solve issues with irrelevant output (possibly change formatting of source text)

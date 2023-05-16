@@ -88,7 +88,7 @@ class EntityProcessor:
         # split the text
         for i, sentence in enumerate(text_list):
             # if you see 'token indices sequence length is longer' warning
-            if len(sentence) > 512:    # reduce this value
+            if len(sentence) > 500:    # reduce this value
                 # split the sentence every 500 chars
                 text_list[i] = [sentence[j:j + 500] for j in range(0, len(sentence), 500)]
                 # flatten resulting list
