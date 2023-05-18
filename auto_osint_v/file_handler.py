@@ -49,7 +49,7 @@ class FileHandler:
                                    "Press ENTER to add another source>>> "))
             bfile.close()
 
-    def write_intel_file(self):
+    def write_intel_file(self, editor: bool):
         """Creates and writes a file for the intelligence statement to be stored in.
 
         This opens the file in the text editor for easier statement writing.
@@ -68,9 +68,15 @@ class FileHandler:
                                  "- Remove this help section and replace it with your "
                                  "intelligence statement.\n"
                                  "- Be sure to save the file before continuing.")
-            fout.write(statement_help)
-            fout.close()
-            webbrowser.open(intel_file_path)  # edit in default text editor
+            if editor:
+                fout.write(statement_help)
+                fout.close()
+                webbrowser.open(intel_file_path)  # edit in default text editor
+            else:
+                statement = str(input(statement_help))
+                fout.write(statement)
+                fout.close()
+
 
     def read_file(self, filename):
         """Reads the given file. Reads any file, extension is included in filename.

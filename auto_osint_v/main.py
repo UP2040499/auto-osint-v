@@ -7,6 +7,7 @@ import sys
 from itertools import combinations
 from sentence_transformers import SentenceTransformer, util
 from tqdm import tqdm
+import argparse
 
 from auto_osint_v.specific_entity_processor import EntityProcessor
 from auto_osint_v.file_handler import FileHandler
@@ -22,12 +23,17 @@ os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:128"
 os.environ['TOKENIZERS_PARALLELISM'] = 'false'
 
 
-def input_intelligence():
+def input_intelligence(editor: bool):
     """This method creates a text file for the user to input their intelligence statement into.
     """
-    print("A notepad window will now open in your default text editor.")
-    print("Please enter the intelligence statement in there and save the file.\n")
-    file_handler.write_intel_file()
+    print("You will now be directed to enter the intelligence statement.")
+    if editor:
+        print("Please enter the intelligence statement in the text editor window that has opened"
+              "and save the file.\n")
+    else:
+        print("Please enter the intelligence statement into the command line.")
+    file_handler.write_intel_file(editor)
+
 
 
 def input_bias_sources():
@@ -116,11 +122,27 @@ def similarity_check(sources):
 
 
 if __name__ == '__main__':
+    # interpret command line arguments
+    parser = argparse.ArgumentParser()
+    # add optional arguments
+    parser.add_argument("-s", "--Silent", help="Assumes you have already entered the intelligence"
+                                               "statement in "
+                                               "auto_osint_v/data_files/intelligence_file.txt")
+    parser.add_argument("-n", "--NoEditor", help="Input intelligence statement into command line"
+                                                 "rather than into text editor.")
+    # read args from command line
+    args = parser.parse_args()
     # This code won't run if this file is imported.
     file_handler = FileHandler(data_file_path)
     # Only input point for user - potential refinement would be a feedback loop to the user.
-    input_intelligence()
-    input("\nPress ENTER to continue...\n")
+    use_editor = True
+    if args.NoEditor:
+        use_editor = False
+    if not args.Silent:
+        input_intelligence(use_editor)
+        input("\nPress ENTER to continue...\n")
+    else:
+        print("Intelligence statement already entered, skipping...")
     input_bias_sources()
     # Read intelligence file
     print("Reading intelligence file...")
@@ -151,6 +173,7 @@ if __name__ == '__main__':
     # Assign higher priority (order) to sources that are most relevant.
     sources = priority_manager.manager()
     # print([f"url: {source['url']}, score: {source['score']}" for source in sources])
+
     # similarity_check(sources) - does not work, unfortunately.
 
     # OUTPUT:
