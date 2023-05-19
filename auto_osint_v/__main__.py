@@ -176,8 +176,10 @@ if __name__ == '__main__':
     parser.add_argument("-n", "--NoEditor", action='store_true',
                         help="Input intelligence statement into command line"
                              "rather than into text editor.")
-    parser.add_argument("--html", action='store_true', help="Output will be in HTML.")
-    parser.add_argument("-m", "--markdown", action='store_true', help="Output will be in markdown")
+    parser.add_argument("--html", action='store_true', help="Output will be in HTML "
+                                                            "(default: csv).")
+    parser.add_argument("-m", "--markdown", action='store_true', help="Output will be in markdown "
+                                                                      "(default: csv)")
     parser.add_argument("-f", "--FileToUse", help="Specify the file to read the intelligence "
                                                   "statement from")
     parser.add_argument("-p", "--output_postfix", help="Specify the output file's postfix,"
