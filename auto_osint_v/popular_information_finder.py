@@ -2,6 +2,7 @@
 """
 import itertools
 from multiprocessing import Pool, Manager
+import requests
 import selenium.common.exceptions
 from bs4 import BeautifulSoup
 from tqdm import tqdm
@@ -59,7 +60,7 @@ class PopularInformationFinder:
         try:
             response = requests.get(url, headers, timeout=5)
         except (requests.exceptions.ReadTimeout, requests.exceptions.ConnectionError):
-            return text
+            return entities
         if "application/javascript" in response.headers['Content-Type'] \
                 or response.status_code != 200:
             # using selenium to avoid 'JavaScript is not available." error

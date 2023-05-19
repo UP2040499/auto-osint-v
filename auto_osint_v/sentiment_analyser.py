@@ -16,7 +16,7 @@ class SentimentAnalyser:
         """Initialises variables to be used in this object.
 
         Args:
-            read_statement: This is the statement input in main.py and read by 
+            read_statement: This is the statement input in __main__.py and read by
                             FileHandler.read_file()
             statement_title: This is the source title or filename.
             file_handler_object: The file handler object passed to the class for reuse

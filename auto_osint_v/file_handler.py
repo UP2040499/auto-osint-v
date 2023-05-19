@@ -39,12 +39,12 @@ class FileHandler:
             writer.writeheader()
             option = ""
             while option not in {"x", "X"}:
-                source_type = str(input("If a closed/classified source, please enter the source "
-                                        "type (HUMINT, SIGINT, etc.)"
+                source_type = str(input("If you wish to enter a source that has no URL, just enter "
+                                        "the type of source (e.g. HUMINT, SIGINT, etc.)."
                                         "If it is an open source, please enter the URL.\n>>> "))
                 key_info = str(input("Enter the key information proffered "
                                      "from this source/intelligence\n>>> "))
-                writer.writerow({"Type/Link": source_type, "Key_Info": key_info,
+                writer.writerow({"Type/Link": source_type, "Key Info": key_info,
                                  "Info Sentiment": info_analyser(key_info)})
                 option = str(input("Enter 'X' to finish entering sources. "
                                    "Press ENTER to add another source>>> "))

@@ -19,7 +19,7 @@ from auto_osint_v.priority_manager import PriorityManager
 
 data_file_path = os.getcwd() + "/data_files/"
 sys.path.append(
-    "/auto_osint_v/main.py")
+    "/auto_osint_v/__main__.py")
 # modify environment variables
 os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:128"
 os.environ['TOKENIZERS_PARALLELISM'] = 'false'
@@ -169,14 +169,17 @@ if __name__ == '__main__':
     # interpret command line arguments
     parser = argparse.ArgumentParser()
     # add optional arguments
-    parser.add_argument("-s", "--Silent", help="Assumes you have already entered the intelligence"
-                                               "statement in "
-                                               "auto_osint_v/data_files/intelligence_file.txt")
-    parser.add_argument("-n", "--NoEditor", help="Input intelligence statement into command line"
-                                                 "rather than into text editor.")
-    parser.add_argument("-h", "--html", help="Output will be in HTML.")
-    parser.add_argument("-m", "--markdown", help="Output will be in markdown")
-    parser.add_argument("-f", "--FileToUse", help="specify the file to use")
+    parser.add_argument("-s", "--Silent", action='store_true',
+                        help="Assumes you have already entered the intelligence"
+                             "statement in "
+                             "auto_osint_v/data_files/intelligence_file.txt")
+    parser.add_argument("-n", "--NoEditor", action='store_true',
+                        help="Input intelligence statement into command line"
+                             "rather than into text editor.")
+    parser.add_argument("--html", action='store_true', help="Output will be in HTML.")
+    parser.add_argument("-m", "--markdown", action='store_true', help="Output will be in markdown")
+    parser.add_argument("-f", "--FileToUse", help="Specify the file to read the intelligence "
+                                                  "statement from")
     parser.add_argument("-p", "--output_postfix", help="Specify the output file's postfix,"
                                                        "e.g. 'output3.txt' rather than default "
                                                        "'output.txt'")
@@ -250,15 +253,13 @@ if __name__ == '__main__':
 
     # TODO:
     #   ~~~~~ High Priority ~~~~~
-    #   Add nice formatting to output (tabular, colour optional)
-    #   Reformat the 'bias source checker' so that it asks for any sources of the intelligence
-    #   Source similarity goes just before the output. These branches can be merged into one.
+    #   TEST the 'bias source checker' so that it asks for any sources of the intelligence
     #   ~~~~~ Low Priority ~~~~~
     #   Assign scores to the bias sources too.
     #   Attempt to fix sentence indices out of range warning (popular info finder).
     #   Attempt to solve the imgur sitemap problem (easy way: remove links to xml)
     #   Solve issues with irrelevant output (possibly change formatting of source text)
-    #   Allow auto_osint_v.main to be called from command line, with the intelligence file as param.
+    #   TEST auto_osint_v.main to be called from command line, with the intelligence file as param.
     #       This means either input through command line or ask for them to modify the file.
     #       I believe that input into the command line will be difficult, so stick with modifying
     #       file in their editor. Ask for user to modify file on first run.

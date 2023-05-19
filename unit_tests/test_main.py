@@ -1,7 +1,7 @@
 import csv
 from unittest import TestCase
 import os
-from auto_osint_v.main import format_output
+from auto_osint_v.__main__ import format_output
 from auto_osint_v.file_handler import FileHandler
 
 
