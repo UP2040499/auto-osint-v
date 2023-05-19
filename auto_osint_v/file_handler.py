@@ -270,7 +270,7 @@ class FileHandler:
 
     def read_evidence_file(self):
         evidence_file_path = self.data_file_path + "evidence_file.csv"
-        with open(evidence_file_path, "r") as evidence_file:
+        with open(evidence_file_path, "r", encoding="utf-8") as evidence_file:
             reader = csv.DictReader(evidence_file)
             list_of_dicts = list(reader)
             return list_of_dicts
@@ -299,3 +299,13 @@ class FileHandler:
             writer.writeheader()
             # write the dictionary to csv
             writer.writerows(sources_list_of_dicts)
+
+    def get_output_path(self, postfix, file_ext):
+        """Gets the path of the output file"""
+        output_directory = self.data_file_path + "output"
+        try:
+            os.mkdir(output_directory)
+            file_path = str(os.path.join(output_directory, f"output{postfix}.{file_ext}"))
+        except FileExistsError:
+            file_path = str(os.path.join(output_directory, f"output{postfix}.{file_ext}"))
+        return file_path

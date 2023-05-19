@@ -3,6 +3,7 @@
 import inspect
 from typing import List
 from multiprocessing import Pool
+import requests
 import selenium.common.exceptions
 from tqdm import tqdm
 from bs4 import BeautifulSoup
@@ -87,37 +88,53 @@ class PriorityManager:
         """
         # initialise the webpage text variable
         text = ""
-        # using selenium to avoid 'JavaScript is not available." error
-        options = webdriver.ChromeOptions()
-        options.headless = True
-        options.add_argument("start-maximized")
-        options.add_experimental_option("excludeSwitches", ["enable-automation"])
-        options.add_experimental_option('useAutomationExtension', False)
-        options.add_argument('--disable-blink-features=AutomationControlled')
-        options.add_argument(
-            "user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, "
-            "like Gecko) Chrome/98.0.4758.102 Safari/537.36")
-        driver = webdriver.Chrome(chrome_options=options)
-        # driver.set_page_load_timeout(5)  # set timeout to 5 secs
-        # request the webpage. If source website timeout, return the current list of entities.
-        driver.get(url)
-        html = driver.page_source
-        # check if we are wasting our time with a broken or inaccessible website
+        # set headers to try to avoid 403 errors
+        headers = {
+            'User-Agent':
+                'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) '
+                'Chrome/112.0.0.0 Safari/537.36'}
+        # request the webpage - if timeout, move on to next source
         try:
-            request = driver.wait_for_request(url, 5)
-        except selenium.common.exceptions.TimeoutException:
-            driver.quit()
+            response = requests.get(url, headers, timeout=5)
+        except (requests.exceptions.ReadTimeout, requests.exceptions.ConnectionError):
             return text
-        if request.response.status_code in {400, 401, 403, 404, 429}:
-            driver.quit()
-            return text
+        if "application/javascript" in response.headers['Content-Type'] \
+                or response.status_code != 200:
+            # using selenium to avoid 'JavaScript is not available." error
+            options = webdriver.ChromeOptions()
+            options.headless = True
+            options.add_argument("start-maximized")
+            options.add_experimental_option("excludeSwitches", ["enable-automation"])
+            options.add_experimental_option('useAutomationExtension', False)
+            options.add_argument('--disable-blink-features=AutomationControlled')
+            options.add_argument(
+                "user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, "
+                "like Gecko) Chrome/98.0.4758.102 Safari/537.36")
+            driver = webdriver.Chrome(chrome_options=options)
+            # driver.set_page_load_timeout(5)  # set timeout to 5 secs
+            # request the webpage. If source website timeout, return the current list of entities.
+            driver.get(url)
+            html = driver.page_source
+            # check if we are wasting our time with a broken or inaccessible website
+            try:
+                request = driver.wait_for_request(url, 5)
+                response = request.response
+                driver.quit()
+            except selenium.common.exceptions.TimeoutException:
+                driver.quit()
+                return text
+            if request.response.status_code in {400, 401, 403, 404, 429}:
+                driver.quit()
+                return text
+        else:
+            html = response.text
         # get the content type
         try:
-            content_type = request.response.headers['Content-Type']
+            # response is either the requests or selenium response
+            content_type = response.headers['Content-Type']
             # if xml use xml parser
             if content_type == "text/xml" or content_type == "application/xml":
                 # don't parse xml
-                driver.quit()
                 return text
             else:
                 # parse using the lxml html parser
@@ -138,7 +155,6 @@ class PriorityManager:
         # drop blank lines
         text = '\n'.join(chunk for chunk in chunks if chunk)
         # return string text formatted and with line breaks
-        driver.quit()
         return text
 
     def target_info_scorer(self):

@@ -208,7 +208,7 @@ class SourceAggregator:
         try:
             iframes, images, videos = self.media_finder(link)
         except (requests.exceptions.SSLError, requests.exceptions.Timeout):
-            iframes, images, videos = [], [], []
+            iframes, images, videos = "NaN", "NaN", "NaN"
         # sentiment analysis check - will discard headlines that appear inflammatory or bias
         # keep threshold relatively high (>0.8), see process_result() documentation.
         max_sentiment_threshold = 0.9

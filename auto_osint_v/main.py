@@ -139,24 +139,29 @@ def format_output(source_list_dict: List[dict], file_handler_obj):
     dataframe = pd.DataFrame(columns=["Evidence Type", "Important Info", "URL", "Extra Info",
                                       "Priority Score", "Headline Sentiment"])
     # add sentiment analysis of statement to dataframe
-    dataframe = dataframe.append({"Evidence Type": sentiment_dict["evidence type"],
-                                  "Important Info": sentiment_dict["info"]})
+    sentiment_df = pd.DataFrame(
+        [{"Evidence Type": sentiment_dict["evidence type"],
+          "Important Info": sentiment_dict["info"]}])
+    dataframe = pd.concat([dataframe, sentiment_df], ignore_index=True)
     # add bias sources to the dataframe
     for bias_dict in bias_list_dict:
-        dataframe = dataframe.append({"Evidence Type": bias_dict["Type/Link"],
-                                      "Important Info": bias_dict["Key Info"],
-                                      "Headline Sentiment": bias_dict["Info Sentiment"]})
+        bias_df = pd.DataFrame(
+            [{"Evidence Type": bias_dict["Type/Link"],
+              "Important Info": bias_dict["Key Info"],
+              "Headline Sentiment": bias_dict["Info Sentiment"]
+              }])
+        dataframe = pd.concat([dataframe, bias_df], ignore_index=True)
     # add corroborating sources to the dataframe
     for source in source_list_dict:
-        dataframe = dataframe.append({"Evidence Type": "Corroboration",
-                                      "Important Info": source["title"],
-                                      "URL": source["url"],
-                                      "Extra Info": source["description"] + " Page Type: " +
-                                      source["page_type"] + " Published on: " +
-                                      source["time_published"],
-                                      "Priority Score": source["score"],
-                                      "Headline Sentiment": source["title_sentiment"]
-                                      })
+        source_df = pd.DataFrame(
+            [{"Evidence Type": "Corroboration", "Important Info": source["title"],
+              "URL": source["url"], "Extra Info": source["description"] + " Page Type: "
+                                                  + source["page_type"] + " Published on: " +
+                                                  source["time_published"],
+              "Priority Score": source["score"],
+              "Headline Sentiment": source["title_sentiment"]
+              }])
+        dataframe = pd.concat([dataframe, source_df], ignore_index=True)
     return dataframe
 
 
@@ -169,6 +174,12 @@ if __name__ == '__main__':
                                                "auto_osint_v/data_files/intelligence_file.txt")
     parser.add_argument("-n", "--NoEditor", help="Input intelligence statement into command line"
                                                  "rather than into text editor.")
+    parser.add_argument("-h", "--html", help="Output will be in HTML.")
+    parser.add_argument("-m", "--markdown", help="Output will be in markdown")
+    parser.add_argument("-f", "--FileToUse", help="specify the file to use")
+    parser.add_argument("-p", "--output_postfix", help="Specify the output file's postfix,"
+                                                       "e.g. 'output3.txt' rather than default "
+                                                       "'output.txt'")
     # read args from command line
     args = parser.parse_args()
     # This code won't run if this file is imported.
@@ -177,17 +188,20 @@ if __name__ == '__main__':
     use_editor = True
     if args.NoEditor:
         use_editor = False
-    if not args.Silent:
+    if args.Silent:
+        print("Intelligence statement already entered, skipping...")
+    else:
         input_intelligence(use_editor)
         input("\nPress ENTER to continue...\n")
-    else:
-        print("Intelligence statement already entered, skipping...")
     intel_file = ""
     analyse_sentiment_object = SentimentAnalyser(intel_file, "intelligence_statement", file_handler)
     input_bias_sources(analyse_sentiment_object)
     # Read intelligence file
     print("Reading intelligence file...")
-    intel_file = file_handler.read_file("intelligence_file.txt")
+    if args.FileToUse:
+        intel_file = file_handler.read_file(args.FileToUse)
+    else:
+        intel_file = file_handler.read_file("intelligence_file.txt")
     # set the statement parameter
     analyse_sentiment_object.set_statement(intel_file)
     # Entity Processor - identifies specific entities mentioned in intel statement
@@ -220,9 +234,19 @@ if __name__ == '__main__':
 
     # OUTPUT:
     out_df = format_output(sources, file_handler)
+    # save the user's given postfix for the output file
+    if args.output_postfix:
+        pfix = args.output_postfix
+    else:
+        pfix = ""
     # we can turn sources into a pandas dataframe then use df.style or display(df) or tabulate(df)
-    # display the dataframe
-    out_df.style
+    # save the dataframe to a markdown or html file
+    if args.markdown:
+        out_df.to_markdown(file_handler.get_output_path(pfix, "md"))
+    elif args.html:
+        out_df.to_html(file_handler.get_output_path(pfix, "html"))
+    else:
+        out_df.to_csv(file_handler.get_output_path(pfix, "csv"))
 
     # TODO:
     #   ~~~~~ High Priority ~~~~~
