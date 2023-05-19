@@ -6,8 +6,8 @@ This module will likely be reused/modified within source aggregation.
 from transformers import pipeline
 
 
-class SemanticAnalyser:
-    """This class provides methods for conducting semantic analysis on a given document.
+class SentimentAnalyser:
+    """This class provides methods for conducting sentiment analysis on a given document.
 
     This document could be the intelligence statement or a different document.
     """
@@ -29,10 +29,14 @@ class SemanticAnalyser:
         self.sentiment_analysis = pipeline("sentiment-analysis",
                                            model="Souvikcmsa/BERT_sentiment_analysis")
 
-    def statement_analyser(self):
-        """This method analyses the intelligence statement.
+    def set_statement(self, new_statement):
+        """Setter for the self.statement initial variable"""
+        self.statement = new_statement
 
-        (or it may be used to analyse other statements)
+    def statement_analyser(self):
+        """This method analyses the overall sentiment of the intelligence statement.
+
+        (it could be used to analyse other statements)
         This code is all from the Hugging Face documentation.
 
         Returns:

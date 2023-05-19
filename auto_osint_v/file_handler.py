@@ -22,7 +22,7 @@ class FileHandler:
         self.urls_present = []
         self.data_file_path = data_file
 
-    def write_bias_file(self):
+    def write_bias_file(self, info_analyser):
         """Creates and writes to the bias information file.
 
         This bias information is only useful for the user if they want to include information that
@@ -33,7 +33,7 @@ class FileHandler:
         """
         bias_file_path = str(os.path.join(self.data_file_path, "bias_sources.csv"))
         with open(bias_file_path, "w", encoding="utf-8") as bfile:
-            fieldnames = ['Type/Link', 'Key_Info']
+            fieldnames = ['Type/Link', 'Key Info', 'Info Sentiment']
             writer = csv.DictWriter(bfile, fieldnames)
             # enter source type and key information
             writer.writeheader()
@@ -44,10 +44,18 @@ class FileHandler:
                                         "If it is an open source, please enter the URL.\n>>> "))
                 key_info = str(input("Enter the key information proffered "
                                      "from this source/intelligence\n>>> "))
-                writer.writerow({"Type/Link": source_type, "Key_Info": key_info})
+                writer.writerow({"Type/Link": source_type, "Key_Info": key_info,
+                                 "Info Sentiment": info_analyser(key_info)})
                 option = str(input("Enter 'X' to finish entering sources. "
                                    "Press ENTER to add another source>>> "))
             bfile.close()
+
+    def read_bias_file(self):
+        bias_file_path = str(os.path.join(self.data_file_path, "bias_sources.csv"))
+        with open(bias_file_path, "r", encoding="utf-8") as bfile:
+            reader = csv.DictReader(bfile)
+            list_of_dicts = list(reader)
+            return list_of_dicts
 
     def write_intel_file(self, editor: bool):
         """Creates and writes a file for the intelligence statement to be stored in.
@@ -76,7 +84,6 @@ class FileHandler:
                 statement = str(input(statement_help))
                 fout.write(statement)
                 fout.close()
-
 
     def read_file(self, filename):
         """Reads the given file. Reads any file, extension is included in filename.
@@ -260,6 +267,13 @@ class FileHandler:
             with open(evidence_file_path, "a", encoding="utf-8") as evidence_file:
                 # Append info to csv
                 self.write_to_given_csv_file(evidence_file, to_write)
+
+    def read_evidence_file(self):
+        evidence_file_path = self.data_file_path + "evidence_file.csv"
+        with open(evidence_file_path, "r") as evidence_file:
+            reader = csv.DictReader(evidence_file)
+            list_of_dicts = list(reader)
+            return list_of_dicts
 
     def create_potential_corroboration_file(self, sources_list_of_dicts):
         """Creates the potential corroboration source store.

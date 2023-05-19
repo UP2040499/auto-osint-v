@@ -8,10 +8,12 @@ from itertools import combinations
 from sentence_transformers import SentenceTransformer, util
 from tqdm import tqdm
 import argparse
+import pandas as pd
+from typing import List
 
 from auto_osint_v.specific_entity_processor import EntityProcessor
 from auto_osint_v.file_handler import FileHandler
-from auto_osint_v.sentiment_analyser import SemanticAnalyser
+from auto_osint_v.sentiment_analyser import SentimentAnalyser
 from auto_osint_v.source_aggregator import SourceAggregator
 from auto_osint_v.priority_manager import PriorityManager
 
@@ -35,8 +37,7 @@ def input_intelligence(editor: bool):
     file_handler.write_intel_file(editor)
 
 
-
-def input_bias_sources():
+def input_bias_sources(sentiment_analyser):
     """This function will create a csv file for the bias sources to be stored in.
     """
     print("Enter a source for your intelligence statement")
@@ -45,7 +46,7 @@ def input_bias_sources():
           "(such as closed or classified sources) to be compared.")
     option = str(input("Press ENTER to continue or press 'X' to skip this step. >>> "))
     if option not in {"x", "X"}:
-        file_handler.write_bias_file()
+        file_handler.write_bias_file(sentiment_analyser.headline_analyser)
 
 
 def similar(a, b, threshold=0.90):
@@ -121,6 +122,44 @@ def similarity_check(sources):
     return output_sources
 
 
+def format_output(source_list_dict: List[dict], file_handler_obj):
+    """Formats all the results into a table.
+
+    This takes the sources, bias sources (if any), sentiment analysis results
+
+    Returns:
+        the output dataframe, which can be printed
+    """
+    output = str()
+    # get sentiment analysis results from evidence file
+    sentiment_dict = file_handler_obj.read_evidence_file()[0]
+    # get bias sources from bias file
+    bias_list_dict = file_handler_obj.read_bias_file()
+    # create the dataframe for all our results
+    dataframe = pd.DataFrame(columns=["Evidence Type", "Important Info", "URL", "Extra Info",
+                                      "Priority Score", "Headline Sentiment"])
+    # add sentiment analysis of statement to dataframe
+    dataframe = dataframe.append({"Evidence Type": sentiment_dict["evidence type"],
+                                  "Important Info": sentiment_dict["info"]})
+    # add bias sources to the dataframe
+    for bias_dict in bias_list_dict:
+        dataframe = dataframe.append({"Evidence Type": bias_dict["Type/Link"],
+                                      "Important Info": bias_dict["Key Info"],
+                                      "Headline Sentiment": bias_dict["Info Sentiment"]})
+    # add corroborating sources to the dataframe
+    for source in source_list_dict:
+        dataframe = dataframe.append({"Evidence Type": "Corroboration",
+                                      "Important Info": source["title"],
+                                      "URL": source["url"],
+                                      "Extra Info": source["description"] + " Page Type: " +
+                                      source["page_type"] + " Published on: " +
+                                      source["time_published"],
+                                      "Priority Score": source["score"],
+                                      "Headline Sentiment": source["title_sentiment"]
+                                      })
+    return dataframe
+
+
 if __name__ == '__main__':
     # interpret command line arguments
     parser = argparse.ArgumentParser()
@@ -143,10 +182,14 @@ if __name__ == '__main__':
         input("\nPress ENTER to continue...\n")
     else:
         print("Intelligence statement already entered, skipping...")
-    input_bias_sources()
+    intel_file = ""
+    analyse_sentiment_object = SentimentAnalyser(intel_file, "intelligence_statement", file_handler)
+    input_bias_sources(analyse_sentiment_object)
     # Read intelligence file
     print("Reading intelligence file...")
     intel_file = file_handler.read_file("intelligence_file.txt")
+    # set the statement parameter
+    analyse_sentiment_object.set_statement(intel_file)
     # Entity Processor - identifies specific entities mentioned in intel statement
     print("Processing entities...")
     process_entities = EntityProcessor(file_handler)
@@ -156,7 +199,6 @@ if __name__ == '__main__':
     file_handler.clean_data_file(data_file_path + "evidence_file.csv")
     # call to sentiment analyser - sentiment analysis on intel statement
     print("Analysing sentiment of intelligence statement...")
-    analyse_sentiment_object = SemanticAnalyser(intel_file, "intelligence_statement", file_handler)
     analyse_sentiment_object.statement_analyser()
     # Source aggregation below
     print("\nAggregating Sources:")
@@ -177,11 +219,13 @@ if __name__ == '__main__':
     # similarity_check(sources) - does not work, unfortunately.
 
     # OUTPUT:
-
+    out_df = format_output(sources, file_handler)
+    # we can turn sources into a pandas dataframe then use df.style or display(df) or tabulate(df)
+    # display the dataframe
+    out_df.style
 
     # TODO:
     #   ~~~~~ High Priority ~~~~~
-    #   Add the similarity checker
     #   Add nice formatting to output (tabular, colour optional)
     #   Reformat the 'bias source checker' so that it asks for any sources of the intelligence
     #   Source similarity goes just before the output. These branches can be merged into one.
