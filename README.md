@@ -84,6 +84,8 @@ The following descriptions can also be found by running `auto_osint_v -h`.
 python -m auto_osint_v
 ```
 
+#### Use with options
+
 This reads the statement from the existing intelligence file, and output the results in a 
 markdown file called 'output0.md'.
 
