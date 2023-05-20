@@ -26,7 +26,7 @@ class SourceAggregator:
 
         Args:
             intel_statement: The original intel statement
-            file_handler_object: The FileHandler object passed from main.py
+            file_handler_object: The FileHandler object passed from __main__.py
         """
         self.intel_statement = intel_statement
         self.sentiment_analyser = sentiment_analyser_object
@@ -65,7 +65,7 @@ class SourceAggregator:
 
         input_ids = tokenizer.encode(self.intel_statement, return_tensors='pt')
         # number of queries to generate - increase in this massively impact performance
-        num_queries = 5
+        num_queries = 3
         outputs = model.generate(
             input_ids=input_ids,
             max_length=128,  # default = 64
@@ -97,6 +97,7 @@ class SourceAggregator:
         try:
             return res['items']
         except KeyError:
+            # print("No results found for query:", search_term)
             return []
 
     # Google Search
@@ -208,7 +209,7 @@ class SourceAggregator:
         try:
             iframes, images, videos = self.media_finder(link)
         except (requests.exceptions.SSLError, requests.exceptions.Timeout):
-            iframes, images, videos = [], [], []
+            iframes, images, videos = "NaN", "NaN", "NaN"
         # sentiment analysis check - will discard headlines that appear inflammatory or bias
         # keep threshold relatively high (>0.8), see process_result() documentation.
         max_sentiment_threshold = 0.9

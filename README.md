@@ -34,14 +34,14 @@ the University of Portsmouth*
     ```bash
     eval "$(conda shell.bash hook)" #copy conda command to shell
     conda activate auto-osint-v-python38
-    python -m auto_osint_v.main
+    python -m auto_osint_v
     ```
     ### Windows
     > :warning: Open an 'Anaconda Powershell Prompt' from Start Menu, then run the following:
     ```powershell
     conda init powershell
     conda activate auto-osint-v-python38
-    python -m auto_osint_v.main
+    python -m auto_osint_v
     ```
 
 ## 🚀 Usage
@@ -61,19 +61,37 @@ Use Google Colab to avoid hogging your computer's resources.
 ---
 ### 💻 Command line instructions:
 ```shell
-python -m auto_osint_v.main <ARGS>
+python -m auto_osint_v <ARGS>
 ```
 
 #### 🚧 Arguments 🚧
-```
-arg1:
-arg2:
-...
-```
+The following descriptions can also be found by running `auto_osint_v -h`.
+
+- `-s/--Silent` Assumes you have already entered the intelligence statement 
+  [here](auto_osint_v/data_files/intelligence_file.txt)
+- `-n/--NoEditor` Input intelligence statement into command line rather than into text editor.
+- `--html` Output will be in HTML (default: csv).
+- `-m/--markdown` Output will be in markdown (default: csv).
+- `-f/--FileToUse` Specify the file to read the intelligence statement from
+- `-p/--output_postfix` Specify the output file's postfix, e.g. 'output3.txt' rather than default 
+  'output.txt'
 
 ### Example usage:
-```bash
-python -m auto_osint_v.main -arg1 -arg2
+
+#### Typical use / First time use
+
+```shell
+python -m auto_osint_v
 ```
 
+#### Use with options
+
+This reads the statement from the existing intelligence file, and output the results in a 
+markdown file called 'output0.md'.
+
+```shell
+python -m auto_osint_v -s -m -p 0
+```
+The postfix (0 in this case) is useful if you are running the tool multiple times and want to save the results 
+separately.
 

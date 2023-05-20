@@ -22,6 +22,7 @@ class TestPriorityManager(TestCase):
         potential_corroboration = frame.to_dict("records")
         pm_object = PriorityManager(fh_object, ep_object, potential_corroboration)
         sources = pm_object.manager()
+        print("\n" + sources + "\n")
         print([f"url: {source['url']}, score: {source['score']}" for source in sources])
 
     def test_target_info_scorer(self):

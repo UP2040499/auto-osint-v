@@ -22,7 +22,7 @@ class FileHandler:
         self.urls_present = []
         self.data_file_path = data_file
 
-    def write_bias_file(self):
+    def write_bias_file(self, info_analyser):
         """Creates and writes to the bias information file.
 
         This bias information is only useful for the user if they want to include information that
@@ -33,23 +33,31 @@ class FileHandler:
         """
         bias_file_path = str(os.path.join(self.data_file_path, "bias_sources.csv"))
         with open(bias_file_path, "w", encoding="utf-8") as bfile:
-            fieldnames = ['Type/Link', 'Key_Info']
+            fieldnames = ['Type/Link', 'Key Info', 'Info Sentiment']
             writer = csv.DictWriter(bfile, fieldnames)
             # enter source type and key information
             writer.writeheader()
             option = ""
             while option not in {"x", "X"}:
-                source_type = str(input("If a closed/classified source, please enter the source "
-                                        "type (HUMINT, SIGINT, etc.)"
+                source_type = str(input("If you wish to enter a source that has no URL, just enter "
+                                        "the type of source (e.g. HUMINT, SIGINT, etc.)."
                                         "If it is an open source, please enter the URL.\n>>> "))
                 key_info = str(input("Enter the key information proffered "
                                      "from this source/intelligence\n>>> "))
-                writer.writerow({"Type/Link": source_type, "Key_Info": key_info})
+                writer.writerow({"Type/Link": source_type, "Key Info": key_info,
+                                 "Info Sentiment": info_analyser(key_info)})
                 option = str(input("Enter 'X' to finish entering sources. "
                                    "Press ENTER to add another source>>> "))
             bfile.close()
 
-    def write_intel_file(self):
+    def read_bias_file(self):
+        bias_file_path = str(os.path.join(self.data_file_path, "bias_sources.csv"))
+        with open(bias_file_path, "r", encoding="utf-8") as bfile:
+            reader = csv.DictReader(bfile)
+            list_of_dicts = list(reader)
+            return list_of_dicts
+
+    def write_intel_file(self, editor: bool):
         """Creates and writes a file for the intelligence statement to be stored in.
 
         This opens the file in the text editor for easier statement writing.
@@ -68,9 +76,14 @@ class FileHandler:
                                  "- Remove this help section and replace it with your "
                                  "intelligence statement.\n"
                                  "- Be sure to save the file before continuing.")
-            fout.write(statement_help)
-            fout.close()
-            webbrowser.open(intel_file_path)  # edit in default text editor
+            if editor:
+                fout.write(statement_help)
+                fout.close()
+                webbrowser.open(intel_file_path)  # edit in default text editor
+            else:
+                statement = str(input(statement_help))
+                fout.write(statement)
+                fout.close()
 
     def read_file(self, filename):
         """Reads the given file. Reads any file, extension is included in filename.
@@ -255,6 +268,13 @@ class FileHandler:
                 # Append info to csv
                 self.write_to_given_csv_file(evidence_file, to_write)
 
+    def read_evidence_file(self):
+        evidence_file_path = self.data_file_path + "evidence_file.csv"
+        with open(evidence_file_path, "r", encoding="utf-8") as evidence_file:
+            reader = csv.DictReader(evidence_file)
+            list_of_dicts = list(reader)
+            return list_of_dicts
+
     def create_potential_corroboration_file(self, sources_list_of_dicts):
         """Creates the potential corroboration source store.
 
@@ -279,3 +299,13 @@ class FileHandler:
             writer.writeheader()
             # write the dictionary to csv
             writer.writerows(sources_list_of_dicts)
+
+    def get_output_path(self, postfix, file_ext):
+        """Gets the path of the output file"""
+        output_directory = self.data_file_path + "output"
+        try:
+            os.mkdir(output_directory)
+            file_path = str(os.path.join(output_directory, f"output{postfix}.{file_ext}"))
+        except FileExistsError:
+            file_path = str(os.path.join(output_directory, f"output{postfix}.{file_ext}"))
+        return file_path
