@@ -1,5 +1,6 @@
 """Finds entities (information) that is popular amongst the potentially corroborating sources.
 """
+import http.client
 import itertools
 from multiprocessing import Pool, Manager
 import requests
@@ -76,7 +77,10 @@ class PopularInformationFinder:
             driver = webdriver.Chrome(chrome_options=options)
             driver.set_page_load_timeout(5)     # set timeout to 5 secs
             # request the webpage. If source website timeout, return the current list of entities.
-            driver.get(url)
+            try:
+                driver = webdriver.Chrome(chrome_options=options)
+            except http.client.RemoteDisconnected:
+                return entities
             html = driver.page_source
             # check if we are wasting our time with a broken or inaccessible website
             try:
