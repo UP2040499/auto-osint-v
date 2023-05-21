@@ -103,7 +103,7 @@ class PriorityManager:
         try:
             content_type = response.headers['Content-Type']
         except KeyError:
-            content_type == ''
+            content_type = ''
         if "application/javascript" in content_type \
                 or response.status_code != 200:
             # using selenium to avoid 'JavaScript is not available." error
