@@ -68,8 +68,8 @@ class PopularInformationFinder:
             # using selenium to avoid 'JavaScript is not available." error
             options = webdriver.ChromeOptions()
             options.headless = True
-            options.add_argument("start-maximized")
             options.add_argument("--no-sandbox")
+            options.add_argument("start-maximized")
             options.add_experimental_option("excludeSwitches", ["enable-automation"])
             options.add_argument('--disable-blink-features=AutomationControlled')
             options.add_argument(
@@ -78,7 +78,7 @@ class PopularInformationFinder:
             try:
                 service_log_path = "{}/chromedriver.log".format(os.getcwd() + "/logs")
                 service_args = ['--verbose']
-                driver = webdriver.Chrome('chromedriver', chrome_options=options,
+                driver = webdriver.Chrome(chrome_options=options,
                                           service_args=service_args,
                                           service_log_path=service_log_path)
             except http.client.RemoteDisconnected:
