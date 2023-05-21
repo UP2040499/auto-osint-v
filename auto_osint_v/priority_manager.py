@@ -1,5 +1,6 @@
 """This module assigns scores to each source, prioritising the most relevant sources.
 """
+import http.client
 import inspect
 from typing import List
 from multiprocessing import Pool
@@ -112,7 +113,7 @@ class PriorityManager:
                 "like Gecko) Chrome/98.0.4758.102 Safari/537.36")
             try:
                 driver = webdriver.Chrome(chrome_options=options)
-            finally:
+            except http.client.RemoteDisconnected:
                 return text
             # driver.set_page_load_timeout(5)  # set timeout to 5 secs
             # request the webpage. If source website timeout, return the current list of entities.
