@@ -2,6 +2,7 @@
 """
 import http.client
 import inspect
+import os
 from typing import List
 from multiprocessing import Pool
 import requests
@@ -112,7 +113,7 @@ class PriorityManager:
                 "user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, "
                 "like Gecko) Chrome/98.0.4758.102 Safari/537.36")
             try:
-                service_log_path = "{}/chromedriver.log".format("/logs")
+                service_log_path = "{}/chromedriver.log".format(os.getcwd()+"/logs")
                 service_args = ['--verbose']
                 driver = webdriver.Chrome('chromedriver', chrome_options=options,
                                           service_args=service_args,

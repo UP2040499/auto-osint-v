@@ -2,6 +2,7 @@
 """
 import http.client
 import itertools
+import os
 from multiprocessing import Pool, Manager
 import requests
 import selenium.common.exceptions
@@ -75,7 +76,7 @@ class PopularInformationFinder:
                 "user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, "
                 "like Gecko) Chrome/98.0.4758.102 Safari/537.36")
             try:
-                service_log_path = "{}/chromedriver.log".format("/logs")
+                service_log_path = "{}/chromedriver.log".format(os.getcwd() + "/logs")
                 service_args = ['--verbose']
                 driver = webdriver.Chrome('chromedriver', chrome_options=options,
                                           service_args=service_args,
