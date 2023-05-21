@@ -100,7 +100,11 @@ class PriorityManager:
             response = requests.get(url, headers, timeout=5)
         except (requests.exceptions.ReadTimeout, requests.exceptions.ConnectionError):
             return text
-        if "application/javascript" in response.headers['Content-Type'] \
+        try:
+            content_type = response.headers['Content-Type']
+        except KeyError:
+            content_type == ''
+        if "application/javascript" in content_type \
                 or response.status_code != 200:
             # using selenium to avoid 'JavaScript is not available." error
             options = webdriver.ChromeOptions()
