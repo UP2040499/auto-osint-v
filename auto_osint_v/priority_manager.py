@@ -179,7 +179,7 @@ class PriorityManager:
         # Count number of appearances in each source
         # for source in tqdm(self.sources, desc="Counting target entity appearances in "
         #                                      "sources"):
-        print(f"I am the parent, with PID {getpid()}")
+        # print(f"I am the parent, with PID {getpid()}")
         with multiprocessing.get_context('spawn').Pool() as pool:
             self.sources = list(tqdm(pool.imap_unordered(self.get_text_get_score_target_inf,
                                                          self.sources), total=len(self.sources),
@@ -213,7 +213,7 @@ class PriorityManager:
         Returns:
             the updated source dictionary with a new 'score' field.
         """
-        print(f"I am the child, with PID {getpid()}")
+        # print(f"I am the child, with PID {getpid()}")
         # get the text from the source
         text = self.get_text_from_site(source["url"])
         # return score for target info
