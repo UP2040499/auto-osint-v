@@ -50,6 +50,7 @@ class PopularInformationFinder:
             A list of key-value pairs (tuples).
             Note: key-value pairs are required for the map function to construct a dictionary from.
         """
+        print(f"I am the child, with PID {os.getpid()}")
         # define entities variable
         entities = []
         # define the url
@@ -155,6 +156,7 @@ class PopularInformationFinder:
         Returns:
             A list of the most popular words amongst all the sources.
         """
+        print(f"I am the parent, with PID {os.getpid()}")
         with multiprocessing.get_context('spawn').Pool() as pool:
             # sources = tqdm(sources)  # add a progress bar
             # calculate an even chunksize for the imap function using pool size (max processes)
