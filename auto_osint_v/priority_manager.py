@@ -3,7 +3,7 @@
 import http.client
 import inspect
 import multiprocessing
-import os
+from os import getpid
 from typing import List
 from multiprocessing import Pool
 import requests
@@ -179,7 +179,9 @@ class PriorityManager:
         # Count number of appearances in each source
         # for source in tqdm(self.sources, desc="Counting target entity appearances in "
         #                                      "sources"):
+        print(f"I am the parent, with PID {getpid()}")
         with multiprocessing.get_context('spawn').Pool() as pool:
+            print(f"I am the child, with PID {getpid()}")
             self.sources = list(tqdm(pool.imap_unordered(self.get_text_get_score_target_inf,
                                                          self.sources), total=len(self.sources),
                                      desc="Assigning scores to sources based on target info"))
