@@ -110,7 +110,10 @@ class PriorityManager:
             options.add_argument(
                 "user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, "
                 "like Gecko) Chrome/98.0.4758.102 Safari/537.36")
-            driver = webdriver.Chrome(chrome_options=options)
+            try:
+                driver = webdriver.Chrome(chrome_options=options)
+            finally:
+                return text
             # driver.set_page_load_timeout(5)  # set timeout to 5 secs
             # request the webpage. If source website timeout, return the current list of entities.
             driver.get(url)
