@@ -115,7 +115,7 @@ class PriorityManager:
             try:
                 service_log_path = "{}/chromedriver.log".format(os.getcwd()+"/logs")
                 service_args = ['--verbose']
-                driver = webdriver.Chrome(chrome_options=options,
+                driver = webdriver.Chrome("usr/bin/chromedriver", chrome_options=options,
                                           service_args=service_args,
                                           service_log_path=service_log_path)
             except http.client.RemoteDisconnected:
