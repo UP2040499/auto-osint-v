@@ -181,7 +181,6 @@ class PriorityManager:
         #                                      "sources"):
         print(f"I am the parent, with PID {getpid()}")
         with multiprocessing.get_context('spawn').Pool() as pool:
-            print(f"I am the child, with PID {getpid()}")
             self.sources = list(tqdm(pool.imap_unordered(self.get_text_get_score_target_inf,
                                                          self.sources), total=len(self.sources),
                                      desc="Assigning scores to sources based on target info"))
@@ -214,6 +213,7 @@ class PriorityManager:
         Returns:
             the updated source dictionary with a new 'score' field.
         """
+        print(f"I am the child, with PID {getpid()}")
         # get the text from the source
         text = self.get_text_from_site(source["url"])
         # return score for target info
