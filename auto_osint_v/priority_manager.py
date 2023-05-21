@@ -124,7 +124,11 @@ class PriorityManager:
                 return text
             # driver.set_page_load_timeout(5)  # set timeout to 5 secs
             # request the webpage. If source website timeout, return the current list of entities.
-            driver.get(url)
+            try:
+                driver.get(url)
+            except selenium.common.exceptions.TimeoutException:
+                driver.quit()
+                return text
             html = driver.page_source
             # check if we are wasting our time with a broken or inaccessible website
             try:
