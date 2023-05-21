@@ -2,6 +2,7 @@
 """
 import http.client
 import itertools
+import multiprocessing
 import os
 from multiprocessing import Pool, Manager
 import requests
@@ -154,7 +155,7 @@ class PopularInformationFinder:
         Returns:
             A list of the most popular words amongst all the sources.
         """
-        with Pool() as pool:
+        with multiprocessing.get_context('spawn').Pool() as pool:
             # sources = tqdm(sources)  # add a progress bar
             # calculate an even chunksize for the imap function using pool size (max processes)
             chunksize = len(sources) / len(pool._pool)
