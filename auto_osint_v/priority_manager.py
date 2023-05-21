@@ -112,7 +112,11 @@ class PriorityManager:
                 "user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, "
                 "like Gecko) Chrome/98.0.4758.102 Safari/537.36")
             try:
-                driver = webdriver.Chrome("chromedriver", chrome_options=options)
+                service_log_path = "{}/chromedriver.log".format("/logs")
+                service_args = ['--verbose']
+                driver = webdriver.Chrome('chromedriver', chrome_options=options,
+                                          service_args=service_args,
+                                          service_log_path=service_log_path)
             except http.client.RemoteDisconnected:
                 return text
             # driver.set_page_load_timeout(5)  # set timeout to 5 secs
