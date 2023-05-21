@@ -10,6 +10,7 @@ from tqdm import tqdm
 import argparse
 import pandas as pd
 from typing import List
+from multiprocessing import set_start_method
 
 from auto_osint_v.specific_entity_processor import EntityProcessor
 from auto_osint_v.file_handler import FileHandler
@@ -17,6 +18,7 @@ from auto_osint_v.sentiment_analyser import SentimentAnalyser
 from auto_osint_v.source_aggregator import SourceAggregator
 from auto_osint_v.priority_manager import PriorityManager
 
+set_start_method("spawn")
 data_file_path = os.getcwd() + "/data_files/"
 sys.path.append(
     "/auto_osint_v/__main__.py")

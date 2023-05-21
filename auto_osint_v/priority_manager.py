@@ -107,7 +107,7 @@ class PriorityManager:
             content_type = ''
         if "application/javascript" in content_type \
                 or response.status_code != 200:
-            # using selenium to avoid 'JavaScript is not available." error
+            # using selenium to avoid 'JavaScript is not available' error
             options = webdriver.ChromeOptions()
             options.headless = True
             options.add_argument("--no-sandbox")
