@@ -165,7 +165,8 @@ class PopularInformationFinder:
                 chunksize = int(chunksize)
             tmp = tqdm(pool.imap_unordered(self.get_text_process_entities, sources, chunksize),
                        total=len(sources), desc="Finding popular entities")
-            self.entities.update([tpl for sublist in tmp for tpl in sublist if tpl])
+
+        self.entities.update([tpl for sublist in tmp for tpl in sublist if tpl])
 
         # sort list of dictionaries by highest no. of mentions.
         # lambda function specifies sorted to use the values of the dictionary in desc. order
