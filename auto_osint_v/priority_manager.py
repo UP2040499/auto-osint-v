@@ -119,7 +119,8 @@ class PriorityManager:
                 "like Gecko) Chrome/98.0.4758.102 Safari/537.36")
             try:
                 driver = webdriver.Chrome('/usr/bin/chromedriver', chrome_options=options)
-            except http.client.RemoteDisconnected:
+            except (http.client.RemoteDisconnected,
+                    selenium.common.exceptions.SessionNotCreatedException):
                 driver.quit()
                 return text
             # driver.set_page_load_timeout(5)  # set timeout to 5 secs
