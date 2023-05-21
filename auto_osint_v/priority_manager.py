@@ -121,8 +121,10 @@ class PriorityManager:
                 driver = webdriver.Chrome('/usr/bin/chromedriver', chrome_options=options)
             except (http.client.RemoteDisconnected,
                     selenium.common.exceptions.SessionNotCreatedException):
-                driver.quit()
-                return text
+                try:
+                    driver.quit()
+                finally:
+                    return text
             # driver.set_page_load_timeout(5)  # set timeout to 5 secs
             # request the webpage. If source website timeout, return the current list of entities.
             try:

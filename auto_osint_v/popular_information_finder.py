@@ -84,8 +84,10 @@ class PopularInformationFinder:
             try:
                 driver = webdriver.Chrome('/usr/bin/chromedriver', chrome_options=options)
             except http.client.RemoteDisconnected:
-                driver.quit()
-                return entities
+                try:
+                    driver.quit()
+                finally:
+                    return entities
             driver.set_page_load_timeout(5)     # set timeout to 5 secs
             # request the webpage. If source website timeout, return the current list of entities.
             try:
