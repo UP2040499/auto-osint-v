@@ -1,6 +1,9 @@
 """Finds entities (information) that is popular amongst the potentially corroborating sources.
 """
+import http.client
 import itertools
+import multiprocessing
+import os
 from multiprocessing import Pool, Manager
 import requests
 import selenium.common.exceptions
@@ -47,6 +50,7 @@ class PopularInformationFinder:
             A list of key-value pairs (tuples).
             Note: key-value pairs are required for the map function to construct a dictionary from.
         """
+        print(f"I am the child, with PID {os.getpid()}")
         # define entities variable
         entities = []
         # define the url
@@ -61,22 +65,36 @@ class PopularInformationFinder:
             response = requests.get(url, headers, timeout=5)
         except (requests.exceptions.ReadTimeout, requests.exceptions.ConnectionError):
             return entities
-        if "application/javascript" in response.headers['Content-Type'] \
+        try:
+            content_type = response.headers['Content-Type']
+        except KeyError:
+            content_type = ''
+        if "application/javascript" in content_type \
                 or response.status_code != 200:
             # using selenium to avoid 'JavaScript is not available." error
             options = webdriver.ChromeOptions()
             options.headless = True
+            options.add_argument("--no-sandbox")
             options.add_argument("start-maximized")
             options.add_experimental_option("excludeSwitches", ["enable-automation"])
-            options.add_experimental_option('useAutomationExtension', False)
             options.add_argument('--disable-blink-features=AutomationControlled')
             options.add_argument(
                 "user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, "
                 "like Gecko) Chrome/98.0.4758.102 Safari/537.36")
-            driver = webdriver.Chrome(chrome_options=options)
+            try:
+                driver = webdriver.Chrome('/usr/bin/chromedriver', chrome_options=options)
+            except http.client.RemoteDisconnected:
+                try:
+                    driver.quit()
+                finally:
+                    return entities
             driver.set_page_load_timeout(5)     # set timeout to 5 secs
             # request the webpage. If source website timeout, return the current list of entities.
-            driver.get(url)
+            try:
+                driver.get(url)
+            except selenium.common.exceptions.TimeoutException:
+                driver.quit()
+                return entities
             html = driver.page_source
             # check if we are wasting our time with a broken or inaccessible website
             try:
@@ -140,14 +158,15 @@ class PopularInformationFinder:
         Returns:
             A list of the most popular words amongst all the sources.
         """
-        with Pool() as pool:
+        print(f"I am the parent, with PID {os.getpid()}")
+        # calculate an even chunksize for the imap function using pool size (max processes)
+        chunksize = len(sources) / os.cpu_count()
+        if int(chunksize) < chunksize:
+            chunksize = int(chunksize) + 1
+        else:
+            chunksize = int(chunksize)
+        with multiprocessing.get_context('spawn').Pool() as pool:
             # sources = tqdm(sources)  # add a progress bar
-            # calculate an even chunksize for the imap function using pool size (max processes)
-            chunksize = len(sources) / len(pool._pool)
-            if int(chunksize) < chunksize:
-                chunksize = int(chunksize) + 1
-            else:
-                chunksize = int(chunksize)
             tmp = tqdm(pool.imap_unordered(self.get_text_process_entities, sources, chunksize),
                        total=len(sources), desc="Finding popular entities")
             self.entities.update([tpl for sublist in tmp for tpl in sublist if tpl])

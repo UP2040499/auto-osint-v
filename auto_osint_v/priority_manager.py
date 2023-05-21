@@ -1,6 +1,9 @@
 """This module assigns scores to each source, prioritising the most relevant sources.
 """
+import http.client
 import inspect
+import multiprocessing
+from os import getpid
 from typing import List
 from multiprocessing import Pool
 import requests
@@ -98,22 +101,37 @@ class PriorityManager:
             response = requests.get(url, headers, timeout=5)
         except (requests.exceptions.ReadTimeout, requests.exceptions.ConnectionError):
             return text
-        if "application/javascript" in response.headers['Content-Type'] \
+        try:
+            content_type = response.headers['Content-Type']
+        except KeyError:
+            content_type = ''
+        if "application/javascript" in content_type \
                 or response.status_code != 200:
-            # using selenium to avoid 'JavaScript is not available." error
+            # using selenium to avoid 'JavaScript is not available' error
             options = webdriver.ChromeOptions()
             options.headless = True
+            options.add_argument("--no-sandbox")
             options.add_argument("start-maximized")
             options.add_experimental_option("excludeSwitches", ["enable-automation"])
-            options.add_experimental_option('useAutomationExtension', False)
             options.add_argument('--disable-blink-features=AutomationControlled')
             options.add_argument(
                 "user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, "
                 "like Gecko) Chrome/98.0.4758.102 Safari/537.36")
-            driver = webdriver.Chrome(chrome_options=options)
+            try:
+                driver = webdriver.Chrome('/usr/bin/chromedriver', chrome_options=options)
+            except (http.client.RemoteDisconnected,
+                    selenium.common.exceptions.SessionNotCreatedException):
+                try:
+                    driver.quit()
+                finally:
+                    return text
             # driver.set_page_load_timeout(5)  # set timeout to 5 secs
             # request the webpage. If source website timeout, return the current list of entities.
-            driver.get(url)
+            try:
+                driver.get(url)
+            except selenium.common.exceptions.TimeoutException:
+                driver.quit()
+                return text
             html = driver.page_source
             # check if we are wasting our time with a broken or inaccessible website
             try:
@@ -168,7 +186,8 @@ class PriorityManager:
         # Count number of appearances in each source
         # for source in tqdm(self.sources, desc="Counting target entity appearances in "
         #                                      "sources"):
-        with Pool() as pool:
+        # print(f"I am the parent, with PID {getpid()}")
+        with multiprocessing.get_context('spawn').Pool() as pool:
             self.sources = list(tqdm(pool.imap_unordered(self.get_text_get_score_target_inf,
                                                          self.sources), total=len(self.sources),
                                      desc="Assigning scores to sources based on target info"))
@@ -186,7 +205,7 @@ class PriorityManager:
         self._entities = entities
         # Count number of appearances in each source
         # new approach using multiprocessing map function
-        with Pool() as pool:
+        with multiprocessing.get_context('spawn').Pool() as pool:
             self.sources = list(tqdm(pool.imap_unordered(self.get_text_get_score_pop_inf,
                                                          self.sources), total=len(self.sources),
                                      desc="Assigning scores to sources based on popular info"))
@@ -201,6 +220,7 @@ class PriorityManager:
         Returns:
             the updated source dictionary with a new 'score' field.
         """
+        # print(f"I am the child, with PID {getpid()}")
         # get the text from the source
         text = self.get_text_from_site(source["url"])
         # return score for target info
