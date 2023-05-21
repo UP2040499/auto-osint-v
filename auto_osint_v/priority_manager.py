@@ -119,6 +119,7 @@ class PriorityManager:
                                           service_args=service_args,
                                           service_log_path=service_log_path)
             except http.client.RemoteDisconnected:
+                driver.quit()
                 return text
             # driver.set_page_load_timeout(5)  # set timeout to 5 secs
             # request the webpage. If source website timeout, return the current list of entities.
