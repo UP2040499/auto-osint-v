@@ -157,18 +157,17 @@ class PopularInformationFinder:
             A list of the most popular words amongst all the sources.
         """
         print(f"I am the parent, with PID {os.getpid()}")
+        # calculate an even chunksize for the imap function using pool size (max processes)
+        chunksize = len(sources) / os.cpu_count()
+        if int(chunksize) < chunksize:
+            chunksize = int(chunksize) + 1
+        else:
+            chunksize = int(chunksize)
         with multiprocessing.get_context('spawn').Pool() as pool:
             # sources = tqdm(sources)  # add a progress bar
-            # calculate an even chunksize for the imap function using pool size (max processes)
-            chunksize = len(sources) / len(pool._pool)
-            if int(chunksize) < chunksize:
-                chunksize = int(chunksize) + 1
-            else:
-                chunksize = int(chunksize)
             tmp = tqdm(pool.imap_unordered(self.get_text_process_entities, sources, chunksize),
                        total=len(sources), desc="Finding popular entities")
-
-        self.entities.update([tpl for sublist in tmp for tpl in sublist if tpl])
+            self.entities.update([tpl for sublist in tmp for tpl in sublist if tpl])
 
         # sort list of dictionaries by highest no. of mentions.
         # lambda function specifies sorted to use the values of the dictionary in desc. order
