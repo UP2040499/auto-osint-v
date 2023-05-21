@@ -74,13 +74,13 @@ class PopularInformationFinder:
             options.add_argument(
                 "user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, "
                 "like Gecko) Chrome/98.0.4758.102 Safari/537.36")
-            driver = webdriver.Chrome(chrome_options=options)
-            driver.set_page_load_timeout(5)     # set timeout to 5 secs
-            # request the webpage. If source website timeout, return the current list of entities.
             try:
-                driver = webdriver.Chrome(chrome_options=options)
+                driver = webdriver.Chrome("chromedriver", chrome_options=options)
             except http.client.RemoteDisconnected:
                 return entities
+            driver.set_page_load_timeout(5)     # set timeout to 5 secs
+            # request the webpage. If source website timeout, return the current list of entities.
+            driver.get(url)
             html = driver.page_source
             # check if we are wasting our time with a broken or inaccessible website
             try:
