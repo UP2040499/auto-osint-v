@@ -200,7 +200,7 @@ if __name__ == '__main__':
         input("\nPress ENTER to continue...\n")
     intel_file = ""
     analyse_sentiment_object = SentimentAnalyser(intel_file, "intelligence_statement", file_handler)
-    input_bias_sources(analyse_sentiment_object)
+    # input_bias_sources(analyse_sentiment_object)
     # Read intelligence file
     print("Reading intelligence file...")
     if args.FileToUse:

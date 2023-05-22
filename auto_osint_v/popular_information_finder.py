@@ -62,8 +62,11 @@ class PopularInformationFinder:
             response = requests.get(url, headers, timeout=5)
         except (requests.exceptions.ReadTimeout, requests.exceptions.ConnectionError):
             return entities
-        if "application/javascript" in response.headers['Content-Type'] \
-                or response.status_code != 200:
+        try:
+            content_type = response.headers['Content-Type']
+        except KeyError:
+            content_type = ''
+        if "application/javascript" in content_type or response.status_code != 200:
             # using selenium to avoid 'JavaScript is not available." error
             options = webdriver.ChromeOptions()
             options.headless = True
@@ -76,11 +79,19 @@ class PopularInformationFinder:
                 "like Gecko) Chrome/98.0.4758.102 Safari/537.36")
             try:
                 driver = webdriver.Chrome("chromedriver", chrome_options=options)
-            except http.client.RemoteDisconnected:
-                return entities
+            except (http.client.RemoteDisconnected,
+                    selenium.common.exceptions.SessionNotCreatedException):
+                try:
+                    driver.quit()
+                finally:
+                    return entities
             driver.set_page_load_timeout(5)     # set timeout to 5 secs
             # request the webpage. If source website timeout, return the current list of entities.
-            driver.get(url)
+            try:
+                driver.get(url)
+            except selenium.common.exceptions.TimeoutException:
+                driver.quit()
+                return entities
             html = driver.page_source
             # check if we are wasting our time with a broken or inaccessible website
             try:
