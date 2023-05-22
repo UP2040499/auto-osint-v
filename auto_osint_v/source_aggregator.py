@@ -110,8 +110,10 @@ class SourceAggregator:
         Returns:
             dictionary of Google search results
         """
-        # searches google using the generated queries
-        query_results = self.searcher(self.queries, num=10)
+        query_results = []
+        for query in self.queries:
+            # searches google using the generated queries
+            query_results += self.searcher(query, num=3)
         for result in tqdm(query_results, desc="Search Google using generated queries"):
             # write link to dict
             self.process_result(result)
