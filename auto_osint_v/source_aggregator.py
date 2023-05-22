@@ -8,6 +8,7 @@ import requests
 from bs4 import BeautifulSoup
 from transformers import T5Tokenizer, T5ForConditionalGeneration
 from googleapiclient.discovery import build
+import config
 
 
 class SourceAggregator:
@@ -90,10 +91,8 @@ class SourceAggregator:
             the results or nothing if none are found.
         """
         # Google custom search engine API key and engine ID
-        api_key = "AIzaSyCgsni4yZyp4Bla9J7a2TE-lxmzVagcjEo"
-        cse_id = "d76b2d8504d104aa8"
-        service = build("customsearch", "v1", developerKey=api_key)
-        res = service.cse().list(q=search_term, cx=cse_id, hl='en', **kwargs).execute()
+        service = build("customsearch", "v1", developerKey=config.api_key)
+        res = service.cse().list(q=search_term, cx=config.cse_id, hl='en', **kwargs).execute()
         try:
             return res['items']
         except KeyError:

@@ -142,3 +142,5 @@ auto_osint_v/data_files/potential_corroboration.csv
 # Google cookies
 .google-cookie
 
+# ignore config
+auto_osint_v/config.py
