@@ -1,0 +1,1226 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.10.0" />
+<title>auto_osint_v.source_aggregator API documentation</title>
+<meta name="description" content="Python Class for all functions of aggregating sources from open sources …" />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>auto_osint_v.source_aggregator</code></h1>
+</header>
+<section id="section-intro">
+<p>Python Class for all functions of aggregating sources from open sources.</p>
+<p>This includes using search engines (Google) and searching social media websites
+(Twitter, Reddit, etc.)</p>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">&#34;&#34;&#34;Python Class for all functions of aggregating sources from open sources.
+
+This includes using search engines (Google) and searching social media websites
+(Twitter, Reddit, etc.)
+&#34;&#34;&#34;
+from tqdm import tqdm
+import requests
+from bs4 import BeautifulSoup
+from transformers import T5Tokenizer, T5ForConditionalGeneration
+from googleapiclient.discovery import build
+
+
+class SourceAggregator:
+    &#34;&#34;&#34;Provides methods for aggregating sources (see module docstring).
+
+    Most methods here will be private - not accessible by the rest of the program.
+    This is because I want the aggregator to do all its work in one &#39;box&#39; - likely more reusable as
+    it can be shipped as a class with one input &amp; one output.
+    Everything output will be put into a &#39;Potential Corroboration Store&#39;.
+    &#34;&#34;&#34;
+
+    # Initialise object
+    def __init__(self, intel_statement, file_handler_object, sentiment_analyser_object):
+        &#34;&#34;&#34;
+        Initialises the SourceAggregator object.
+
+        Args:
+            intel_statement: The original intel statement
+            file_handler_object: The FileHandler object passed from __main__.py
+        &#34;&#34;&#34;
+        self.intel_statement = intel_statement
+        self.sentiment_analyser = sentiment_analyser_object
+        self.file_handler = file_handler_object
+        self.queries = []
+        # Keywords here because they are used throughout the class
+        self.keywords = self.file_handler.get_keywords_from_target_info()
+        # create the list of dictionaries
+        self.results_list_dict = []
+        # list to store unique urls
+        self.urls_present = []
+
+    # For searching, I think the key information needs to be extracted from the intel statement
+    # Don&#39;t want to search using just the intel statement itself.
+    # Statement keyword or key info generator (generating search query)
+    def search_query_generator(self):
+        &#34;&#34;&#34;Generates a search queries based on the given statement.
+
+        This is a resource (particularly memory) intensive process. Limit usage.
+        Uses the BeIR/query-gen-msmarco-t5-large-v1 pre-trained model and example code available on
+        HuggingFace.co
+        Currently uses the &#39;large&#39; model for accuracy. This can be downgraded to &#39;base&#39; for reduced
+        accuracy but better performance.
+
+        Returns:
+            List of queries
+        &#34;&#34;&#34;
+        # Query generation based on the context of the intelligence statement
+        tokenizer = T5Tokenizer.from_pretrained(&#39;BeIR/query-gen-msmarco-t5-large-v1&#39;)
+        model = T5ForConditionalGeneration.from_pretrained(&#39;BeIR/query-gen-msmarco-t5-large-v1&#39;)
+        # WARNING: If you are getting out of memory errors the model will need to be changed from
+        # &#39;large&#39; to &#39;base&#39;.
+        # Potential future fix to this problem - wrap in a try-except to auto switch to base model.
+        # If it is borderline try to change the max_length and num_return_sequences parameters
+        # below.
+
+        input_ids = tokenizer.encode(self.intel_statement, return_tensors=&#39;pt&#39;)
+        # number of queries to generate - increase in this massively impact performance
+        num_queries = 3
+        outputs = model.generate(
+            input_ids=input_ids,
+            max_length=128,  # default = 64
+            do_sample=True,
+            top_p=0.95,  # default = 0.95
+            num_return_sequences=num_queries)  # Returns x queries, default = 3
+
+        for output in outputs:
+            query = tokenizer.decode(output, skip_special_tokens=True)
+            self.queries.append(str(query))
+
+    # the searcher method to search using a custom programmable search engine
+    @staticmethod
+    def searcher(search_term, **kwargs):
+        &#34;&#34;&#34;Using the Google Custom Search Engine to search for results to the search_term.
+
+        Args:
+            search_term: The keyword/query to search for. This can be a string or a list of strings.
+            kwargs: Extra arguments to pass to service.cse().list
+
+        Returns:
+            the results or nothing if none are found.
+        &#34;&#34;&#34;
+        # Google custom search engine API key and engine ID
+        api_key = &#34;AIzaSyCgsni4yZyp4Bla9J7a2TE-lxmzVagcjEo&#34;
+        cse_id = &#34;d76b2d8504d104aa8&#34;
+        service = build(&#34;customsearch&#34;, &#34;v1&#34;, developerKey=api_key)
+        res = service.cse().list(q=search_term, cx=cse_id, hl=&#39;en&#39;, **kwargs).execute()
+        try:
+            return res[&#39;items&#39;]
+        except KeyError:
+            # print(&#34;No results found for query:&#34;, search_term)
+            return []
+
+    # Google Search
+    def google_search(self):
+        &#34;&#34;&#34;Searches google using both the generated queries, and the extracted keywords.
+
+        Limits the number of queries sent to google where possible.
+        Uses the Google Custom Search Engine
+
+        Returns:
+            dictionary of Google search results
+        &#34;&#34;&#34;
+        query_results = []
+        for query in self.queries:
+            # searches google using the generated queries
+            query_results += self.searcher(query, num=3)
+        for result in tqdm(query_results, desc=&#34;Search Google using generated queries&#34;):
+            # write link to dict
+            self.process_result(result)
+        # search for the keywords, only 7 at a time
+        keyword_results = []
+        length_of_split = 7
+        split_keywords = [self.keywords[i:i + length_of_split]
+                          for i in range(0, len(self.keywords), length_of_split)]
+        for keywords in split_keywords:
+            keyword_results += self.searcher(keywords, num=10//len(split_keywords))
+        # loop through results
+        for result in tqdm(keyword_results, desc=&#34;Search Google using extracted keywords&#34;):
+            # write link to dict
+            self.process_result(result)
+
+    # Social Media Search
+    # reuse file_handler.write_to_txt_file_remove_duplicates method
+    def social_media_search(self):
+        &#34;&#34;&#34;Searches a variety of social media sites see &#39;social_media_sites&#39; variable.
+
+        WARNING: To search using generated queries and extracted keywords, the code has nested for
+        loops.
+        Significant performance boost achieved by finding out that the &#39;q&#39; parameter for cse.list
+        takes lists as well as strings.
+
+        Returns:
+            dictionary storing the social media results
+        &#34;&#34;&#34;
+        # define social media sites - to add more insert the domain name here.
+        social_media_sites = [&#34;www.instagram.com&#34;, &#34;www.tiktok.com&#34;, &#34;www.facebook.com&#34;,
+                              &#34;www.youtube.com&#34;, &#34;www.reddit.com&#34;, &#34;www.twitter.com&#34;,
+                              &#34;www.pinterest.com&#34;, &#34;www.github.com&#34;, &#34;www.tumblr.com&#34;,
+                              &#34;www.flickr.com&#34;, &#34;vimeo.com&#34;, &#34;www.telegram.com&#34;
+                              &#34;medium.com&#34;, &#34;vk.com&#34;, &#34;imgur.com&#34;, &#34;www.patreon.com&#34;,
+                              &#34;bitbucket.org&#34;, &#34;www.dailymotion.com&#34;, &#34;news.ycombinator.com&#34;]
+        # Join the list of keywords/phrases into one string seperated by &#39;|&#39; and surrounded by &#34;&#34;
+        # it appears that the max number of comparisons is between 7 and 10.
+        # google documentation says it should be 10
+        # join_keywords = &#39;|&#39;.join(f&#39;&#34;{word}&#34;&#39; for word in self.keywords)
+        # Loop through list of social media sites
+        for site in tqdm(social_media_sites, desc=&#34;Searching Social Media Sites&#34;):
+            # this for loop is clearly inefficient, I don&#39;t know how to improve it
+            # I&#39;m unsure of this behaviour as the siteSearch parameter doesn&#39;t seem to work
+            query_results = self.searcher(self.queries, siteSearch=site, siteSearchFilter=&#39;i&#39;,
+                                          num=5)
+            # loop through results
+            for result in query_results:
+                # write link to dict
+                self.process_result(result)
+            # search for the keywords, only 7 at a time
+            keyword_results = []
+            length_of_split = 7
+            split_keywords = [self.keywords[i:i + length_of_split]
+                              for i in range(0, len(self.keywords), length_of_split)]
+            for keywords in split_keywords:
+                keyword_results += self.searcher(keywords, siteSearch=site,
+                                                 siteSearchFilter=&#39;i&#39;, num=5)
+            for result in keyword_results:
+                # get process the result
+                self.process_result(result)
+
+    def process_result(self, result):
+        &#34;&#34;&#34;Takes the result from the search, extracts information and saves it all in a dictionary.
+
+        This is the main processing step.
+        Sentiment analysis is done to filter bias and inflammatory sources.
+        By adjusting max_sentiment_threshold you may filter more sources
+        (that are bias or inflammatory). Only change this if you find that sources retrieved appear
+        bias or inflammatory, and vice versa, if it is filtering sources that do not appear very
+        biased or inflammatory.
+
+        Args:
+            result: Result type from Google Search API
+
+        Returns:
+            nothing, stores info in instance dictionary variable
+        &#34;&#34;&#34;
+        link = result[&#39;link&#39;]
+        try:
+            title = result[&#39;pagemap&#39;][&#39;metatags&#39;][0][&#39;og:title&#39;]
+        except KeyError:
+            title = result[&#39;title&#39;]
+        try:
+            desc = result[&#39;pagemap&#39;][&#39;metatags&#39;][0][&#39;og:description&#39;]
+        except KeyError:
+            desc = result[&#39;snippet&#39;]
+        try:
+            page_type = result[&#39;pagemap&#39;][&#39;metatags&#39;][0][&#39;og:type&#39;]
+        except KeyError:
+            page_type = &#34;&#34;
+        try:
+            publish_time = result[&#39;pagemap&#39;][&#39;metatags&#39;][0][&#39;article:published_time&#39;]
+        except KeyError:
+            publish_time = &#34;&#34;
+        try:
+            iframes, images, videos = self.media_finder(link)
+        except (requests.exceptions.SSLError, requests.exceptions.Timeout):
+            iframes, images, videos = &#34;NaN&#34;, &#34;NaN&#34;, &#34;NaN&#34;
+        # sentiment analysis check - will discard headlines that appear inflammatory or bias
+        # keep threshold relatively high (&gt;0.8), see process_result() documentation.
+        max_sentiment_threshold = 0.9
+        label, score = self.sentiment_analyser.headline_analyser(title)
+        # discard any duplicates
+        if link not in self.urls_present:
+            self.urls_present.append(link)
+            # Very poor scores will lead to the source being discarded
+            if not (label != &#34;neutral&#34; and score &gt; max_sentiment_threshold):
+                self.results_list_dict.append({&#34;url&#34;: link, &#34;title&#34;: title, &#34;description&#34;: desc,
+                                               &#34;page_type&#34;: page_type,
+                                               &#34;time_published&#34;: publish_time,
+                                               &#34;image_links&#34;: images, &#34;video_links&#34;: videos,
+                                               &#34;embedded_content&#34;: iframes,
+                                               &#34;title_sentiment&#34;:
+                                                   f&#34;{label} sentiment, score={score}&#34;})
+
+    def find_sources(self):
+        &#34;&#34;&#34;Runs the various search operations.
+
+        Returns:
+            results in the form of a list of dictionaries
+        &#34;&#34;&#34;
+        # in both methods reduce number of queries
+        self.google_search()
+        self.social_media_search()
+        # store potentially corroborating sources in .csv file
+        self.file_handler.create_potential_corroboration_file(self.results_list_dict)
+        return self.results_list_dict
+
+    # Media Processor
+    # interrogate each link and return a description of the media
+    # i.e. text, video, image.
+    # all media but text should go through the media processor
+    # then retrieve the metadata for the media (if available)
+    @staticmethod
+    def find_images(soup):
+        &#34;&#34;&#34;Finds images in a given HTML document.
+
+        Args:
+            soup: Parsed HTML
+
+        Returns:
+            source URLs for the images
+        &#34;&#34;&#34;
+        image_urls = []
+        images = soup.find_all(&#34;img&#34;)
+        for image in images:
+            image_urls.append(image.get(&#34;src&#34;))
+        return image_urls
+
+    @staticmethod
+    def find_videos(soup):
+        &#34;&#34;&#34;Finds images in a given HTML document.
+
+        Args:
+            soup: Parsed HTML
+
+        Returns:
+            source URLs for the videos
+        &#34;&#34;&#34;
+        video_urls = []
+        videos = soup.find_all(&#34;video&#34;)
+        for video in videos:
+            video_urls.append(video.get(&#34;src&#34;))
+        return video_urls
+
+    @staticmethod
+    def find_iframes(soup):
+        &#34;&#34;&#34;Finds embedded content in iframes, in a given HTML document.
+
+        Args:
+            soup: Parsed HTML
+
+        Returns:
+            source URLs for the content
+        &#34;&#34;&#34;
+        iframe_urls = []
+        iframes = soup.find_all(&#34;iframe&#34;)
+        for iframe in iframes:
+            iframe_urls.append(iframe.get(&#34;src&#34;))
+        return iframe_urls
+
+    def media_finder(self, url):
+        &#34;&#34;&#34;Finds media in the HTML from the given URL. This finds images and videos.
+
+        Args:
+            url: The URL for the website
+
+        Returns:
+            The info we want: website title, description, images &amp; videos
+        &#34;&#34;&#34;
+        # retrieve html from URL
+        response = requests.get(url, timeout=10)  # timeout 10 seconds
+        # get the content type
+        try:
+            content_type = response.headers[&#39;Content-Type&#39;]
+            # if xml use xml parser
+            if content_type == &#34;text/xml&#34; or content_type == &#34;application/xml&#34;:
+                # use xml parser
+                soup = BeautifulSoup(response.text, &#34;xml&#34;)
+            else:
+                # parse using the lxml html parser
+                soup = BeautifulSoup(response.text, &#34;lxml&#34;)
+        except KeyError:
+            # except on KeyError if no &#39;content-type&#39; header exists
+            soup = BeautifulSoup(response.text, &#34;lxml&#34;)
+        # image and video tags may not be in the website.
+        try:
+            images = self.find_images(soup)
+        except KeyError:
+            images = []
+        try:
+            videos = self.find_videos(soup)
+        except KeyError:
+            videos = []
+        try:
+            iframes = self.find_iframes(soup)
+        except KeyError:
+            iframes = []
+        return images, videos, iframes</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="auto_osint_v.source_aggregator.SourceAggregator"><code class="flex name class">
+<span>class <span class="ident">SourceAggregator</span></span>
+<span>(</span><span>intel_statement, file_handler_object, sentiment_analyser_object)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Provides methods for aggregating sources (see module docstring).</p>
+<p>Most methods here will be private - not accessible by the rest of the program.
+This is because I want the aggregator to do all its work in one 'box' - likely more reusable as
+it can be shipped as a class with one input &amp; one output.
+Everything output will be put into a 'Potential Corroboration Store'.</p>
+<p>Initialises the SourceAggregator object.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>intel_statement</code></strong></dt>
+<dd>The original intel statement</dd>
+<dt><strong><code>file_handler_object</code></strong></dt>
+<dd>The FileHandler object passed from <strong>main</strong>.py</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class SourceAggregator:
+    &#34;&#34;&#34;Provides methods for aggregating sources (see module docstring).
+
+    Most methods here will be private - not accessible by the rest of the program.
+    This is because I want the aggregator to do all its work in one &#39;box&#39; - likely more reusable as
+    it can be shipped as a class with one input &amp; one output.
+    Everything output will be put into a &#39;Potential Corroboration Store&#39;.
+    &#34;&#34;&#34;
+
+    # Initialise object
+    def __init__(self, intel_statement, file_handler_object, sentiment_analyser_object):
+        &#34;&#34;&#34;
+        Initialises the SourceAggregator object.
+
+        Args:
+            intel_statement: The original intel statement
+            file_handler_object: The FileHandler object passed from __main__.py
+        &#34;&#34;&#34;
+        self.intel_statement = intel_statement
+        self.sentiment_analyser = sentiment_analyser_object
+        self.file_handler = file_handler_object
+        self.queries = []
+        # Keywords here because they are used throughout the class
+        self.keywords = self.file_handler.get_keywords_from_target_info()
+        # create the list of dictionaries
+        self.results_list_dict = []
+        # list to store unique urls
+        self.urls_present = []
+
+    # For searching, I think the key information needs to be extracted from the intel statement
+    # Don&#39;t want to search using just the intel statement itself.
+    # Statement keyword or key info generator (generating search query)
+    def search_query_generator(self):
+        &#34;&#34;&#34;Generates a search queries based on the given statement.
+
+        This is a resource (particularly memory) intensive process. Limit usage.
+        Uses the BeIR/query-gen-msmarco-t5-large-v1 pre-trained model and example code available on
+        HuggingFace.co
+        Currently uses the &#39;large&#39; model for accuracy. This can be downgraded to &#39;base&#39; for reduced
+        accuracy but better performance.
+
+        Returns:
+            List of queries
+        &#34;&#34;&#34;
+        # Query generation based on the context of the intelligence statement
+        tokenizer = T5Tokenizer.from_pretrained(&#39;BeIR/query-gen-msmarco-t5-large-v1&#39;)
+        model = T5ForConditionalGeneration.from_pretrained(&#39;BeIR/query-gen-msmarco-t5-large-v1&#39;)
+        # WARNING: If you are getting out of memory errors the model will need to be changed from
+        # &#39;large&#39; to &#39;base&#39;.
+        # Potential future fix to this problem - wrap in a try-except to auto switch to base model.
+        # If it is borderline try to change the max_length and num_return_sequences parameters
+        # below.
+
+        input_ids = tokenizer.encode(self.intel_statement, return_tensors=&#39;pt&#39;)
+        # number of queries to generate - increase in this massively impact performance
+        num_queries = 3
+        outputs = model.generate(
+            input_ids=input_ids,
+            max_length=128,  # default = 64
+            do_sample=True,
+            top_p=0.95,  # default = 0.95
+            num_return_sequences=num_queries)  # Returns x queries, default = 3
+
+        for output in outputs:
+            query = tokenizer.decode(output, skip_special_tokens=True)
+            self.queries.append(str(query))
+
+    # the searcher method to search using a custom programmable search engine
+    @staticmethod
+    def searcher(search_term, **kwargs):
+        &#34;&#34;&#34;Using the Google Custom Search Engine to search for results to the search_term.
+
+        Args:
+            search_term: The keyword/query to search for. This can be a string or a list of strings.
+            kwargs: Extra arguments to pass to service.cse().list
+
+        Returns:
+            the results or nothing if none are found.
+        &#34;&#34;&#34;
+        # Google custom search engine API key and engine ID
+        api_key = &#34;AIzaSyCgsni4yZyp4Bla9J7a2TE-lxmzVagcjEo&#34;
+        cse_id = &#34;d76b2d8504d104aa8&#34;
+        service = build(&#34;customsearch&#34;, &#34;v1&#34;, developerKey=api_key)
+        res = service.cse().list(q=search_term, cx=cse_id, hl=&#39;en&#39;, **kwargs).execute()
+        try:
+            return res[&#39;items&#39;]
+        except KeyError:
+            # print(&#34;No results found for query:&#34;, search_term)
+            return []
+
+    # Google Search
+    def google_search(self):
+        &#34;&#34;&#34;Searches google using both the generated queries, and the extracted keywords.
+
+        Limits the number of queries sent to google where possible.
+        Uses the Google Custom Search Engine
+
+        Returns:
+            dictionary of Google search results
+        &#34;&#34;&#34;
+        query_results = []
+        for query in self.queries:
+            # searches google using the generated queries
+            query_results += self.searcher(query, num=3)
+        for result in tqdm(query_results, desc=&#34;Search Google using generated queries&#34;):
+            # write link to dict
+            self.process_result(result)
+        # search for the keywords, only 7 at a time
+        keyword_results = []
+        length_of_split = 7
+        split_keywords = [self.keywords[i:i + length_of_split]
+                          for i in range(0, len(self.keywords), length_of_split)]
+        for keywords in split_keywords:
+            keyword_results += self.searcher(keywords, num=10//len(split_keywords))
+        # loop through results
+        for result in tqdm(keyword_results, desc=&#34;Search Google using extracted keywords&#34;):
+            # write link to dict
+            self.process_result(result)
+
+    # Social Media Search
+    # reuse file_handler.write_to_txt_file_remove_duplicates method
+    def social_media_search(self):
+        &#34;&#34;&#34;Searches a variety of social media sites see &#39;social_media_sites&#39; variable.
+
+        WARNING: To search using generated queries and extracted keywords, the code has nested for
+        loops.
+        Significant performance boost achieved by finding out that the &#39;q&#39; parameter for cse.list
+        takes lists as well as strings.
+
+        Returns:
+            dictionary storing the social media results
+        &#34;&#34;&#34;
+        # define social media sites - to add more insert the domain name here.
+        social_media_sites = [&#34;www.instagram.com&#34;, &#34;www.tiktok.com&#34;, &#34;www.facebook.com&#34;,
+                              &#34;www.youtube.com&#34;, &#34;www.reddit.com&#34;, &#34;www.twitter.com&#34;,
+                              &#34;www.pinterest.com&#34;, &#34;www.github.com&#34;, &#34;www.tumblr.com&#34;,
+                              &#34;www.flickr.com&#34;, &#34;vimeo.com&#34;, &#34;www.telegram.com&#34;
+                              &#34;medium.com&#34;, &#34;vk.com&#34;, &#34;imgur.com&#34;, &#34;www.patreon.com&#34;,
+                              &#34;bitbucket.org&#34;, &#34;www.dailymotion.com&#34;, &#34;news.ycombinator.com&#34;]
+        # Join the list of keywords/phrases into one string seperated by &#39;|&#39; and surrounded by &#34;&#34;
+        # it appears that the max number of comparisons is between 7 and 10.
+        # google documentation says it should be 10
+        # join_keywords = &#39;|&#39;.join(f&#39;&#34;{word}&#34;&#39; for word in self.keywords)
+        # Loop through list of social media sites
+        for site in tqdm(social_media_sites, desc=&#34;Searching Social Media Sites&#34;):
+            # this for loop is clearly inefficient, I don&#39;t know how to improve it
+            # I&#39;m unsure of this behaviour as the siteSearch parameter doesn&#39;t seem to work
+            query_results = self.searcher(self.queries, siteSearch=site, siteSearchFilter=&#39;i&#39;,
+                                          num=5)
+            # loop through results
+            for result in query_results:
+                # write link to dict
+                self.process_result(result)
+            # search for the keywords, only 7 at a time
+            keyword_results = []
+            length_of_split = 7
+            split_keywords = [self.keywords[i:i + length_of_split]
+                              for i in range(0, len(self.keywords), length_of_split)]
+            for keywords in split_keywords:
+                keyword_results += self.searcher(keywords, siteSearch=site,
+                                                 siteSearchFilter=&#39;i&#39;, num=5)
+            for result in keyword_results:
+                # get process the result
+                self.process_result(result)
+
+    def process_result(self, result):
+        &#34;&#34;&#34;Takes the result from the search, extracts information and saves it all in a dictionary.
+
+        This is the main processing step.
+        Sentiment analysis is done to filter bias and inflammatory sources.
+        By adjusting max_sentiment_threshold you may filter more sources
+        (that are bias or inflammatory). Only change this if you find that sources retrieved appear
+        bias or inflammatory, and vice versa, if it is filtering sources that do not appear very
+        biased or inflammatory.
+
+        Args:
+            result: Result type from Google Search API
+
+        Returns:
+            nothing, stores info in instance dictionary variable
+        &#34;&#34;&#34;
+        link = result[&#39;link&#39;]
+        try:
+            title = result[&#39;pagemap&#39;][&#39;metatags&#39;][0][&#39;og:title&#39;]
+        except KeyError:
+            title = result[&#39;title&#39;]
+        try:
+            desc = result[&#39;pagemap&#39;][&#39;metatags&#39;][0][&#39;og:description&#39;]
+        except KeyError:
+            desc = result[&#39;snippet&#39;]
+        try:
+            page_type = result[&#39;pagemap&#39;][&#39;metatags&#39;][0][&#39;og:type&#39;]
+        except KeyError:
+            page_type = &#34;&#34;
+        try:
+            publish_time = result[&#39;pagemap&#39;][&#39;metatags&#39;][0][&#39;article:published_time&#39;]
+        except KeyError:
+            publish_time = &#34;&#34;
+        try:
+            iframes, images, videos = self.media_finder(link)
+        except (requests.exceptions.SSLError, requests.exceptions.Timeout):
+            iframes, images, videos = &#34;NaN&#34;, &#34;NaN&#34;, &#34;NaN&#34;
+        # sentiment analysis check - will discard headlines that appear inflammatory or bias
+        # keep threshold relatively high (&gt;0.8), see process_result() documentation.
+        max_sentiment_threshold = 0.9
+        label, score = self.sentiment_analyser.headline_analyser(title)
+        # discard any duplicates
+        if link not in self.urls_present:
+            self.urls_present.append(link)
+            # Very poor scores will lead to the source being discarded
+            if not (label != &#34;neutral&#34; and score &gt; max_sentiment_threshold):
+                self.results_list_dict.append({&#34;url&#34;: link, &#34;title&#34;: title, &#34;description&#34;: desc,
+                                               &#34;page_type&#34;: page_type,
+                                               &#34;time_published&#34;: publish_time,
+                                               &#34;image_links&#34;: images, &#34;video_links&#34;: videos,
+                                               &#34;embedded_content&#34;: iframes,
+                                               &#34;title_sentiment&#34;:
+                                                   f&#34;{label} sentiment, score={score}&#34;})
+
+    def find_sources(self):
+        &#34;&#34;&#34;Runs the various search operations.
+
+        Returns:
+            results in the form of a list of dictionaries
+        &#34;&#34;&#34;
+        # in both methods reduce number of queries
+        self.google_search()
+        self.social_media_search()
+        # store potentially corroborating sources in .csv file
+        self.file_handler.create_potential_corroboration_file(self.results_list_dict)
+        return self.results_list_dict
+
+    # Media Processor
+    # interrogate each link and return a description of the media
+    # i.e. text, video, image.
+    # all media but text should go through the media processor
+    # then retrieve the metadata for the media (if available)
+    @staticmethod
+    def find_images(soup):
+        &#34;&#34;&#34;Finds images in a given HTML document.
+
+        Args:
+            soup: Parsed HTML
+
+        Returns:
+            source URLs for the images
+        &#34;&#34;&#34;
+        image_urls = []
+        images = soup.find_all(&#34;img&#34;)
+        for image in images:
+            image_urls.append(image.get(&#34;src&#34;))
+        return image_urls
+
+    @staticmethod
+    def find_videos(soup):
+        &#34;&#34;&#34;Finds images in a given HTML document.
+
+        Args:
+            soup: Parsed HTML
+
+        Returns:
+            source URLs for the videos
+        &#34;&#34;&#34;
+        video_urls = []
+        videos = soup.find_all(&#34;video&#34;)
+        for video in videos:
+            video_urls.append(video.get(&#34;src&#34;))
+        return video_urls
+
+    @staticmethod
+    def find_iframes(soup):
+        &#34;&#34;&#34;Finds embedded content in iframes, in a given HTML document.
+
+        Args:
+            soup: Parsed HTML
+
+        Returns:
+            source URLs for the content
+        &#34;&#34;&#34;
+        iframe_urls = []
+        iframes = soup.find_all(&#34;iframe&#34;)
+        for iframe in iframes:
+            iframe_urls.append(iframe.get(&#34;src&#34;))
+        return iframe_urls
+
+    def media_finder(self, url):
+        &#34;&#34;&#34;Finds media in the HTML from the given URL. This finds images and videos.
+
+        Args:
+            url: The URL for the website
+
+        Returns:
+            The info we want: website title, description, images &amp; videos
+        &#34;&#34;&#34;
+        # retrieve html from URL
+        response = requests.get(url, timeout=10)  # timeout 10 seconds
+        # get the content type
+        try:
+            content_type = response.headers[&#39;Content-Type&#39;]
+            # if xml use xml parser
+            if content_type == &#34;text/xml&#34; or content_type == &#34;application/xml&#34;:
+                # use xml parser
+                soup = BeautifulSoup(response.text, &#34;xml&#34;)
+            else:
+                # parse using the lxml html parser
+                soup = BeautifulSoup(response.text, &#34;lxml&#34;)
+        except KeyError:
+            # except on KeyError if no &#39;content-type&#39; header exists
+            soup = BeautifulSoup(response.text, &#34;lxml&#34;)
+        # image and video tags may not be in the website.
+        try:
+            images = self.find_images(soup)
+        except KeyError:
+            images = []
+        try:
+            videos = self.find_videos(soup)
+        except KeyError:
+            videos = []
+        try:
+            iframes = self.find_iframes(soup)
+        except KeyError:
+            iframes = []
+        return images, videos, iframes</code></pre>
+</details>
+<h3>Static methods</h3>
+<dl>
+<dt id="auto_osint_v.source_aggregator.SourceAggregator.find_iframes"><code class="name flex">
+<span>def <span class="ident">find_iframes</span></span>(<span>soup)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Finds embedded content in iframes, in a given HTML document.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>soup</code></strong></dt>
+<dd>Parsed HTML</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>source URLs for the content</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@staticmethod
+def find_iframes(soup):
+    &#34;&#34;&#34;Finds embedded content in iframes, in a given HTML document.
+
+    Args:
+        soup: Parsed HTML
+
+    Returns:
+        source URLs for the content
+    &#34;&#34;&#34;
+    iframe_urls = []
+    iframes = soup.find_all(&#34;iframe&#34;)
+    for iframe in iframes:
+        iframe_urls.append(iframe.get(&#34;src&#34;))
+    return iframe_urls</code></pre>
+</details>
+</dd>
+<dt id="auto_osint_v.source_aggregator.SourceAggregator.find_images"><code class="name flex">
+<span>def <span class="ident">find_images</span></span>(<span>soup)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Finds images in a given HTML document.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>soup</code></strong></dt>
+<dd>Parsed HTML</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>source URLs for the images</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@staticmethod
+def find_images(soup):
+    &#34;&#34;&#34;Finds images in a given HTML document.
+
+    Args:
+        soup: Parsed HTML
+
+    Returns:
+        source URLs for the images
+    &#34;&#34;&#34;
+    image_urls = []
+    images = soup.find_all(&#34;img&#34;)
+    for image in images:
+        image_urls.append(image.get(&#34;src&#34;))
+    return image_urls</code></pre>
+</details>
+</dd>
+<dt id="auto_osint_v.source_aggregator.SourceAggregator.find_videos"><code class="name flex">
+<span>def <span class="ident">find_videos</span></span>(<span>soup)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Finds images in a given HTML document.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>soup</code></strong></dt>
+<dd>Parsed HTML</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>source URLs for the videos</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@staticmethod
+def find_videos(soup):
+    &#34;&#34;&#34;Finds images in a given HTML document.
+
+    Args:
+        soup: Parsed HTML
+
+    Returns:
+        source URLs for the videos
+    &#34;&#34;&#34;
+    video_urls = []
+    videos = soup.find_all(&#34;video&#34;)
+    for video in videos:
+        video_urls.append(video.get(&#34;src&#34;))
+    return video_urls</code></pre>
+</details>
+</dd>
+<dt id="auto_osint_v.source_aggregator.SourceAggregator.searcher"><code class="name flex">
+<span>def <span class="ident">searcher</span></span>(<span>search_term, **kwargs)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Using the Google Custom Search Engine to search for results to the search_term.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>search_term</code></strong></dt>
+<dd>The keyword/query to search for. This can be a string or a list of strings.</dd>
+<dt><strong><code>kwargs</code></strong></dt>
+<dd>Extra arguments to pass to service.cse().list</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>the results or nothing if none are found.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@staticmethod
+def searcher(search_term, **kwargs):
+    &#34;&#34;&#34;Using the Google Custom Search Engine to search for results to the search_term.
+
+    Args:
+        search_term: The keyword/query to search for. This can be a string or a list of strings.
+        kwargs: Extra arguments to pass to service.cse().list
+
+    Returns:
+        the results or nothing if none are found.
+    &#34;&#34;&#34;
+    # Google custom search engine API key and engine ID
+    api_key = &#34;AIzaSyCgsni4yZyp4Bla9J7a2TE-lxmzVagcjEo&#34;
+    cse_id = &#34;d76b2d8504d104aa8&#34;
+    service = build(&#34;customsearch&#34;, &#34;v1&#34;, developerKey=api_key)
+    res = service.cse().list(q=search_term, cx=cse_id, hl=&#39;en&#39;, **kwargs).execute()
+    try:
+        return res[&#39;items&#39;]
+    except KeyError:
+        # print(&#34;No results found for query:&#34;, search_term)
+        return []</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="auto_osint_v.source_aggregator.SourceAggregator.find_sources"><code class="name flex">
+<span>def <span class="ident">find_sources</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Runs the various search operations.</p>
+<h2 id="returns">Returns</h2>
+<p>results in the form of a list of dictionaries</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def find_sources(self):
+    &#34;&#34;&#34;Runs the various search operations.
+
+    Returns:
+        results in the form of a list of dictionaries
+    &#34;&#34;&#34;
+    # in both methods reduce number of queries
+    self.google_search()
+    self.social_media_search()
+    # store potentially corroborating sources in .csv file
+    self.file_handler.create_potential_corroboration_file(self.results_list_dict)
+    return self.results_list_dict</code></pre>
+</details>
+</dd>
+<dt id="auto_osint_v.source_aggregator.SourceAggregator.google_search"><code class="name flex">
+<span>def <span class="ident">google_search</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Searches google using both the generated queries, and the extracted keywords.</p>
+<p>Limits the number of queries sent to google where possible.
+Uses the Google Custom Search Engine</p>
+<h2 id="returns">Returns</h2>
+<p>dictionary of Google search results</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def google_search(self):
+    &#34;&#34;&#34;Searches google using both the generated queries, and the extracted keywords.
+
+    Limits the number of queries sent to google where possible.
+    Uses the Google Custom Search Engine
+
+    Returns:
+        dictionary of Google search results
+    &#34;&#34;&#34;
+    query_results = []
+    for query in self.queries:
+        # searches google using the generated queries
+        query_results += self.searcher(query, num=3)
+    for result in tqdm(query_results, desc=&#34;Search Google using generated queries&#34;):
+        # write link to dict
+        self.process_result(result)
+    # search for the keywords, only 7 at a time
+    keyword_results = []
+    length_of_split = 7
+    split_keywords = [self.keywords[i:i + length_of_split]
+                      for i in range(0, len(self.keywords), length_of_split)]
+    for keywords in split_keywords:
+        keyword_results += self.searcher(keywords, num=10//len(split_keywords))
+    # loop through results
+    for result in tqdm(keyword_results, desc=&#34;Search Google using extracted keywords&#34;):
+        # write link to dict
+        self.process_result(result)</code></pre>
+</details>
+</dd>
+<dt id="auto_osint_v.source_aggregator.SourceAggregator.media_finder"><code class="name flex">
+<span>def <span class="ident">media_finder</span></span>(<span>self, url)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Finds media in the HTML from the given URL. This finds images and videos.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>url</code></strong></dt>
+<dd>The URL for the website</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>The info we want</code></dt>
+<dd>website title, description, images &amp; videos</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def media_finder(self, url):
+    &#34;&#34;&#34;Finds media in the HTML from the given URL. This finds images and videos.
+
+    Args:
+        url: The URL for the website
+
+    Returns:
+        The info we want: website title, description, images &amp; videos
+    &#34;&#34;&#34;
+    # retrieve html from URL
+    response = requests.get(url, timeout=10)  # timeout 10 seconds
+    # get the content type
+    try:
+        content_type = response.headers[&#39;Content-Type&#39;]
+        # if xml use xml parser
+        if content_type == &#34;text/xml&#34; or content_type == &#34;application/xml&#34;:
+            # use xml parser
+            soup = BeautifulSoup(response.text, &#34;xml&#34;)
+        else:
+            # parse using the lxml html parser
+            soup = BeautifulSoup(response.text, &#34;lxml&#34;)
+    except KeyError:
+        # except on KeyError if no &#39;content-type&#39; header exists
+        soup = BeautifulSoup(response.text, &#34;lxml&#34;)
+    # image and video tags may not be in the website.
+    try:
+        images = self.find_images(soup)
+    except KeyError:
+        images = []
+    try:
+        videos = self.find_videos(soup)
+    except KeyError:
+        videos = []
+    try:
+        iframes = self.find_iframes(soup)
+    except KeyError:
+        iframes = []
+    return images, videos, iframes</code></pre>
+</details>
+</dd>
+<dt id="auto_osint_v.source_aggregator.SourceAggregator.process_result"><code class="name flex">
+<span>def <span class="ident">process_result</span></span>(<span>self, result)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Takes the result from the search, extracts information and saves it all in a dictionary.</p>
+<p>This is the main processing step.
+Sentiment analysis is done to filter bias and inflammatory sources.
+By adjusting max_sentiment_threshold you may filter more sources
+(that are bias or inflammatory). Only change this if you find that sources retrieved appear
+bias or inflammatory, and vice versa, if it is filtering sources that do not appear very
+biased or inflammatory.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>result</code></strong></dt>
+<dd>Result type from Google Search API</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>nothing, stores info in instance dictionary variable</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def process_result(self, result):
+    &#34;&#34;&#34;Takes the result from the search, extracts information and saves it all in a dictionary.
+
+    This is the main processing step.
+    Sentiment analysis is done to filter bias and inflammatory sources.
+    By adjusting max_sentiment_threshold you may filter more sources
+    (that are bias or inflammatory). Only change this if you find that sources retrieved appear
+    bias or inflammatory, and vice versa, if it is filtering sources that do not appear very
+    biased or inflammatory.
+
+    Args:
+        result: Result type from Google Search API
+
+    Returns:
+        nothing, stores info in instance dictionary variable
+    &#34;&#34;&#34;
+    link = result[&#39;link&#39;]
+    try:
+        title = result[&#39;pagemap&#39;][&#39;metatags&#39;][0][&#39;og:title&#39;]
+    except KeyError:
+        title = result[&#39;title&#39;]
+    try:
+        desc = result[&#39;pagemap&#39;][&#39;metatags&#39;][0][&#39;og:description&#39;]
+    except KeyError:
+        desc = result[&#39;snippet&#39;]
+    try:
+        page_type = result[&#39;pagemap&#39;][&#39;metatags&#39;][0][&#39;og:type&#39;]
+    except KeyError:
+        page_type = &#34;&#34;
+    try:
+        publish_time = result[&#39;pagemap&#39;][&#39;metatags&#39;][0][&#39;article:published_time&#39;]
+    except KeyError:
+        publish_time = &#34;&#34;
+    try:
+        iframes, images, videos = self.media_finder(link)
+    except (requests.exceptions.SSLError, requests.exceptions.Timeout):
+        iframes, images, videos = &#34;NaN&#34;, &#34;NaN&#34;, &#34;NaN&#34;
+    # sentiment analysis check - will discard headlines that appear inflammatory or bias
+    # keep threshold relatively high (&gt;0.8), see process_result() documentation.
+    max_sentiment_threshold = 0.9
+    label, score = self.sentiment_analyser.headline_analyser(title)
+    # discard any duplicates
+    if link not in self.urls_present:
+        self.urls_present.append(link)
+        # Very poor scores will lead to the source being discarded
+        if not (label != &#34;neutral&#34; and score &gt; max_sentiment_threshold):
+            self.results_list_dict.append({&#34;url&#34;: link, &#34;title&#34;: title, &#34;description&#34;: desc,
+                                           &#34;page_type&#34;: page_type,
+                                           &#34;time_published&#34;: publish_time,
+                                           &#34;image_links&#34;: images, &#34;video_links&#34;: videos,
+                                           &#34;embedded_content&#34;: iframes,
+                                           &#34;title_sentiment&#34;:
+                                               f&#34;{label} sentiment, score={score}&#34;})</code></pre>
+</details>
+</dd>
+<dt id="auto_osint_v.source_aggregator.SourceAggregator.search_query_generator"><code class="name flex">
+<span>def <span class="ident">search_query_generator</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Generates a search queries based on the given statement.</p>
+<p>This is a resource (particularly memory) intensive process. Limit usage.
+Uses the BeIR/query-gen-msmarco-t5-large-v1 pre-trained model and example code available on
+HuggingFace.co
+Currently uses the 'large' model for accuracy. This can be downgraded to 'base' for reduced
+accuracy but better performance.</p>
+<h2 id="returns">Returns</h2>
+<p>List of queries</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def search_query_generator(self):
+    &#34;&#34;&#34;Generates a search queries based on the given statement.
+
+    This is a resource (particularly memory) intensive process. Limit usage.
+    Uses the BeIR/query-gen-msmarco-t5-large-v1 pre-trained model and example code available on
+    HuggingFace.co
+    Currently uses the &#39;large&#39; model for accuracy. This can be downgraded to &#39;base&#39; for reduced
+    accuracy but better performance.
+
+    Returns:
+        List of queries
+    &#34;&#34;&#34;
+    # Query generation based on the context of the intelligence statement
+    tokenizer = T5Tokenizer.from_pretrained(&#39;BeIR/query-gen-msmarco-t5-large-v1&#39;)
+    model = T5ForConditionalGeneration.from_pretrained(&#39;BeIR/query-gen-msmarco-t5-large-v1&#39;)
+    # WARNING: If you are getting out of memory errors the model will need to be changed from
+    # &#39;large&#39; to &#39;base&#39;.
+    # Potential future fix to this problem - wrap in a try-except to auto switch to base model.
+    # If it is borderline try to change the max_length and num_return_sequences parameters
+    # below.
+
+    input_ids = tokenizer.encode(self.intel_statement, return_tensors=&#39;pt&#39;)
+    # number of queries to generate - increase in this massively impact performance
+    num_queries = 3
+    outputs = model.generate(
+        input_ids=input_ids,
+        max_length=128,  # default = 64
+        do_sample=True,
+        top_p=0.95,  # default = 0.95
+        num_return_sequences=num_queries)  # Returns x queries, default = 3
+
+    for output in outputs:
+        query = tokenizer.decode(output, skip_special_tokens=True)
+        self.queries.append(str(query))</code></pre>
+</details>
+</dd>
+<dt id="auto_osint_v.source_aggregator.SourceAggregator.social_media_search"><code class="name flex">
+<span>def <span class="ident">social_media_search</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Searches a variety of social media sites see 'social_media_sites' variable.</p>
+<p>WARNING: To search using generated queries and extracted keywords, the code has nested for
+loops.
+Significant performance boost achieved by finding out that the 'q' parameter for cse.list
+takes lists as well as strings.</p>
+<h2 id="returns">Returns</h2>
+<p>dictionary storing the social media results</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def social_media_search(self):
+    &#34;&#34;&#34;Searches a variety of social media sites see &#39;social_media_sites&#39; variable.
+
+    WARNING: To search using generated queries and extracted keywords, the code has nested for
+    loops.
+    Significant performance boost achieved by finding out that the &#39;q&#39; parameter for cse.list
+    takes lists as well as strings.
+
+    Returns:
+        dictionary storing the social media results
+    &#34;&#34;&#34;
+    # define social media sites - to add more insert the domain name here.
+    social_media_sites = [&#34;www.instagram.com&#34;, &#34;www.tiktok.com&#34;, &#34;www.facebook.com&#34;,
+                          &#34;www.youtube.com&#34;, &#34;www.reddit.com&#34;, &#34;www.twitter.com&#34;,
+                          &#34;www.pinterest.com&#34;, &#34;www.github.com&#34;, &#34;www.tumblr.com&#34;,
+                          &#34;www.flickr.com&#34;, &#34;vimeo.com&#34;, &#34;www.telegram.com&#34;
+                          &#34;medium.com&#34;, &#34;vk.com&#34;, &#34;imgur.com&#34;, &#34;www.patreon.com&#34;,
+                          &#34;bitbucket.org&#34;, &#34;www.dailymotion.com&#34;, &#34;news.ycombinator.com&#34;]
+    # Join the list of keywords/phrases into one string seperated by &#39;|&#39; and surrounded by &#34;&#34;
+    # it appears that the max number of comparisons is between 7 and 10.
+    # google documentation says it should be 10
+    # join_keywords = &#39;|&#39;.join(f&#39;&#34;{word}&#34;&#39; for word in self.keywords)
+    # Loop through list of social media sites
+    for site in tqdm(social_media_sites, desc=&#34;Searching Social Media Sites&#34;):
+        # this for loop is clearly inefficient, I don&#39;t know how to improve it
+        # I&#39;m unsure of this behaviour as the siteSearch parameter doesn&#39;t seem to work
+        query_results = self.searcher(self.queries, siteSearch=site, siteSearchFilter=&#39;i&#39;,
+                                      num=5)
+        # loop through results
+        for result in query_results:
+            # write link to dict
+            self.process_result(result)
+        # search for the keywords, only 7 at a time
+        keyword_results = []
+        length_of_split = 7
+        split_keywords = [self.keywords[i:i + length_of_split]
+                          for i in range(0, len(self.keywords), length_of_split)]
+        for keywords in split_keywords:
+            keyword_results += self.searcher(keywords, siteSearch=site,
+                                             siteSearchFilter=&#39;i&#39;, num=5)
+        for result in keyword_results:
+            # get process the result
+            self.process_result(result)</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="auto_osint_v" href="index.html">auto_osint_v</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="auto_osint_v.source_aggregator.SourceAggregator" href="#auto_osint_v.source_aggregator.SourceAggregator">SourceAggregator</a></code></h4>
+<ul class="">
+<li><code><a title="auto_osint_v.source_aggregator.SourceAggregator.find_iframes" href="#auto_osint_v.source_aggregator.SourceAggregator.find_iframes">find_iframes</a></code></li>
+<li><code><a title="auto_osint_v.source_aggregator.SourceAggregator.find_images" href="#auto_osint_v.source_aggregator.SourceAggregator.find_images">find_images</a></code></li>
+<li><code><a title="auto_osint_v.source_aggregator.SourceAggregator.find_sources" href="#auto_osint_v.source_aggregator.SourceAggregator.find_sources">find_sources</a></code></li>
+<li><code><a title="auto_osint_v.source_aggregator.SourceAggregator.find_videos" href="#auto_osint_v.source_aggregator.SourceAggregator.find_videos">find_videos</a></code></li>
+<li><code><a title="auto_osint_v.source_aggregator.SourceAggregator.google_search" href="#auto_osint_v.source_aggregator.SourceAggregator.google_search">google_search</a></code></li>
+<li><code><a title="auto_osint_v.source_aggregator.SourceAggregator.media_finder" href="#auto_osint_v.source_aggregator.SourceAggregator.media_finder">media_finder</a></code></li>
+<li><code><a title="auto_osint_v.source_aggregator.SourceAggregator.process_result" href="#auto_osint_v.source_aggregator.SourceAggregator.process_result">process_result</a></code></li>
+<li><code><a title="auto_osint_v.source_aggregator.SourceAggregator.search_query_generator" href="#auto_osint_v.source_aggregator.SourceAggregator.search_query_generator">search_query_generator</a></code></li>
+<li><code><a title="auto_osint_v.source_aggregator.SourceAggregator.searcher" href="#auto_osint_v.source_aggregator.SourceAggregator.searcher">searcher</a></code></li>
+<li><code><a title="auto_osint_v.source_aggregator.SourceAggregator.social_media_search" href="#auto_osint_v.source_aggregator.SourceAggregator.social_media_search">social_media_search</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.10.0</a>.</p>
+</footer>
+</body>
+</html>

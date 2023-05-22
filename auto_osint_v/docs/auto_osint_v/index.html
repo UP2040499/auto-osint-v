@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.10.0" />
+<title>auto_osint_v API documentation</title>
+<meta name="description" content="A tool for validating OSINT.
+auto-osint-v # …" />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Package <code>auto_osint_v</code></h1>
+</header>
+<section id="section-intro">
+<p>A tool for validating OSINT.</p>
+<h1 id="auto-osint-v">auto-osint-v</h1>
+<p><em>An automated tool for Validating OSINT. This forms part of the final step of OSINT production as
+detailed by NATO's open source handbook (2001). This is a research artefact for my Dissertation at
+the University of Portsmouth</em></p>
+<h2 id="installation">📁 Installation</h2>
+<blockquote>
+<p><strong>Note</strong>
+First, please attempt to use the Google Colab, more info <a href="#mortar_board-google-colab">below</a>.</p>
+</blockquote>
+<h3 id="linux-windows">Linux / Windows</h3>
+<ul>
+<li>Clone this GitHub repository <code>git clone https://github.com/UP2040499/auto-osint-v.git</code></li>
+<li>Install conda (mamba also works) </li>
+<li><a href="https://conda.io/projects/conda/en/latest/user-guide/install/index.html">Conda installation guide</a></li>
+<li>Check conda is installed by checking the version: <code>conda --version</code></li>
+<li>Move into the repo
+<code>bash
+cd ~/&lt;install directory&gt;/auto-osint-v</code></li>
+<li>Create a conda OR mamba environment and install dependencies:</li>
+<li>Install dependencies with conda:
+<code>bash
+conda env create -f environment.yml -n auto-osint-v-python38</code></li>
+<li>Install dependencies using mamba
+<code>bash
+mamba env create -f environment.yml</code></li>
+<li>Activate conda environment and run the tool.
+### Linux (bash)
+<code>bash
+eval "$(conda shell.bash hook)" #copy conda command to shell
+conda activate auto-osint-v-python38
+python -m auto_osint_v</code>
+### Windows
+&gt; :warning: Open an 'Anaconda Powershell Prompt' from Start Menu, then run the following:
+<code>powershell
+conda init powershell
+conda activate auto-osint-v-python38
+python -m auto_osint_v</code></li>
+</ul>
+<h2 id="usage">🚀 Usage</h2>
+<h3 id="google-colab">🎓 Google Colab</h3>
+<p>I strongly recommend using Google Colab to run this tool. However, the default machine in the Google
+Colab performs worse than most local machines would (this is likely to do with CPU limits in place).</p>
+<p>The Google Colab can be found <a href="https://colab.research.google.com/drive/18_PY8sSLYn3ThPBJMMSAfrjj_CxXu1h1?usp=sharing">here</a></p>
+<p>The reason it is recommended to use Google Colab, is because it runs the tool remotely.
+While performance on a local machine may be better, it is likely that the majority of the machine's
+available resources (CPU, RAM) will be utilised by the tool. </p>
+<p>Use Google Colab to avoid hogging your computer's resources.</p>
+<hr>
+<h3 id="command-line-instructions">💻 Command line instructions:</h3>
+<pre><code class="language-shell">python -m auto_osint_v &lt;ARGS&gt;
+</code></pre>
+<h4 id="arguments">🚧 Arguments 🚧</h4>
+<p>The following descriptions can also be found by running <code>auto_osint_v -h</code>.</p>
+<ul>
+<li><code>-s/--Silent</code> Assumes you have already entered the intelligence statement
+<a href="auto_osint_v/data_files/intelligence_file.txt">here</a></li>
+<li><code>-n/--NoEditor</code> Input intelligence statement into command line rather than into text editor.</li>
+<li><code>--html</code> Output will be in HTML (default: csv).</li>
+<li><code>-m/--markdown</code> Output will be in markdown (default: csv).</li>
+<li><code>-f/--FileToUse</code> Specify the file to read the intelligence statement from</li>
+<li><code>-p/--output_postfix</code> Specify the output file's postfix, e.g. 'output3.txt' rather than default
+'output.txt'</li>
+</ul>
+<h3 id="example-usage">Example usage:</h3>
+<h4 id="typical-use-first-time-use">Typical use / First time use</h4>
+<pre><code class="language-shell">python -m auto_osint_v
+</code></pre>
+<h4 id="use-with-options">Use with options</h4>
+<p>This reads the statement from the existing intelligence file, and output the results in a
+markdown file called 'output0.md'.</p>
+<pre><code class="language-shell">python -m auto_osint_v -s -m -p 0
+</code></pre>
+<p>The postfix (0 in this case) is useful if you are running the tool multiple times and want to save the results
+separately.</p>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">&#34;&#34;&#34;A tool for validating OSINT.
+.. include:: ../README.md
+&#34;&#34;&#34;</code></pre>
+</details>
+</section>
+<section>
+<h2 class="section-title" id="header-submodules">Sub-modules</h2>
+<dl>
+<dt><code class="name"><a title="auto_osint_v.file_handler" href="file_handler.html">auto_osint_v.file_handler</a></code></dt>
+<dd>
+<div class="desc"><p>This module handles all our data files. CSV or TXT.</p></div>
+</dd>
+<dt><code class="name"><a title="auto_osint_v.popular_information_finder" href="popular_information_finder.html">auto_osint_v.popular_information_finder</a></code></dt>
+<dd>
+<div class="desc"><p>Finds entities (information) that is popular amongst the potentially corroborating sources.</p></div>
+</dd>
+<dt><code class="name"><a title="auto_osint_v.priority_manager" href="priority_manager.html">auto_osint_v.priority_manager</a></code></dt>
+<dd>
+<div class="desc"><p>This module assigns scores to each source, prioritising the most relevant sources.</p></div>
+</dd>
+<dt><code class="name"><a title="auto_osint_v.sentiment_analyser" href="sentiment_analyser.html">auto_osint_v.sentiment_analyser</a></code></dt>
+<dd>
+<div class="desc"><p>This module's primary role is to analyse the semantics of the intelligence statement …</p></div>
+</dd>
+<dt><code class="name"><a title="auto_osint_v.source_aggregator" href="source_aggregator.html">auto_osint_v.source_aggregator</a></code></dt>
+<dd>
+<div class="desc"><p>Python Class for all functions of aggregating sources from open sources …</p></div>
+</dd>
+<dt><code class="name"><a title="auto_osint_v.specific_entity_processor" href="specific_entity_processor.html">auto_osint_v.specific_entity_processor</a></code></dt>
+<dd>
+<div class="desc"><p>This module will identify specific entities …</p></div>
+</dd>
+</dl>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul>
+<li><a href="#auto-osint-v">auto-osint-v</a><ul>
+<li><a href="#installation">📁 Installation</a><ul>
+<li><a href="#linux-windows">Linux / Windows</a></li>
+</ul>
+</li>
+<li><a href="#usage">🚀 Usage</a><ul>
+<li><a href="#google-colab">🎓 Google Colab</a></li>
+<li><a href="#command-line-instructions">💻 Command line instructions:</a><ul>
+<li><a href="#arguments">🚧 Arguments 🚧</a></li>
+</ul>
+</li>
+<li><a href="#example-usage">Example usage:</a><ul>
+<li><a href="#typical-use-first-time-use">Typical use / First time use</a></li>
+<li><a href="#use-with-options">Use with options</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+<ul id="index">
+<li><h3><a href="#header-submodules">Sub-modules</a></h3>
+<ul>
+<li><code><a title="auto_osint_v.file_handler" href="file_handler.html">auto_osint_v.file_handler</a></code></li>
+<li><code><a title="auto_osint_v.popular_information_finder" href="popular_information_finder.html">auto_osint_v.popular_information_finder</a></code></li>
+<li><code><a title="auto_osint_v.priority_manager" href="priority_manager.html">auto_osint_v.priority_manager</a></code></li>
+<li><code><a title="auto_osint_v.sentiment_analyser" href="sentiment_analyser.html">auto_osint_v.sentiment_analyser</a></code></li>
+<li><code><a title="auto_osint_v.source_aggregator" href="source_aggregator.html">auto_osint_v.source_aggregator</a></code></li>
+<li><code><a title="auto_osint_v.specific_entity_processor" href="specific_entity_processor.html">auto_osint_v.specific_entity_processor</a></code></li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.10.0</a>.</p>
+</footer>
+</body>
+</html>
