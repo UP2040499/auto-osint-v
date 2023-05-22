@@ -67,7 +67,7 @@ class PopularInformationFinder:
         except KeyError:
             content_type = ''
         if "application/javascript" in content_type or response.status_code != 200:
-            # using selenium to avoid 'JavaScript is not available." error
+            # using selenium to avoid 'JavaScript is not available.' error
             options = webdriver.ChromeOptions()
             options.headless = True
             options.add_argument("start-maximized")
@@ -101,7 +101,7 @@ class PopularInformationFinder:
             except selenium.common.exceptions.TimeoutException:
                 driver.quit()
                 return entities
-            if request.response.status_code in {400, 401, 403, 404, 429}:
+            if request.response.status_code != 200:
                 driver.quit()
                 return entities
         else:

@@ -1,0 +1,1044 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+<meta name="generator" content="pdoc 0.10.0" />
+<title>auto_osint_v.priority_manager API documentation</title>
+<meta name="description" content="This module assigns scores to each source, prioritising the most relevant sources." />
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
+<link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
+<link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:30px;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:1em 0 .50em 0}h3{font-size:1.4em;margin:25px 0 10px 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .3s ease-in-out}a:hover{color:#e82}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900}pre code{background:#f8f8f8;font-size:.8em;line-height:1.4em}code{background:#f2f2f1;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{background:#f8f8f8;border:0;border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0;padding:1ex}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-weight:bold;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em .5em;margin-bottom:1em}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.item .name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul{padding-left:1.5em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js" integrity="sha256-Uv3H6lx7dJmRfRvH8TH6kJD1TSK1aFcwgx+mdg3epi8=" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => hljs.initHighlighting())</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>auto_osint_v.priority_manager</code></h1>
+</header>
+<section id="section-intro">
+<p>This module assigns scores to each source, prioritising the most relevant sources.</p>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">&#34;&#34;&#34;This module assigns scores to each source, prioritising the most relevant sources.
+&#34;&#34;&#34;
+import http.client
+import inspect
+from typing import List
+from multiprocessing import Pool
+import requests
+import selenium.common.exceptions
+from tqdm import tqdm
+from bs4 import BeautifulSoup
+from seleniumwire import webdriver
+
+
+from auto_osint_v.popular_information_finder import PopularInformationFinder
+
+
+def count_entities(entities, source_text):
+    &#34;&#34;&#34;Counts the number of entities appearing in a given source.
+
+    Args:
+        entities: the entities to look for.
+        source_text: the source text to look for entities within.
+
+    Returns:
+        Integer number of appearances of all entities in the source
+    &#34;&#34;&#34;
+    entity_count = 0
+    for entity in entities:
+        # built-in method find() returns the index of a given substring within
+        # a string, returns -1 if not found
+        if source_text.find(entity) != -1:
+            entity_count += 1
+    return entity_count
+
+
+class PriorityManager:
+    &#34;&#34;&#34;Provides methods for assigning source scores based on relevancy to the user&#39;s statement.
+    &#34;&#34;&#34;
+
+    def __init__(self, fh_object, entity_processor_object, potential_corroboration: List[dict]):
+        &#34;&#34;&#34;Initialises the PriorityManager object.
+
+        Args:
+            fh_object: file handler object to use for extracting info from data files.
+            entity_processor_object: object to use for processing entities
+            potential_corroboration: list of dictionaries of source information.
+        &#34;&#34;&#34;
+        self._target_entity_multiplier = 10  # multiplier for mentions of target info
+        self._popular_entity_multiplier = 5  # multiplier for mentions of popular info
+        self._entities = []
+        self.file_handler = fh_object
+        self.entity_processor = entity_processor_object
+        self.sources = potential_corroboration
+
+    def manager(self):
+        &#34;&#34;&#34;This method controls the order of execution for counting target and popular info.
+
+        Returns:
+            self.sources: list of dictionaries of source information
+        &#34;&#34;&#34;
+        self.target_info_scorer()  # generates a score for each source
+        # remove sources with 0 score (or could remove bottom x% of sources)
+        self.remove_sources()
+        # clear entities list
+        self._entities.clear()
+        # generate a popular info score for each source
+        self.popular_info_scorer()
+        # sort sources by score in descending order
+        self.sort_sources_desc()
+        # return scored sources list(dict)
+        return self.sources
+
+    def get_sources(self):
+        &#34;&#34;&#34;Method for getting the list of source dictionaries.&#34;&#34;&#34;
+        return self.sources
+
+    @staticmethod
+    def get_text_from_site(url):
+        &#34;&#34;&#34;Gets the body text from each source using its URL.
+
+        Uses requests and BeautifulSoup to retrieve and parse the webpage&#39;s HTML into a readable
+        format for entity recognition.
+
+        Args:
+            url: url fetched from sources dictionary.
+
+        Returns:
+            The content of the webpage in UTF-8 format.
+        &#34;&#34;&#34;
+        # initialise the webpage text variable
+        text = &#34;&#34;
+        # set headers to try to avoid 403 errors
+        headers = {
+            &#39;User-Agent&#39;:
+                &#39;Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) &#39;
+                &#39;Chrome/112.0.0.0 Safari/537.36&#39;}
+        # request the webpage - if timeout, move on to next source
+        try:
+            response = requests.get(url, headers, timeout=5)
+        except (requests.exceptions.ReadTimeout, requests.exceptions.ConnectionError):
+            return text
+        try:
+            content_type = response.headers[&#39;Content-Type&#39;]
+        except KeyError:
+            content_type = &#39;&#39;
+        if &#34;application/javascript&#34; in content_type or response.status_code != 200:
+            # using selenium to avoid &#39;JavaScript is not available.&#34; error
+            options = webdriver.ChromeOptions()
+            options.headless = True
+            options.add_argument(&#34;start-maximized&#34;)
+            options.add_experimental_option(&#34;excludeSwitches&#34;, [&#34;enable-automation&#34;])
+            options.add_experimental_option(&#39;useAutomationExtension&#39;, False)
+            options.add_argument(&#39;--disable-blink-features=AutomationControlled&#39;)
+            options.add_argument(
+                &#34;user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, &#34;
+                &#34;like Gecko) Chrome/98.0.4758.102 Safari/537.36&#34;)
+            try:
+                driver = webdriver.Chrome(&#34;chromedriver&#34;, chrome_options=options)
+            except (http.client.RemoteDisconnected,
+                    selenium.common.exceptions.SessionNotCreatedException):
+                try:
+                    driver.quit()
+                finally:
+                    return text
+            # driver.set_page_load_timeout(5)  # set timeout to 5 secs
+            # request the webpage. If source website timeout, return the current list of entities.
+            try:
+                driver.get(url)
+            except selenium.common.exceptions.TimeoutException:
+                driver.quit()
+                return text
+            html = driver.page_source
+            # check if we are wasting our time with a broken or inaccessible website
+            try:
+                request = driver.wait_for_request(url, 5)
+                response = request.response
+                driver.quit()
+            except selenium.common.exceptions.TimeoutException:
+                driver.quit()
+                return text
+            if request.response.status_code in {400, 401, 403, 404, 429}:
+                driver.quit()
+                return text
+        else:
+            html = response.text
+        # get the content type
+        try:
+            # response is either the requests or selenium response
+            content_type = response.headers[&#39;Content-Type&#39;]
+            # if xml use xml parser
+            if content_type == &#34;text/xml&#34; or content_type == &#34;application/xml&#34;:
+                # don&#39;t parse xml
+                return text
+            else:
+                # parse using the lxml html parser
+                soup = BeautifulSoup(html, &#34;lxml&#34;)
+        except KeyError:
+            # except on KeyError if no &#39;content-type&#39; header exists
+            soup = BeautifulSoup(html, &#34;lxml&#34;)
+
+        # kill all script and style elements
+        for script in soup([&#34;script&#34;, &#34;style&#34;]):
+            script.extract()  # rip it out
+        # get text
+        text = soup.get_text()
+        # break into lines and remove leading and trailing space on each
+        lines = (line.strip() for line in text.splitlines())
+        # break multi-headlines into a line each
+        chunks = (phrase.strip() for line in lines for phrase in line.split(&#34;  &#34;))
+        # drop blank lines
+        text = &#39;\n&#39;.join(chunk for chunk in chunks if chunk)
+        # return string text formatted and with line breaks
+        return text
+
+    def target_info_scorer(self):
+        &#34;&#34;&#34;Assigns scores based on the amount of target entities identified.
+
+        Updates the &#39;self.sources&#39; list of dicts
+        &#34;&#34;&#34;
+        # Gather saved target entities
+        self._entities = self.file_handler.get_keywords_from_target_info()
+
+        # Count number of appearances in each source
+        # for source in tqdm(self.sources, desc=&#34;Counting target entity appearances in &#34;
+        #                                      &#34;sources&#34;):
+        with Pool() as pool:
+            self.sources = list(tqdm(pool.imap_unordered(self.get_text_get_score_target_inf,
+                                                         self.sources), total=len(self.sources),
+                                     desc=&#34;Assigning scores to sources based on target info&#34;))
+        # Updated &#39;self.sources&#39; list of dictionaries
+
+    def popular_info_scorer(self):
+        &#34;&#34;&#34;Assigns scores to each source based on the amount of popular entities identified.
+
+        Updates the &#39;self.sources&#39; list of dicts.
+        &#34;&#34;&#34;
+        # initialise popular info finder object
+        popular_info_object = PopularInformationFinder(self.file_handler, self.entity_processor)
+        # Gather popular entities
+        entities = popular_info_object.find_entities(self.sources)
+        self._entities = entities
+        # Count number of appearances in each source
+        # new approach using multiprocessing map function
+        with Pool() as pool:
+            self.sources = list(tqdm(pool.imap_unordered(self.get_text_get_score_pop_inf,
+                                                         self.sources), total=len(self.sources),
+                                     desc=&#34;Assigning scores to sources based on popular info&#34;))
+        # Updated &#39;self.sources&#39; list of dictionaries
+
+    def get_text_get_score_target_inf(self, source):
+        &#34;&#34;&#34;Gets the text from the source URL and assigns a score.
+
+        Args:
+            source: the individual source dictionary of information
+
+        Returns:
+            the updated source dictionary with a new &#39;score&#39; field.
+        &#34;&#34;&#34;
+        # get the text from the source
+        text = self.get_text_from_site(source[&#34;url&#34;])
+        # return score for target info
+        score = int(count_entities(self._entities, text) * self._target_entity_multiplier)
+        # adds score to the source dictionary
+        try:
+            source[&#34;score&#34;] += score
+        except KeyError:
+            source[&#34;score&#34;] = score
+        return source
+
+    def get_text_get_score_pop_inf(self, source):
+        &#34;&#34;&#34;Gets the text from the source URL and assigns a score.
+
+        Args:
+            source: the individual source dictionary of information
+
+        Returns:
+            the updated source dictionary with a new &#39;score&#39; field.
+        &#34;&#34;&#34;
+        # get the text from the source
+        text = self.get_text_from_site(source[&#34;url&#34;])
+        # return score for target info
+        score = int(count_entities(self._entities, text) * self._target_entity_multiplier)
+        # adds score to the source dictionary
+        try:
+            source[&#34;score&#34;] += score
+        except KeyError:
+            source[&#34;score&#34;] = score
+        return source
+
+    def get_text_assign_score(self, source):
+        &#34;&#34;&#34;Gets the text from the source URL and examines it to count the number of entities.
+
+        Args:
+            source: the individual source dictionary of information.
+        &#34;&#34;&#34;
+        # get the text from the source
+        text = self.get_text_from_site(source[&#34;url&#34;])
+        # assign score based on entity appearance count
+        # use different multiplier depending on which method has called &#39;get_text_assign_score()&#39;
+        if inspect.stack()[1].function == &#34;target_info_scorer()&#34;:
+            score = count_entities(self._entities, text) * self._target_entity_multiplier
+        elif inspect.stack()[1].function == &#34;popular_info_scorer()&#34;:
+            score = count_entities(self._entities, text) * self._popular_entity_multiplier
+        else:
+            score = 10
+        # adds score to the source dictionary
+        try:
+            source[&#34;score&#34;] += score
+        except KeyError:
+            source[&#34;score&#34;] = score
+        return source
+
+    def remove_sources(self):
+        &#34;&#34;&#34;Removes sources that have a score of 0.&#34;&#34;&#34;
+        self.sources = [dict_ for dict_ in self.sources if dict_[&#34;score&#34;] != 0]
+
+    def sort_sources_desc(self):
+        &#34;&#34;&#34;Sorts the &#39;self.sources&#39; list of dicts in descending order based on score.&#34;&#34;&#34;
+        # sort sources list of dictionaries by highest score.
+        # lambda function specifies sorted to use the values of the dictionary in desc. order
+        self.sources.sort(key=lambda x: x[&#34;score&#34;], reverse=True)</code></pre>
+</details>
+</section>
+<section>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="auto_osint_v.priority_manager.count_entities"><code class="name flex">
+<span>def <span class="ident">count_entities</span></span>(<span>entities, source_text)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Counts the number of entities appearing in a given source.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>entities</code></strong></dt>
+<dd>the entities to look for.</dd>
+<dt><strong><code>source_text</code></strong></dt>
+<dd>the source text to look for entities within.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>Integer number of appearances of all entities in the source</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def count_entities(entities, source_text):
+    &#34;&#34;&#34;Counts the number of entities appearing in a given source.
+
+    Args:
+        entities: the entities to look for.
+        source_text: the source text to look for entities within.
+
+    Returns:
+        Integer number of appearances of all entities in the source
+    &#34;&#34;&#34;
+    entity_count = 0
+    for entity in entities:
+        # built-in method find() returns the index of a given substring within
+        # a string, returns -1 if not found
+        if source_text.find(entity) != -1:
+            entity_count += 1
+    return entity_count</code></pre>
+</details>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="auto_osint_v.priority_manager.PriorityManager"><code class="flex name class">
+<span>class <span class="ident">PriorityManager</span></span>
+<span>(</span><span>fh_object, entity_processor_object, potential_corroboration: List[dict])</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Provides methods for assigning source scores based on relevancy to the user's statement.</p>
+<p>Initialises the PriorityManager object.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>fh_object</code></strong></dt>
+<dd>file handler object to use for extracting info from data files.</dd>
+<dt><strong><code>entity_processor_object</code></strong></dt>
+<dd>object to use for processing entities</dd>
+<dt><strong><code>potential_corroboration</code></strong></dt>
+<dd>list of dictionaries of source information.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">class PriorityManager:
+    &#34;&#34;&#34;Provides methods for assigning source scores based on relevancy to the user&#39;s statement.
+    &#34;&#34;&#34;
+
+    def __init__(self, fh_object, entity_processor_object, potential_corroboration: List[dict]):
+        &#34;&#34;&#34;Initialises the PriorityManager object.
+
+        Args:
+            fh_object: file handler object to use for extracting info from data files.
+            entity_processor_object: object to use for processing entities
+            potential_corroboration: list of dictionaries of source information.
+        &#34;&#34;&#34;
+        self._target_entity_multiplier = 10  # multiplier for mentions of target info
+        self._popular_entity_multiplier = 5  # multiplier for mentions of popular info
+        self._entities = []
+        self.file_handler = fh_object
+        self.entity_processor = entity_processor_object
+        self.sources = potential_corroboration
+
+    def manager(self):
+        &#34;&#34;&#34;This method controls the order of execution for counting target and popular info.
+
+        Returns:
+            self.sources: list of dictionaries of source information
+        &#34;&#34;&#34;
+        self.target_info_scorer()  # generates a score for each source
+        # remove sources with 0 score (or could remove bottom x% of sources)
+        self.remove_sources()
+        # clear entities list
+        self._entities.clear()
+        # generate a popular info score for each source
+        self.popular_info_scorer()
+        # sort sources by score in descending order
+        self.sort_sources_desc()
+        # return scored sources list(dict)
+        return self.sources
+
+    def get_sources(self):
+        &#34;&#34;&#34;Method for getting the list of source dictionaries.&#34;&#34;&#34;
+        return self.sources
+
+    @staticmethod
+    def get_text_from_site(url):
+        &#34;&#34;&#34;Gets the body text from each source using its URL.
+
+        Uses requests and BeautifulSoup to retrieve and parse the webpage&#39;s HTML into a readable
+        format for entity recognition.
+
+        Args:
+            url: url fetched from sources dictionary.
+
+        Returns:
+            The content of the webpage in UTF-8 format.
+        &#34;&#34;&#34;
+        # initialise the webpage text variable
+        text = &#34;&#34;
+        # set headers to try to avoid 403 errors
+        headers = {
+            &#39;User-Agent&#39;:
+                &#39;Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) &#39;
+                &#39;Chrome/112.0.0.0 Safari/537.36&#39;}
+        # request the webpage - if timeout, move on to next source
+        try:
+            response = requests.get(url, headers, timeout=5)
+        except (requests.exceptions.ReadTimeout, requests.exceptions.ConnectionError):
+            return text
+        try:
+            content_type = response.headers[&#39;Content-Type&#39;]
+        except KeyError:
+            content_type = &#39;&#39;
+        if &#34;application/javascript&#34; in content_type or response.status_code != 200:
+            # using selenium to avoid &#39;JavaScript is not available.&#34; error
+            options = webdriver.ChromeOptions()
+            options.headless = True
+            options.add_argument(&#34;start-maximized&#34;)
+            options.add_experimental_option(&#34;excludeSwitches&#34;, [&#34;enable-automation&#34;])
+            options.add_experimental_option(&#39;useAutomationExtension&#39;, False)
+            options.add_argument(&#39;--disable-blink-features=AutomationControlled&#39;)
+            options.add_argument(
+                &#34;user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, &#34;
+                &#34;like Gecko) Chrome/98.0.4758.102 Safari/537.36&#34;)
+            try:
+                driver = webdriver.Chrome(&#34;chromedriver&#34;, chrome_options=options)
+            except (http.client.RemoteDisconnected,
+                    selenium.common.exceptions.SessionNotCreatedException):
+                try:
+                    driver.quit()
+                finally:
+                    return text
+            # driver.set_page_load_timeout(5)  # set timeout to 5 secs
+            # request the webpage. If source website timeout, return the current list of entities.
+            try:
+                driver.get(url)
+            except selenium.common.exceptions.TimeoutException:
+                driver.quit()
+                return text
+            html = driver.page_source
+            # check if we are wasting our time with a broken or inaccessible website
+            try:
+                request = driver.wait_for_request(url, 5)
+                response = request.response
+                driver.quit()
+            except selenium.common.exceptions.TimeoutException:
+                driver.quit()
+                return text
+            if request.response.status_code in {400, 401, 403, 404, 429}:
+                driver.quit()
+                return text
+        else:
+            html = response.text
+        # get the content type
+        try:
+            # response is either the requests or selenium response
+            content_type = response.headers[&#39;Content-Type&#39;]
+            # if xml use xml parser
+            if content_type == &#34;text/xml&#34; or content_type == &#34;application/xml&#34;:
+                # don&#39;t parse xml
+                return text
+            else:
+                # parse using the lxml html parser
+                soup = BeautifulSoup(html, &#34;lxml&#34;)
+        except KeyError:
+            # except on KeyError if no &#39;content-type&#39; header exists
+            soup = BeautifulSoup(html, &#34;lxml&#34;)
+
+        # kill all script and style elements
+        for script in soup([&#34;script&#34;, &#34;style&#34;]):
+            script.extract()  # rip it out
+        # get text
+        text = soup.get_text()
+        # break into lines and remove leading and trailing space on each
+        lines = (line.strip() for line in text.splitlines())
+        # break multi-headlines into a line each
+        chunks = (phrase.strip() for line in lines for phrase in line.split(&#34;  &#34;))
+        # drop blank lines
+        text = &#39;\n&#39;.join(chunk for chunk in chunks if chunk)
+        # return string text formatted and with line breaks
+        return text
+
+    def target_info_scorer(self):
+        &#34;&#34;&#34;Assigns scores based on the amount of target entities identified.
+
+        Updates the &#39;self.sources&#39; list of dicts
+        &#34;&#34;&#34;
+        # Gather saved target entities
+        self._entities = self.file_handler.get_keywords_from_target_info()
+
+        # Count number of appearances in each source
+        # for source in tqdm(self.sources, desc=&#34;Counting target entity appearances in &#34;
+        #                                      &#34;sources&#34;):
+        with Pool() as pool:
+            self.sources = list(tqdm(pool.imap_unordered(self.get_text_get_score_target_inf,
+                                                         self.sources), total=len(self.sources),
+                                     desc=&#34;Assigning scores to sources based on target info&#34;))
+        # Updated &#39;self.sources&#39; list of dictionaries
+
+    def popular_info_scorer(self):
+        &#34;&#34;&#34;Assigns scores to each source based on the amount of popular entities identified.
+
+        Updates the &#39;self.sources&#39; list of dicts.
+        &#34;&#34;&#34;
+        # initialise popular info finder object
+        popular_info_object = PopularInformationFinder(self.file_handler, self.entity_processor)
+        # Gather popular entities
+        entities = popular_info_object.find_entities(self.sources)
+        self._entities = entities
+        # Count number of appearances in each source
+        # new approach using multiprocessing map function
+        with Pool() as pool:
+            self.sources = list(tqdm(pool.imap_unordered(self.get_text_get_score_pop_inf,
+                                                         self.sources), total=len(self.sources),
+                                     desc=&#34;Assigning scores to sources based on popular info&#34;))
+        # Updated &#39;self.sources&#39; list of dictionaries
+
+    def get_text_get_score_target_inf(self, source):
+        &#34;&#34;&#34;Gets the text from the source URL and assigns a score.
+
+        Args:
+            source: the individual source dictionary of information
+
+        Returns:
+            the updated source dictionary with a new &#39;score&#39; field.
+        &#34;&#34;&#34;
+        # get the text from the source
+        text = self.get_text_from_site(source[&#34;url&#34;])
+        # return score for target info
+        score = int(count_entities(self._entities, text) * self._target_entity_multiplier)
+        # adds score to the source dictionary
+        try:
+            source[&#34;score&#34;] += score
+        except KeyError:
+            source[&#34;score&#34;] = score
+        return source
+
+    def get_text_get_score_pop_inf(self, source):
+        &#34;&#34;&#34;Gets the text from the source URL and assigns a score.
+
+        Args:
+            source: the individual source dictionary of information
+
+        Returns:
+            the updated source dictionary with a new &#39;score&#39; field.
+        &#34;&#34;&#34;
+        # get the text from the source
+        text = self.get_text_from_site(source[&#34;url&#34;])
+        # return score for target info
+        score = int(count_entities(self._entities, text) * self._target_entity_multiplier)
+        # adds score to the source dictionary
+        try:
+            source[&#34;score&#34;] += score
+        except KeyError:
+            source[&#34;score&#34;] = score
+        return source
+
+    def get_text_assign_score(self, source):
+        &#34;&#34;&#34;Gets the text from the source URL and examines it to count the number of entities.
+
+        Args:
+            source: the individual source dictionary of information.
+        &#34;&#34;&#34;
+        # get the text from the source
+        text = self.get_text_from_site(source[&#34;url&#34;])
+        # assign score based on entity appearance count
+        # use different multiplier depending on which method has called &#39;get_text_assign_score()&#39;
+        if inspect.stack()[1].function == &#34;target_info_scorer()&#34;:
+            score = count_entities(self._entities, text) * self._target_entity_multiplier
+        elif inspect.stack()[1].function == &#34;popular_info_scorer()&#34;:
+            score = count_entities(self._entities, text) * self._popular_entity_multiplier
+        else:
+            score = 10
+        # adds score to the source dictionary
+        try:
+            source[&#34;score&#34;] += score
+        except KeyError:
+            source[&#34;score&#34;] = score
+        return source
+
+    def remove_sources(self):
+        &#34;&#34;&#34;Removes sources that have a score of 0.&#34;&#34;&#34;
+        self.sources = [dict_ for dict_ in self.sources if dict_[&#34;score&#34;] != 0]
+
+    def sort_sources_desc(self):
+        &#34;&#34;&#34;Sorts the &#39;self.sources&#39; list of dicts in descending order based on score.&#34;&#34;&#34;
+        # sort sources list of dictionaries by highest score.
+        # lambda function specifies sorted to use the values of the dictionary in desc. order
+        self.sources.sort(key=lambda x: x[&#34;score&#34;], reverse=True)</code></pre>
+</details>
+<h3>Static methods</h3>
+<dl>
+<dt id="auto_osint_v.priority_manager.PriorityManager.get_text_from_site"><code class="name flex">
+<span>def <span class="ident">get_text_from_site</span></span>(<span>url)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Gets the body text from each source using its URL.</p>
+<p>Uses requests and BeautifulSoup to retrieve and parse the webpage's HTML into a readable
+format for entity recognition.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>url</code></strong></dt>
+<dd>url fetched from sources dictionary.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>The content of the webpage in UTF-8 format.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@staticmethod
+def get_text_from_site(url):
+    &#34;&#34;&#34;Gets the body text from each source using its URL.
+
+    Uses requests and BeautifulSoup to retrieve and parse the webpage&#39;s HTML into a readable
+    format for entity recognition.
+
+    Args:
+        url: url fetched from sources dictionary.
+
+    Returns:
+        The content of the webpage in UTF-8 format.
+    &#34;&#34;&#34;
+    # initialise the webpage text variable
+    text = &#34;&#34;
+    # set headers to try to avoid 403 errors
+    headers = {
+        &#39;User-Agent&#39;:
+            &#39;Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) &#39;
+            &#39;Chrome/112.0.0.0 Safari/537.36&#39;}
+    # request the webpage - if timeout, move on to next source
+    try:
+        response = requests.get(url, headers, timeout=5)
+    except (requests.exceptions.ReadTimeout, requests.exceptions.ConnectionError):
+        return text
+    try:
+        content_type = response.headers[&#39;Content-Type&#39;]
+    except KeyError:
+        content_type = &#39;&#39;
+    if &#34;application/javascript&#34; in content_type or response.status_code != 200:
+        # using selenium to avoid &#39;JavaScript is not available.&#34; error
+        options = webdriver.ChromeOptions()
+        options.headless = True
+        options.add_argument(&#34;start-maximized&#34;)
+        options.add_experimental_option(&#34;excludeSwitches&#34;, [&#34;enable-automation&#34;])
+        options.add_experimental_option(&#39;useAutomationExtension&#39;, False)
+        options.add_argument(&#39;--disable-blink-features=AutomationControlled&#39;)
+        options.add_argument(
+            &#34;user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, &#34;
+            &#34;like Gecko) Chrome/98.0.4758.102 Safari/537.36&#34;)
+        try:
+            driver = webdriver.Chrome(&#34;chromedriver&#34;, chrome_options=options)
+        except (http.client.RemoteDisconnected,
+                selenium.common.exceptions.SessionNotCreatedException):
+            try:
+                driver.quit()
+            finally:
+                return text
+        # driver.set_page_load_timeout(5)  # set timeout to 5 secs
+        # request the webpage. If source website timeout, return the current list of entities.
+        try:
+            driver.get(url)
+        except selenium.common.exceptions.TimeoutException:
+            driver.quit()
+            return text
+        html = driver.page_source
+        # check if we are wasting our time with a broken or inaccessible website
+        try:
+            request = driver.wait_for_request(url, 5)
+            response = request.response
+            driver.quit()
+        except selenium.common.exceptions.TimeoutException:
+            driver.quit()
+            return text
+        if request.response.status_code in {400, 401, 403, 404, 429}:
+            driver.quit()
+            return text
+    else:
+        html = response.text
+    # get the content type
+    try:
+        # response is either the requests or selenium response
+        content_type = response.headers[&#39;Content-Type&#39;]
+        # if xml use xml parser
+        if content_type == &#34;text/xml&#34; or content_type == &#34;application/xml&#34;:
+            # don&#39;t parse xml
+            return text
+        else:
+            # parse using the lxml html parser
+            soup = BeautifulSoup(html, &#34;lxml&#34;)
+    except KeyError:
+        # except on KeyError if no &#39;content-type&#39; header exists
+        soup = BeautifulSoup(html, &#34;lxml&#34;)
+
+    # kill all script and style elements
+    for script in soup([&#34;script&#34;, &#34;style&#34;]):
+        script.extract()  # rip it out
+    # get text
+    text = soup.get_text()
+    # break into lines and remove leading and trailing space on each
+    lines = (line.strip() for line in text.splitlines())
+    # break multi-headlines into a line each
+    chunks = (phrase.strip() for line in lines for phrase in line.split(&#34;  &#34;))
+    # drop blank lines
+    text = &#39;\n&#39;.join(chunk for chunk in chunks if chunk)
+    # return string text formatted and with line breaks
+    return text</code></pre>
+</details>
+</dd>
+</dl>
+<h3>Methods</h3>
+<dl>
+<dt id="auto_osint_v.priority_manager.PriorityManager.get_sources"><code class="name flex">
+<span>def <span class="ident">get_sources</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Method for getting the list of source dictionaries.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_sources(self):
+    &#34;&#34;&#34;Method for getting the list of source dictionaries.&#34;&#34;&#34;
+    return self.sources</code></pre>
+</details>
+</dd>
+<dt id="auto_osint_v.priority_manager.PriorityManager.get_text_assign_score"><code class="name flex">
+<span>def <span class="ident">get_text_assign_score</span></span>(<span>self, source)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Gets the text from the source URL and examines it to count the number of entities.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>source</code></strong></dt>
+<dd>the individual source dictionary of information.</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_text_assign_score(self, source):
+    &#34;&#34;&#34;Gets the text from the source URL and examines it to count the number of entities.
+
+    Args:
+        source: the individual source dictionary of information.
+    &#34;&#34;&#34;
+    # get the text from the source
+    text = self.get_text_from_site(source[&#34;url&#34;])
+    # assign score based on entity appearance count
+    # use different multiplier depending on which method has called &#39;get_text_assign_score()&#39;
+    if inspect.stack()[1].function == &#34;target_info_scorer()&#34;:
+        score = count_entities(self._entities, text) * self._target_entity_multiplier
+    elif inspect.stack()[1].function == &#34;popular_info_scorer()&#34;:
+        score = count_entities(self._entities, text) * self._popular_entity_multiplier
+    else:
+        score = 10
+    # adds score to the source dictionary
+    try:
+        source[&#34;score&#34;] += score
+    except KeyError:
+        source[&#34;score&#34;] = score
+    return source</code></pre>
+</details>
+</dd>
+<dt id="auto_osint_v.priority_manager.PriorityManager.get_text_get_score_pop_inf"><code class="name flex">
+<span>def <span class="ident">get_text_get_score_pop_inf</span></span>(<span>self, source)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Gets the text from the source URL and assigns a score.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>source</code></strong></dt>
+<dd>the individual source dictionary of information</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>the updated source dictionary with a new 'score' field.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_text_get_score_pop_inf(self, source):
+    &#34;&#34;&#34;Gets the text from the source URL and assigns a score.
+
+    Args:
+        source: the individual source dictionary of information
+
+    Returns:
+        the updated source dictionary with a new &#39;score&#39; field.
+    &#34;&#34;&#34;
+    # get the text from the source
+    text = self.get_text_from_site(source[&#34;url&#34;])
+    # return score for target info
+    score = int(count_entities(self._entities, text) * self._target_entity_multiplier)
+    # adds score to the source dictionary
+    try:
+        source[&#34;score&#34;] += score
+    except KeyError:
+        source[&#34;score&#34;] = score
+    return source</code></pre>
+</details>
+</dd>
+<dt id="auto_osint_v.priority_manager.PriorityManager.get_text_get_score_target_inf"><code class="name flex">
+<span>def <span class="ident">get_text_get_score_target_inf</span></span>(<span>self, source)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Gets the text from the source URL and assigns a score.</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>source</code></strong></dt>
+<dd>the individual source dictionary of information</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>the updated source dictionary with a new 'score' field.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_text_get_score_target_inf(self, source):
+    &#34;&#34;&#34;Gets the text from the source URL and assigns a score.
+
+    Args:
+        source: the individual source dictionary of information
+
+    Returns:
+        the updated source dictionary with a new &#39;score&#39; field.
+    &#34;&#34;&#34;
+    # get the text from the source
+    text = self.get_text_from_site(source[&#34;url&#34;])
+    # return score for target info
+    score = int(count_entities(self._entities, text) * self._target_entity_multiplier)
+    # adds score to the source dictionary
+    try:
+        source[&#34;score&#34;] += score
+    except KeyError:
+        source[&#34;score&#34;] = score
+    return source</code></pre>
+</details>
+</dd>
+<dt id="auto_osint_v.priority_manager.PriorityManager.manager"><code class="name flex">
+<span>def <span class="ident">manager</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>This method controls the order of execution for counting target and popular info.</p>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>self.sources</code></dt>
+<dd>list of dictionaries of source information</dd>
+</dl></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def manager(self):
+    &#34;&#34;&#34;This method controls the order of execution for counting target and popular info.
+
+    Returns:
+        self.sources: list of dictionaries of source information
+    &#34;&#34;&#34;
+    self.target_info_scorer()  # generates a score for each source
+    # remove sources with 0 score (or could remove bottom x% of sources)
+    self.remove_sources()
+    # clear entities list
+    self._entities.clear()
+    # generate a popular info score for each source
+    self.popular_info_scorer()
+    # sort sources by score in descending order
+    self.sort_sources_desc()
+    # return scored sources list(dict)
+    return self.sources</code></pre>
+</details>
+</dd>
+<dt id="auto_osint_v.priority_manager.PriorityManager.popular_info_scorer"><code class="name flex">
+<span>def <span class="ident">popular_info_scorer</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Assigns scores to each source based on the amount of popular entities identified.</p>
+<p>Updates the 'self.sources' list of dicts.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def popular_info_scorer(self):
+    &#34;&#34;&#34;Assigns scores to each source based on the amount of popular entities identified.
+
+    Updates the &#39;self.sources&#39; list of dicts.
+    &#34;&#34;&#34;
+    # initialise popular info finder object
+    popular_info_object = PopularInformationFinder(self.file_handler, self.entity_processor)
+    # Gather popular entities
+    entities = popular_info_object.find_entities(self.sources)
+    self._entities = entities
+    # Count number of appearances in each source
+    # new approach using multiprocessing map function
+    with Pool() as pool:
+        self.sources = list(tqdm(pool.imap_unordered(self.get_text_get_score_pop_inf,
+                                                     self.sources), total=len(self.sources),
+                                 desc=&#34;Assigning scores to sources based on popular info&#34;))
+    # Updated &#39;self.sources&#39; list of dictionaries</code></pre>
+</details>
+</dd>
+<dt id="auto_osint_v.priority_manager.PriorityManager.remove_sources"><code class="name flex">
+<span>def <span class="ident">remove_sources</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Removes sources that have a score of 0.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def remove_sources(self):
+    &#34;&#34;&#34;Removes sources that have a score of 0.&#34;&#34;&#34;
+    self.sources = [dict_ for dict_ in self.sources if dict_[&#34;score&#34;] != 0]</code></pre>
+</details>
+</dd>
+<dt id="auto_osint_v.priority_manager.PriorityManager.sort_sources_desc"><code class="name flex">
+<span>def <span class="ident">sort_sources_desc</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Sorts the 'self.sources' list of dicts in descending order based on score.</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def sort_sources_desc(self):
+    &#34;&#34;&#34;Sorts the &#39;self.sources&#39; list of dicts in descending order based on score.&#34;&#34;&#34;
+    # sort sources list of dictionaries by highest score.
+    # lambda function specifies sorted to use the values of the dictionary in desc. order
+    self.sources.sort(key=lambda x: x[&#34;score&#34;], reverse=True)</code></pre>
+</details>
+</dd>
+<dt id="auto_osint_v.priority_manager.PriorityManager.target_info_scorer"><code class="name flex">
+<span>def <span class="ident">target_info_scorer</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Assigns scores based on the amount of target entities identified.</p>
+<p>Updates the 'self.sources' list of dicts</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def target_info_scorer(self):
+    &#34;&#34;&#34;Assigns scores based on the amount of target entities identified.
+
+    Updates the &#39;self.sources&#39; list of dicts
+    &#34;&#34;&#34;
+    # Gather saved target entities
+    self._entities = self.file_handler.get_keywords_from_target_info()
+
+    # Count number of appearances in each source
+    # for source in tqdm(self.sources, desc=&#34;Counting target entity appearances in &#34;
+    #                                      &#34;sources&#34;):
+    with Pool() as pool:
+        self.sources = list(tqdm(pool.imap_unordered(self.get_text_get_score_target_inf,
+                                                     self.sources), total=len(self.sources),
+                                 desc=&#34;Assigning scores to sources based on target info&#34;))
+    # Updated &#39;self.sources&#39; list of dictionaries</code></pre>
+</details>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<h1>Index</h1>
+<div class="toc">
+<ul></ul>
+</div>
+<ul id="index">
+<li><h3>Super-module</h3>
+<ul>
+<li><code><a title="auto_osint_v" href="index.html">auto_osint_v</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="auto_osint_v.priority_manager.count_entities" href="#auto_osint_v.priority_manager.count_entities">count_entities</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="auto_osint_v.priority_manager.PriorityManager" href="#auto_osint_v.priority_manager.PriorityManager">PriorityManager</a></code></h4>
+<ul class="">
+<li><code><a title="auto_osint_v.priority_manager.PriorityManager.get_sources" href="#auto_osint_v.priority_manager.PriorityManager.get_sources">get_sources</a></code></li>
+<li><code><a title="auto_osint_v.priority_manager.PriorityManager.get_text_assign_score" href="#auto_osint_v.priority_manager.PriorityManager.get_text_assign_score">get_text_assign_score</a></code></li>
+<li><code><a title="auto_osint_v.priority_manager.PriorityManager.get_text_from_site" href="#auto_osint_v.priority_manager.PriorityManager.get_text_from_site">get_text_from_site</a></code></li>
+<li><code><a title="auto_osint_v.priority_manager.PriorityManager.get_text_get_score_pop_inf" href="#auto_osint_v.priority_manager.PriorityManager.get_text_get_score_pop_inf">get_text_get_score_pop_inf</a></code></li>
+<li><code><a title="auto_osint_v.priority_manager.PriorityManager.get_text_get_score_target_inf" href="#auto_osint_v.priority_manager.PriorityManager.get_text_get_score_target_inf">get_text_get_score_target_inf</a></code></li>
+<li><code><a title="auto_osint_v.priority_manager.PriorityManager.manager" href="#auto_osint_v.priority_manager.PriorityManager.manager">manager</a></code></li>
+<li><code><a title="auto_osint_v.priority_manager.PriorityManager.popular_info_scorer" href="#auto_osint_v.priority_manager.PriorityManager.popular_info_scorer">popular_info_scorer</a></code></li>
+<li><code><a title="auto_osint_v.priority_manager.PriorityManager.remove_sources" href="#auto_osint_v.priority_manager.PriorityManager.remove_sources">remove_sources</a></code></li>
+<li><code><a title="auto_osint_v.priority_manager.PriorityManager.sort_sources_desc" href="#auto_osint_v.priority_manager.PriorityManager.sort_sources_desc">sort_sources_desc</a></code></li>
+<li><code><a title="auto_osint_v.priority_manager.PriorityManager.target_info_scorer" href="#auto_osint_v.priority_manager.PriorityManager.target_info_scorer">target_info_scorer</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.10.0</a>.</p>
+</footer>
+</body>
+</html>
