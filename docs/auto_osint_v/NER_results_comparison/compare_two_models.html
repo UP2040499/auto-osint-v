@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Entity Recognition Model Comparison</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <script>
+        window.addEventListener('load', function() {
+            var frame1 = document.getElementById('doc1');
+            var frame2 = document.getElementById('doc2');
+
+            frame2.contentWindow.addEventListener('scroll', function() {
+                frame1.contentWindow.scrollTo(frame2.contentWindow.scrollX, frame2.contentWindow.scrollY);
+            });
+        });
+    </script>
+    <style>
+        .split{
+            height:100%;
+            width:50%;
+            position: fixed;
+            top: 0;
+            border:2px solid black;
+        }
+        #doc1 {
+            left: 0;
+            background-color: #ffffff;
+        }
+        #doc2 {
+            right: 0;
+            background-color: #ffffff;
+        }
+        iframe {
+            display:block;
+            width:49%;
+            height:100%;
+        }
+    </style>
+</head>
+<body translate="no">
+    <div>
+        <iframe class="split" id="doc1" scrolling="no" src="NER_results_trained_on_re3d.html"></iframe>
+        <iframe class="split" id="doc2" src="NER_results_en_core_web_sm.html"></iframe>
+    </div>
+</body>
+</html>

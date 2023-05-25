@@ -4,6 +4,10 @@
 detailed by NATO's open source handbook (2001). This is a research artefact for my Dissertation at 
 the University of Portsmouth*
 
+See the results of the different Entity Recognition language models [here](https://up2040499.github.io/auto-osint-v/NER_results_comparison/compare_two_models.html). 
+Note how the spaCy standard 'en_core_web_sm' NER model struggles to recognise military information compared to the 
+model used for this project using the Defence Science and Technology Laboratory 're3d' dataset.
+
 ## 📁 Installation
 
 > **Note**
