@@ -29,12 +29,15 @@
 </summary>
 <pre><code class="python">&#34;&#34;&#34;This module assigns scores to each source, prioritising the most relevant sources.
 &#34;&#34;&#34;
+import http.client
 import inspect
 from typing import List
 from multiprocessing import Pool
 import requests
+import selenium.common.exceptions
 from tqdm import tqdm
 from bs4 import BeautifulSoup
+from seleniumwire import webdriver
 
 
 from auto_osint_v.popular_information_finder import PopularInformationFinder
@@ -125,25 +128,64 @@ class PriorityManager:
             response = requests.get(url, headers, timeout=5)
         except (requests.exceptions.ReadTimeout, requests.exceptions.ConnectionError):
             return text
-        # check if we are wasting our time with a broken or inaccessible website
         try:
-            response.raise_for_status()
-        except requests.HTTPError:
-            return text
-
+            content_type = response.headers[&#39;Content-Type&#39;]
+        except KeyError:
+            content_type = &#39;&#39;
+        if &#34;application/javascript&#34; in content_type or response.status_code != 200:
+            # using selenium to avoid &#39;JavaScript is not available.&#34; error
+            options = webdriver.ChromeOptions()
+            options.headless = True
+            options.add_argument(&#34;start-maximized&#34;)
+            options.add_experimental_option(&#34;excludeSwitches&#34;, [&#34;enable-automation&#34;])
+            options.add_experimental_option(&#39;useAutomationExtension&#39;, False)
+            options.add_argument(&#39;--disable-blink-features=AutomationControlled&#39;)
+            options.add_argument(
+                &#34;user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, &#34;
+                &#34;like Gecko) Chrome/98.0.4758.102 Safari/537.36&#34;)
+            try:
+                driver = webdriver.Chrome(&#34;chromedriver&#34;, chrome_options=options)
+            except (http.client.RemoteDisconnected,
+                    selenium.common.exceptions.SessionNotCreatedException):
+                try:
+                    driver.quit()
+                finally:
+                    return text
+            # driver.set_page_load_timeout(5)  # set timeout to 5 secs
+            # request the webpage. If source website timeout, return the current list of entities.
+            try:
+                driver.get(url)
+            except selenium.common.exceptions.TimeoutException:
+                driver.quit()
+                return text
+            html = driver.page_source
+            # check if we are wasting our time with a broken or inaccessible website
+            try:
+                request = driver.wait_for_request(url, 5)
+                response = request.response
+                driver.quit()
+            except selenium.common.exceptions.TimeoutException:
+                driver.quit()
+                return text
+            if request.response.status_code in {400, 401, 403, 404, 429}:
+                driver.quit()
+                return text
+        else:
+            html = response.text
         # get the content type
         try:
+            # response is either the requests or selenium response
             content_type = response.headers[&#39;Content-Type&#39;]
             # if xml use xml parser
             if content_type == &#34;text/xml&#34; or content_type == &#34;application/xml&#34;:
-                # use xml parser
-                soup = BeautifulSoup(response.text, &#34;xml&#34;)
+                # don&#39;t parse xml
+                return text
             else:
                 # parse using the lxml html parser
-                soup = BeautifulSoup(response.text, &#34;lxml&#34;)
+                soup = BeautifulSoup(html, &#34;lxml&#34;)
         except KeyError:
             # except on KeyError if no &#39;content-type&#39; header exists
-            soup = BeautifulSoup(response.text, &#34;lxml&#34;)
+            soup = BeautifulSoup(html, &#34;lxml&#34;)
 
         # kill all script and style elements
         for script in soup([&#34;script&#34;, &#34;style&#34;]):
@@ -172,7 +214,8 @@ class PriorityManager:
         #                                      &#34;sources&#34;):
         with Pool() as pool:
             self.sources = list(tqdm(pool.imap_unordered(self.get_text_get_score_target_inf,
-                                                         self.sources), total=len(self.sources)))
+                                                         self.sources), total=len(self.sources),
+                                     desc=&#34;Assigning scores to sources based on target info&#34;))
         # Updated &#39;self.sources&#39; list of dictionaries
 
     def popular_info_scorer(self):
@@ -189,7 +232,8 @@ class PriorityManager:
         # new approach using multiprocessing map function
         with Pool() as pool:
             self.sources = list(tqdm(pool.imap_unordered(self.get_text_get_score_pop_inf,
-                                                         self.sources), total=len(self.sources)))
+                                                         self.sources), total=len(self.sources),
+                                     desc=&#34;Assigning scores to sources based on popular info&#34;))
         # Updated &#39;self.sources&#39; list of dictionaries
 
     def get_text_get_score_target_inf(self, source):
@@ -401,25 +445,64 @@ class PriorityManager:
             response = requests.get(url, headers, timeout=5)
         except (requests.exceptions.ReadTimeout, requests.exceptions.ConnectionError):
             return text
-        # check if we are wasting our time with a broken or inaccessible website
         try:
-            response.raise_for_status()
-        except requests.HTTPError:
-            return text
-
+            content_type = response.headers[&#39;Content-Type&#39;]
+        except KeyError:
+            content_type = &#39;&#39;
+        if &#34;application/javascript&#34; in content_type or response.status_code != 200:
+            # using selenium to avoid &#39;JavaScript is not available.&#34; error
+            options = webdriver.ChromeOptions()
+            options.headless = True
+            options.add_argument(&#34;start-maximized&#34;)
+            options.add_experimental_option(&#34;excludeSwitches&#34;, [&#34;enable-automation&#34;])
+            options.add_experimental_option(&#39;useAutomationExtension&#39;, False)
+            options.add_argument(&#39;--disable-blink-features=AutomationControlled&#39;)
+            options.add_argument(
+                &#34;user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, &#34;
+                &#34;like Gecko) Chrome/98.0.4758.102 Safari/537.36&#34;)
+            try:
+                driver = webdriver.Chrome(&#34;chromedriver&#34;, chrome_options=options)
+            except (http.client.RemoteDisconnected,
+                    selenium.common.exceptions.SessionNotCreatedException):
+                try:
+                    driver.quit()
+                finally:
+                    return text
+            # driver.set_page_load_timeout(5)  # set timeout to 5 secs
+            # request the webpage. If source website timeout, return the current list of entities.
+            try:
+                driver.get(url)
+            except selenium.common.exceptions.TimeoutException:
+                driver.quit()
+                return text
+            html = driver.page_source
+            # check if we are wasting our time with a broken or inaccessible website
+            try:
+                request = driver.wait_for_request(url, 5)
+                response = request.response
+                driver.quit()
+            except selenium.common.exceptions.TimeoutException:
+                driver.quit()
+                return text
+            if request.response.status_code in {400, 401, 403, 404, 429}:
+                driver.quit()
+                return text
+        else:
+            html = response.text
         # get the content type
         try:
+            # response is either the requests or selenium response
             content_type = response.headers[&#39;Content-Type&#39;]
             # if xml use xml parser
             if content_type == &#34;text/xml&#34; or content_type == &#34;application/xml&#34;:
-                # use xml parser
-                soup = BeautifulSoup(response.text, &#34;xml&#34;)
+                # don&#39;t parse xml
+                return text
             else:
                 # parse using the lxml html parser
-                soup = BeautifulSoup(response.text, &#34;lxml&#34;)
+                soup = BeautifulSoup(html, &#34;lxml&#34;)
         except KeyError:
             # except on KeyError if no &#39;content-type&#39; header exists
-            soup = BeautifulSoup(response.text, &#34;lxml&#34;)
+            soup = BeautifulSoup(html, &#34;lxml&#34;)
 
         # kill all script and style elements
         for script in soup([&#34;script&#34;, &#34;style&#34;]):
@@ -448,7 +531,8 @@ class PriorityManager:
         #                                      &#34;sources&#34;):
         with Pool() as pool:
             self.sources = list(tqdm(pool.imap_unordered(self.get_text_get_score_target_inf,
-                                                         self.sources), total=len(self.sources)))
+                                                         self.sources), total=len(self.sources),
+                                     desc=&#34;Assigning scores to sources based on target info&#34;))
         # Updated &#39;self.sources&#39; list of dictionaries
 
     def popular_info_scorer(self):
@@ -465,7 +549,8 @@ class PriorityManager:
         # new approach using multiprocessing map function
         with Pool() as pool:
             self.sources = list(tqdm(pool.imap_unordered(self.get_text_get_score_pop_inf,
-                                                         self.sources), total=len(self.sources)))
+                                                         self.sources), total=len(self.sources),
+                                     desc=&#34;Assigning scores to sources based on popular info&#34;))
         # Updated &#39;self.sources&#39; list of dictionaries
 
     def get_text_get_score_target_inf(self, source):
@@ -586,25 +671,64 @@ def get_text_from_site(url):
         response = requests.get(url, headers, timeout=5)
     except (requests.exceptions.ReadTimeout, requests.exceptions.ConnectionError):
         return text
-    # check if we are wasting our time with a broken or inaccessible website
     try:
-        response.raise_for_status()
-    except requests.HTTPError:
-        return text
-
+        content_type = response.headers[&#39;Content-Type&#39;]
+    except KeyError:
+        content_type = &#39;&#39;
+    if &#34;application/javascript&#34; in content_type or response.status_code != 200:
+        # using selenium to avoid &#39;JavaScript is not available.&#34; error
+        options = webdriver.ChromeOptions()
+        options.headless = True
+        options.add_argument(&#34;start-maximized&#34;)
+        options.add_experimental_option(&#34;excludeSwitches&#34;, [&#34;enable-automation&#34;])
+        options.add_experimental_option(&#39;useAutomationExtension&#39;, False)
+        options.add_argument(&#39;--disable-blink-features=AutomationControlled&#39;)
+        options.add_argument(
+            &#34;user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, &#34;
+            &#34;like Gecko) Chrome/98.0.4758.102 Safari/537.36&#34;)
+        try:
+            driver = webdriver.Chrome(&#34;chromedriver&#34;, chrome_options=options)
+        except (http.client.RemoteDisconnected,
+                selenium.common.exceptions.SessionNotCreatedException):
+            try:
+                driver.quit()
+            finally:
+                return text
+        # driver.set_page_load_timeout(5)  # set timeout to 5 secs
+        # request the webpage. If source website timeout, return the current list of entities.
+        try:
+            driver.get(url)
+        except selenium.common.exceptions.TimeoutException:
+            driver.quit()
+            return text
+        html = driver.page_source
+        # check if we are wasting our time with a broken or inaccessible website
+        try:
+            request = driver.wait_for_request(url, 5)
+            response = request.response
+            driver.quit()
+        except selenium.common.exceptions.TimeoutException:
+            driver.quit()
+            return text
+        if request.response.status_code in {400, 401, 403, 404, 429}:
+            driver.quit()
+            return text
+    else:
+        html = response.text
     # get the content type
     try:
+        # response is either the requests or selenium response
         content_type = response.headers[&#39;Content-Type&#39;]
         # if xml use xml parser
         if content_type == &#34;text/xml&#34; or content_type == &#34;application/xml&#34;:
-            # use xml parser
-            soup = BeautifulSoup(response.text, &#34;xml&#34;)
+            # don&#39;t parse xml
+            return text
         else:
             # parse using the lxml html parser
-            soup = BeautifulSoup(response.text, &#34;lxml&#34;)
+            soup = BeautifulSoup(html, &#34;lxml&#34;)
     except KeyError:
         # except on KeyError if no &#39;content-type&#39; header exists
-        soup = BeautifulSoup(response.text, &#34;lxml&#34;)
+        soup = BeautifulSoup(html, &#34;lxml&#34;)
 
     # kill all script and style elements
     for script in soup([&#34;script&#34;, &#34;style&#34;]):
@@ -807,7 +931,8 @@ def get_text_from_site(url):
     # new approach using multiprocessing map function
     with Pool() as pool:
         self.sources = list(tqdm(pool.imap_unordered(self.get_text_get_score_pop_inf,
-                                                     self.sources), total=len(self.sources)))
+                                                     self.sources), total=len(self.sources),
+                                 desc=&#34;Assigning scores to sources based on popular info&#34;))
     # Updated &#39;self.sources&#39; list of dictionaries</code></pre>
 </details>
 </dd>
@@ -864,7 +989,8 @@ def get_text_from_site(url):
     #                                      &#34;sources&#34;):
     with Pool() as pool:
         self.sources = list(tqdm(pool.imap_unordered(self.get_text_get_score_target_inf,
-                                                     self.sources), total=len(self.sources)))
+                                                     self.sources), total=len(self.sources),
+                                 desc=&#34;Assigning scores to sources based on target info&#34;))
     # Updated &#39;self.sources&#39; list of dictionaries</code></pre>
 </details>
 </dd>

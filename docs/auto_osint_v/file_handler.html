@@ -51,7 +51,7 @@ class FileHandler:
         self.urls_present = []
         self.data_file_path = data_file
 
-    def write_bias_file(self):
+    def write_bias_file(self, info_analyser):
         &#34;&#34;&#34;Creates and writes to the bias information file.
 
         This bias information is only useful for the user if they want to include information that
@@ -62,23 +62,31 @@ class FileHandler:
         &#34;&#34;&#34;
         bias_file_path = str(os.path.join(self.data_file_path, &#34;bias_sources.csv&#34;))
         with open(bias_file_path, &#34;w&#34;, encoding=&#34;utf-8&#34;) as bfile:
-            fieldnames = [&#39;Type/Link&#39;, &#39;Key_Info&#39;]
+            fieldnames = [&#39;Type/Link&#39;, &#39;Key Info&#39;, &#39;Info Sentiment&#39;]
             writer = csv.DictWriter(bfile, fieldnames)
             # enter source type and key information
             writer.writeheader()
             option = &#34;&#34;
             while option not in {&#34;x&#34;, &#34;X&#34;}:
-                source_type = str(input(&#34;If a closed/classified source, please enter the source &#34;
-                                        &#34;type (HUMINT, SIGINT, etc.)&#34;
+                source_type = str(input(&#34;If you wish to enter a source that has no URL, just enter &#34;
+                                        &#34;the type of source (e.g. HUMINT, SIGINT, etc.).&#34;
                                         &#34;If it is an open source, please enter the URL.\n&gt;&gt;&gt; &#34;))
                 key_info = str(input(&#34;Enter the key information proffered &#34;
                                      &#34;from this source/intelligence\n&gt;&gt;&gt; &#34;))
-                writer.writerow({&#34;Type/Link&#34;: source_type, &#34;Key_Info&#34;: key_info})
+                writer.writerow({&#34;Type/Link&#34;: source_type, &#34;Key Info&#34;: key_info,
+                                 &#34;Info Sentiment&#34;: info_analyser(key_info)})
                 option = str(input(&#34;Enter &#39;X&#39; to finish entering sources. &#34;
                                    &#34;Press ENTER to add another source&gt;&gt;&gt; &#34;))
             bfile.close()
 
-    def write_intel_file(self):
+    def read_bias_file(self):
+        bias_file_path = str(os.path.join(self.data_file_path, &#34;bias_sources.csv&#34;))
+        with open(bias_file_path, &#34;r&#34;, encoding=&#34;utf-8&#34;) as bfile:
+            reader = csv.DictReader(bfile)
+            list_of_dicts = list(reader)
+            return list_of_dicts
+
+    def write_intel_file(self, editor: bool):
         &#34;&#34;&#34;Creates and writes a file for the intelligence statement to be stored in.
 
         This opens the file in the text editor for easier statement writing.
@@ -97,9 +105,14 @@ class FileHandler:
                                  &#34;- Remove this help section and replace it with your &#34;
                                  &#34;intelligence statement.\n&#34;
                                  &#34;- Be sure to save the file before continuing.&#34;)
-            fout.write(statement_help)
-            fout.close()
-            webbrowser.open(intel_file_path)  # edit in default text editor
+            if editor:
+                fout.write(statement_help)
+                fout.close()
+                webbrowser.open(intel_file_path)  # edit in default text editor
+            else:
+                statement = str(input(statement_help))
+                fout.write(statement)
+                fout.close()
 
     def read_file(self, filename):
         &#34;&#34;&#34;Reads the given file. Reads any file, extension is included in filename.
@@ -284,6 +297,13 @@ class FileHandler:
                 # Append info to csv
                 self.write_to_given_csv_file(evidence_file, to_write)
 
+    def read_evidence_file(self):
+        evidence_file_path = self.data_file_path + &#34;evidence_file.csv&#34;
+        with open(evidence_file_path, &#34;r&#34;, encoding=&#34;utf-8&#34;) as evidence_file:
+            reader = csv.DictReader(evidence_file)
+            list_of_dicts = list(reader)
+            return list_of_dicts
+
     def create_potential_corroboration_file(self, sources_list_of_dicts):
         &#34;&#34;&#34;Creates the potential corroboration source store.
 
@@ -307,7 +327,17 @@ class FileHandler:
             writer = csv.DictWriter(sources_file, fieldnames)
             writer.writeheader()
             # write the dictionary to csv
-            writer.writerows(sources_list_of_dicts)</code></pre>
+            writer.writerows(sources_list_of_dicts)
+
+    def get_output_path(self, postfix, file_ext):
+        &#34;&#34;&#34;Gets the path of the output file&#34;&#34;&#34;
+        output_directory = self.data_file_path + &#34;output&#34;
+        try:
+            os.mkdir(output_directory)
+            file_path = str(os.path.join(output_directory, f&#34;output{postfix}.{file_ext}&#34;))
+        except FileExistsError:
+            file_path = str(os.path.join(output_directory, f&#34;output{postfix}.{file_ext}&#34;))
+        return file_path</code></pre>
 </details>
 </section>
 <section>
@@ -351,7 +381,7 @@ class FileHandler:
         self.urls_present = []
         self.data_file_path = data_file
 
-    def write_bias_file(self):
+    def write_bias_file(self, info_analyser):
         &#34;&#34;&#34;Creates and writes to the bias information file.
 
         This bias information is only useful for the user if they want to include information that
@@ -362,23 +392,31 @@ class FileHandler:
         &#34;&#34;&#34;
         bias_file_path = str(os.path.join(self.data_file_path, &#34;bias_sources.csv&#34;))
         with open(bias_file_path, &#34;w&#34;, encoding=&#34;utf-8&#34;) as bfile:
-            fieldnames = [&#39;Type/Link&#39;, &#39;Key_Info&#39;]
+            fieldnames = [&#39;Type/Link&#39;, &#39;Key Info&#39;, &#39;Info Sentiment&#39;]
             writer = csv.DictWriter(bfile, fieldnames)
             # enter source type and key information
             writer.writeheader()
             option = &#34;&#34;
             while option not in {&#34;x&#34;, &#34;X&#34;}:
-                source_type = str(input(&#34;If a closed/classified source, please enter the source &#34;
-                                        &#34;type (HUMINT, SIGINT, etc.)&#34;
+                source_type = str(input(&#34;If you wish to enter a source that has no URL, just enter &#34;
+                                        &#34;the type of source (e.g. HUMINT, SIGINT, etc.).&#34;
                                         &#34;If it is an open source, please enter the URL.\n&gt;&gt;&gt; &#34;))
                 key_info = str(input(&#34;Enter the key information proffered &#34;
                                      &#34;from this source/intelligence\n&gt;&gt;&gt; &#34;))
-                writer.writerow({&#34;Type/Link&#34;: source_type, &#34;Key_Info&#34;: key_info})
+                writer.writerow({&#34;Type/Link&#34;: source_type, &#34;Key Info&#34;: key_info,
+                                 &#34;Info Sentiment&#34;: info_analyser(key_info)})
                 option = str(input(&#34;Enter &#39;X&#39; to finish entering sources. &#34;
                                    &#34;Press ENTER to add another source&gt;&gt;&gt; &#34;))
             bfile.close()
 
-    def write_intel_file(self):
+    def read_bias_file(self):
+        bias_file_path = str(os.path.join(self.data_file_path, &#34;bias_sources.csv&#34;))
+        with open(bias_file_path, &#34;r&#34;, encoding=&#34;utf-8&#34;) as bfile:
+            reader = csv.DictReader(bfile)
+            list_of_dicts = list(reader)
+            return list_of_dicts
+
+    def write_intel_file(self, editor: bool):
         &#34;&#34;&#34;Creates and writes a file for the intelligence statement to be stored in.
 
         This opens the file in the text editor for easier statement writing.
@@ -397,9 +435,14 @@ class FileHandler:
                                  &#34;- Remove this help section and replace it with your &#34;
                                  &#34;intelligence statement.\n&#34;
                                  &#34;- Be sure to save the file before continuing.&#34;)
-            fout.write(statement_help)
-            fout.close()
-            webbrowser.open(intel_file_path)  # edit in default text editor
+            if editor:
+                fout.write(statement_help)
+                fout.close()
+                webbrowser.open(intel_file_path)  # edit in default text editor
+            else:
+                statement = str(input(statement_help))
+                fout.write(statement)
+                fout.close()
 
     def read_file(self, filename):
         &#34;&#34;&#34;Reads the given file. Reads any file, extension is included in filename.
@@ -584,6 +627,13 @@ class FileHandler:
                 # Append info to csv
                 self.write_to_given_csv_file(evidence_file, to_write)
 
+    def read_evidence_file(self):
+        evidence_file_path = self.data_file_path + &#34;evidence_file.csv&#34;
+        with open(evidence_file_path, &#34;r&#34;, encoding=&#34;utf-8&#34;) as evidence_file:
+            reader = csv.DictReader(evidence_file)
+            list_of_dicts = list(reader)
+            return list_of_dicts
+
     def create_potential_corroboration_file(self, sources_list_of_dicts):
         &#34;&#34;&#34;Creates the potential corroboration source store.
 
@@ -607,7 +657,17 @@ class FileHandler:
             writer = csv.DictWriter(sources_file, fieldnames)
             writer.writeheader()
             # write the dictionary to csv
-            writer.writerows(sources_list_of_dicts)</code></pre>
+            writer.writerows(sources_list_of_dicts)
+
+    def get_output_path(self, postfix, file_ext):
+        &#34;&#34;&#34;Gets the path of the output file&#34;&#34;&#34;
+        output_directory = self.data_file_path + &#34;output&#34;
+        try:
+            os.mkdir(output_directory)
+            file_path = str(os.path.join(output_directory, f&#34;output{postfix}.{file_ext}&#34;))
+        except FileExistsError:
+            file_path = str(os.path.join(output_directory, f&#34;output{postfix}.{file_ext}&#34;))
+        return file_path</code></pre>
 </details>
 <h3>Static methods</h3>
 <dl>
@@ -812,6 +872,26 @@ def write_to_given_csv_file(file_object, to_write):
     return info_all</code></pre>
 </details>
 </dd>
+<dt id="auto_osint_v.file_handler.FileHandler.get_output_path"><code class="name flex">
+<span>def <span class="ident">get_output_path</span></span>(<span>self, postfix, file_ext)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Gets the path of the output file</p></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def get_output_path(self, postfix, file_ext):
+    &#34;&#34;&#34;Gets the path of the output file&#34;&#34;&#34;
+    output_directory = self.data_file_path + &#34;output&#34;
+    try:
+        os.mkdir(output_directory)
+        file_path = str(os.path.join(output_directory, f&#34;output{postfix}.{file_ext}&#34;))
+    except FileExistsError:
+        file_path = str(os.path.join(output_directory, f&#34;output{postfix}.{file_ext}&#34;))
+    return file_path</code></pre>
+</details>
+</dd>
 <dt id="auto_osint_v.file_handler.FileHandler.open_evidence_file"><code class="name flex">
 <span>def <span class="ident">open_evidence_file</span></span>(<span>self, to_write)</span>
 </code></dt>
@@ -942,6 +1022,40 @@ word</dd>
         return open(os.path.join(self.data_file_path, filename), &#34;w&#34;, encoding=&#34;utf-8&#34;)</code></pre>
 </details>
 </dd>
+<dt id="auto_osint_v.file_handler.FileHandler.read_bias_file"><code class="name flex">
+<span>def <span class="ident">read_bias_file</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def read_bias_file(self):
+    bias_file_path = str(os.path.join(self.data_file_path, &#34;bias_sources.csv&#34;))
+    with open(bias_file_path, &#34;r&#34;, encoding=&#34;utf-8&#34;) as bfile:
+        reader = csv.DictReader(bfile)
+        list_of_dicts = list(reader)
+        return list_of_dicts</code></pre>
+</details>
+</dd>
+<dt id="auto_osint_v.file_handler.FileHandler.read_evidence_file"><code class="name flex">
+<span>def <span class="ident">read_evidence_file</span></span>(<span>self)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">def read_evidence_file(self):
+    evidence_file_path = self.data_file_path + &#34;evidence_file.csv&#34;
+    with open(evidence_file_path, &#34;r&#34;, encoding=&#34;utf-8&#34;) as evidence_file:
+        reader = csv.DictReader(evidence_file)
+        list_of_dicts = list(reader)
+        return list_of_dicts</code></pre>
+</details>
+</dd>
 <dt id="auto_osint_v.file_handler.FileHandler.read_file"><code class="name flex">
 <span>def <span class="ident">read_file</span></span>(<span>self, filename)</span>
 </code></dt>
@@ -975,7 +1089,7 @@ word</dd>
 </details>
 </dd>
 <dt id="auto_osint_v.file_handler.FileHandler.write_bias_file"><code class="name flex">
-<span>def <span class="ident">write_bias_file</span></span>(<span>self)</span>
+<span>def <span class="ident">write_bias_file</span></span>(<span>self, info_analyser)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Creates and writes to the bias information file.</p>
@@ -987,7 +1101,7 @@ the tool cannot use, but may be relevant to their analysis or conclusions.</p>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def write_bias_file(self):
+<pre><code class="python">def write_bias_file(self, info_analyser):
     &#34;&#34;&#34;Creates and writes to the bias information file.
 
     This bias information is only useful for the user if they want to include information that
@@ -998,25 +1112,26 @@ the tool cannot use, but may be relevant to their analysis or conclusions.</p>
     &#34;&#34;&#34;
     bias_file_path = str(os.path.join(self.data_file_path, &#34;bias_sources.csv&#34;))
     with open(bias_file_path, &#34;w&#34;, encoding=&#34;utf-8&#34;) as bfile:
-        fieldnames = [&#39;Type/Link&#39;, &#39;Key_Info&#39;]
+        fieldnames = [&#39;Type/Link&#39;, &#39;Key Info&#39;, &#39;Info Sentiment&#39;]
         writer = csv.DictWriter(bfile, fieldnames)
         # enter source type and key information
         writer.writeheader()
         option = &#34;&#34;
         while option not in {&#34;x&#34;, &#34;X&#34;}:
-            source_type = str(input(&#34;If a closed/classified source, please enter the source &#34;
-                                    &#34;type (HUMINT, SIGINT, etc.)&#34;
+            source_type = str(input(&#34;If you wish to enter a source that has no URL, just enter &#34;
+                                    &#34;the type of source (e.g. HUMINT, SIGINT, etc.).&#34;
                                     &#34;If it is an open source, please enter the URL.\n&gt;&gt;&gt; &#34;))
             key_info = str(input(&#34;Enter the key information proffered &#34;
                                  &#34;from this source/intelligence\n&gt;&gt;&gt; &#34;))
-            writer.writerow({&#34;Type/Link&#34;: source_type, &#34;Key_Info&#34;: key_info})
+            writer.writerow({&#34;Type/Link&#34;: source_type, &#34;Key Info&#34;: key_info,
+                             &#34;Info Sentiment&#34;: info_analyser(key_info)})
             option = str(input(&#34;Enter &#39;X&#39; to finish entering sources. &#34;
                                &#34;Press ENTER to add another source&gt;&gt;&gt; &#34;))
         bfile.close()</code></pre>
 </details>
 </dd>
 <dt id="auto_osint_v.file_handler.FileHandler.write_intel_file"><code class="name flex">
-<span>def <span class="ident">write_intel_file</span></span>(<span>self)</span>
+<span>def <span class="ident">write_intel_file</span></span>(<span>self, editor: bool)</span>
 </code></dt>
 <dd>
 <div class="desc"><p>Creates and writes a file for the intelligence statement to be stored in.</p>
@@ -1027,7 +1142,7 @@ the tool cannot use, but may be relevant to their analysis or conclusions.</p>
 <summary>
 <span>Expand source code</span>
 </summary>
-<pre><code class="python">def write_intel_file(self):
+<pre><code class="python">def write_intel_file(self, editor: bool):
     &#34;&#34;&#34;Creates and writes a file for the intelligence statement to be stored in.
 
     This opens the file in the text editor for easier statement writing.
@@ -1046,9 +1161,14 @@ the tool cannot use, but may be relevant to their analysis or conclusions.</p>
                              &#34;- Remove this help section and replace it with your &#34;
                              &#34;intelligence statement.\n&#34;
                              &#34;- Be sure to save the file before continuing.&#34;)
-        fout.write(statement_help)
-        fout.close()
-        webbrowser.open(intel_file_path)  # edit in default text editor</code></pre>
+        if editor:
+            fout.write(statement_help)
+            fout.close()
+            webbrowser.open(intel_file_path)  # edit in default text editor
+        else:
+            statement = str(input(statement_help))
+            fout.write(statement)
+            fout.close()</code></pre>
 </details>
 </dd>
 <dt id="auto_osint_v.file_handler.FileHandler.write_to_txt_file_remove_duplicates"><code class="name flex">
@@ -1108,9 +1228,12 @@ the tool cannot use, but may be relevant to their analysis or conclusions.</p>
 <li><code><a title="auto_osint_v.file_handler.FileHandler.close_file" href="#auto_osint_v.file_handler.FileHandler.close_file">close_file</a></code></li>
 <li><code><a title="auto_osint_v.file_handler.FileHandler.create_potential_corroboration_file" href="#auto_osint_v.file_handler.FileHandler.create_potential_corroboration_file">create_potential_corroboration_file</a></code></li>
 <li><code><a title="auto_osint_v.file_handler.FileHandler.get_keywords_from_target_info" href="#auto_osint_v.file_handler.FileHandler.get_keywords_from_target_info">get_keywords_from_target_info</a></code></li>
+<li><code><a title="auto_osint_v.file_handler.FileHandler.get_output_path" href="#auto_osint_v.file_handler.FileHandler.get_output_path">get_output_path</a></code></li>
 <li><code><a title="auto_osint_v.file_handler.FileHandler.open_evidence_file" href="#auto_osint_v.file_handler.FileHandler.open_evidence_file">open_evidence_file</a></code></li>
 <li><code><a title="auto_osint_v.file_handler.FileHandler.open_label_file" href="#auto_osint_v.file_handler.FileHandler.open_label_file">open_label_file</a></code></li>
 <li><code><a title="auto_osint_v.file_handler.FileHandler.open_txt_file" href="#auto_osint_v.file_handler.FileHandler.open_txt_file">open_txt_file</a></code></li>
+<li><code><a title="auto_osint_v.file_handler.FileHandler.read_bias_file" href="#auto_osint_v.file_handler.FileHandler.read_bias_file">read_bias_file</a></code></li>
+<li><code><a title="auto_osint_v.file_handler.FileHandler.read_evidence_file" href="#auto_osint_v.file_handler.FileHandler.read_evidence_file">read_evidence_file</a></code></li>
 <li><code><a title="auto_osint_v.file_handler.FileHandler.read_file" href="#auto_osint_v.file_handler.FileHandler.read_file">read_file</a></code></li>
 <li><code><a title="auto_osint_v.file_handler.FileHandler.write_bias_file" href="#auto_osint_v.file_handler.FileHandler.write_bias_file">write_bias_file</a></code></li>
 <li><code><a title="auto_osint_v.file_handler.FileHandler.write_intel_file" href="#auto_osint_v.file_handler.FileHandler.write_intel_file">write_intel_file</a></code></li>

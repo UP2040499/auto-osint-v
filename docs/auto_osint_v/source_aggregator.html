@@ -39,6 +39,7 @@ import requests
 from bs4 import BeautifulSoup
 from transformers import T5Tokenizer, T5ForConditionalGeneration
 from googleapiclient.discovery import build
+import auto_osint_v.config as config
 
 
 class SourceAggregator:
@@ -57,7 +58,7 @@ class SourceAggregator:
 
         Args:
             intel_statement: The original intel statement
-            file_handler_object: The FileHandler object passed from main.py
+            file_handler_object: The FileHandler object passed from __main__.py
         &#34;&#34;&#34;
         self.intel_statement = intel_statement
         self.sentiment_analyser = sentiment_analyser_object
@@ -96,7 +97,7 @@ class SourceAggregator:
 
         input_ids = tokenizer.encode(self.intel_statement, return_tensors=&#39;pt&#39;)
         # number of queries to generate - increase in this massively impact performance
-        num_queries = 5
+        num_queries = 3
         outputs = model.generate(
             input_ids=input_ids,
             max_length=128,  # default = 64
@@ -121,13 +122,12 @@ class SourceAggregator:
             the results or nothing if none are found.
         &#34;&#34;&#34;
         # Google custom search engine API key and engine ID
-        api_key = &#34;AIzaSyCgsni4yZyp4Bla9J7a2TE-lxmzVagcjEo&#34;
-        cse_id = &#34;d76b2d8504d104aa8&#34;
-        service = build(&#34;customsearch&#34;, &#34;v1&#34;, developerKey=api_key)
-        res = service.cse().list(q=search_term, cx=cse_id, hl=&#39;en&#39;, **kwargs).execute()
+        service = build(&#34;customsearch&#34;, &#34;v1&#34;, developerKey=config.api_key)
+        res = service.cse().list(q=search_term, cx=config.cse_id, hl=&#39;en&#39;, **kwargs).execute()
         try:
             return res[&#39;items&#39;]
         except KeyError:
+            # print(&#34;No results found for query:&#34;, search_term)
             return []
 
     # Google Search
@@ -140,8 +140,10 @@ class SourceAggregator:
         Returns:
             dictionary of Google search results
         &#34;&#34;&#34;
-        # searches google using the generated queries
-        query_results = self.searcher(self.queries, num=10)
+        query_results = []
+        for query in self.queries:
+            # searches google using the generated queries
+            query_results += self.searcher(query, num=3)
         for result in tqdm(query_results, desc=&#34;Search Google using generated queries&#34;):
             # write link to dict
             self.process_result(result)
@@ -239,7 +241,7 @@ class SourceAggregator:
         try:
             iframes, images, videos = self.media_finder(link)
         except (requests.exceptions.SSLError, requests.exceptions.Timeout):
-            iframes, images, videos = [], [], []
+            iframes, images, videos = &#34;NaN&#34;, &#34;NaN&#34;, &#34;NaN&#34;
         # sentiment analysis check - will discard headlines that appear inflammatory or bias
         # keep threshold relatively high (&gt;0.8), see process_result() documentation.
         max_sentiment_threshold = 0.9
@@ -388,7 +390,7 @@ Everything output will be put into a 'Potential Corroboration Store'.</p>
 <dt><strong><code>intel_statement</code></strong></dt>
 <dd>The original intel statement</dd>
 <dt><strong><code>file_handler_object</code></strong></dt>
-<dd>The FileHandler object passed from main.py</dd>
+<dd>The FileHandler object passed from <strong>main</strong>.py</dd>
 </dl></div>
 <details class="source">
 <summary>
@@ -410,7 +412,7 @@ Everything output will be put into a 'Potential Corroboration Store'.</p>
 
         Args:
             intel_statement: The original intel statement
-            file_handler_object: The FileHandler object passed from main.py
+            file_handler_object: The FileHandler object passed from __main__.py
         &#34;&#34;&#34;
         self.intel_statement = intel_statement
         self.sentiment_analyser = sentiment_analyser_object
@@ -449,7 +451,7 @@ Everything output will be put into a 'Potential Corroboration Store'.</p>
 
         input_ids = tokenizer.encode(self.intel_statement, return_tensors=&#39;pt&#39;)
         # number of queries to generate - increase in this massively impact performance
-        num_queries = 5
+        num_queries = 3
         outputs = model.generate(
             input_ids=input_ids,
             max_length=128,  # default = 64
@@ -474,13 +476,12 @@ Everything output will be put into a 'Potential Corroboration Store'.</p>
             the results or nothing if none are found.
         &#34;&#34;&#34;
         # Google custom search engine API key and engine ID
-        api_key = &#34;AIzaSyCgsni4yZyp4Bla9J7a2TE-lxmzVagcjEo&#34;
-        cse_id = &#34;d76b2d8504d104aa8&#34;
-        service = build(&#34;customsearch&#34;, &#34;v1&#34;, developerKey=api_key)
-        res = service.cse().list(q=search_term, cx=cse_id, hl=&#39;en&#39;, **kwargs).execute()
+        service = build(&#34;customsearch&#34;, &#34;v1&#34;, developerKey=config.api_key)
+        res = service.cse().list(q=search_term, cx=config.cse_id, hl=&#39;en&#39;, **kwargs).execute()
         try:
             return res[&#39;items&#39;]
         except KeyError:
+            # print(&#34;No results found for query:&#34;, search_term)
             return []
 
     # Google Search
@@ -493,8 +494,10 @@ Everything output will be put into a 'Potential Corroboration Store'.</p>
         Returns:
             dictionary of Google search results
         &#34;&#34;&#34;
-        # searches google using the generated queries
-        query_results = self.searcher(self.queries, num=10)
+        query_results = []
+        for query in self.queries:
+            # searches google using the generated queries
+            query_results += self.searcher(query, num=3)
         for result in tqdm(query_results, desc=&#34;Search Google using generated queries&#34;):
             # write link to dict
             self.process_result(result)
@@ -592,7 +595,7 @@ Everything output will be put into a 'Potential Corroboration Store'.</p>
         try:
             iframes, images, videos = self.media_finder(link)
         except (requests.exceptions.SSLError, requests.exceptions.Timeout):
-            iframes, images, videos = [], [], []
+            iframes, images, videos = &#34;NaN&#34;, &#34;NaN&#34;, &#34;NaN&#34;
         # sentiment analysis check - will discard headlines that appear inflammatory or bias
         # keep threshold relatively high (&gt;0.8), see process_result() documentation.
         max_sentiment_threshold = 0.9
@@ -846,13 +849,12 @@ def searcher(search_term, **kwargs):
         the results or nothing if none are found.
     &#34;&#34;&#34;
     # Google custom search engine API key and engine ID
-    api_key = &#34;AIzaSyCgsni4yZyp4Bla9J7a2TE-lxmzVagcjEo&#34;
-    cse_id = &#34;d76b2d8504d104aa8&#34;
-    service = build(&#34;customsearch&#34;, &#34;v1&#34;, developerKey=api_key)
-    res = service.cse().list(q=search_term, cx=cse_id, hl=&#39;en&#39;, **kwargs).execute()
+    service = build(&#34;customsearch&#34;, &#34;v1&#34;, developerKey=config.api_key)
+    res = service.cse().list(q=search_term, cx=config.cse_id, hl=&#39;en&#39;, **kwargs).execute()
     try:
         return res[&#39;items&#39;]
     except KeyError:
+        # print(&#34;No results found for query:&#34;, search_term)
         return []</code></pre>
 </details>
 </dd>
@@ -906,8 +908,10 @@ Uses the Google Custom Search Engine</p>
     Returns:
         dictionary of Google search results
     &#34;&#34;&#34;
-    # searches google using the generated queries
-    query_results = self.searcher(self.queries, num=10)
+    query_results = []
+    for query in self.queries:
+        # searches google using the generated queries
+        query_results += self.searcher(query, num=3)
     for result in tqdm(query_results, desc=&#34;Search Google using generated queries&#34;):
         # write link to dict
         self.process_result(result)
@@ -1041,7 +1045,7 @@ biased or inflammatory.</p>
     try:
         iframes, images, videos = self.media_finder(link)
     except (requests.exceptions.SSLError, requests.exceptions.Timeout):
-        iframes, images, videos = [], [], []
+        iframes, images, videos = &#34;NaN&#34;, &#34;NaN&#34;, &#34;NaN&#34;
     # sentiment analysis check - will discard headlines that appear inflammatory or bias
     # keep threshold relatively high (&gt;0.8), see process_result() documentation.
     max_sentiment_threshold = 0.9
@@ -1099,7 +1103,7 @@ accuracy but better performance.</p>
 
     input_ids = tokenizer.encode(self.intel_statement, return_tensors=&#39;pt&#39;)
     # number of queries to generate - increase in this massively impact performance
-    num_queries = 5
+    num_queries = 3
     outputs = model.generate(
         input_ids=input_ids,
         max_length=128,  # default = 64

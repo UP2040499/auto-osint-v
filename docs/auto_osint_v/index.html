@@ -28,6 +28,9 @@ auto-osint-v # …" />
 <p><em>An automated tool for Validating OSINT. This forms part of the final step of OSINT production as
 detailed by NATO's open source handbook (2001). This is a research artefact for my Dissertation at
 the University of Portsmouth</em></p>
+<p>See the results of the different Entity Recognition language models <a href="https://up2040499.github.io/auto-osint-v/NER_results_comparison/compare_two_models.html">here</a>.
+Note how the spaCy standard 'en_core_web_sm' NER model struggles to recognise military information compared to the
+model used for this project using the Defence Science and Technology Laboratory 're3d' dataset.</p>
 <h2 id="installation">📁 Installation</h2>
 <blockquote>
 <p><strong>Note</strong>
@@ -54,13 +57,13 @@ mamba env create -f environment.yml</code></li>
 <code>bash
 eval "$(conda shell.bash hook)" #copy conda command to shell
 conda activate auto-osint-v-python38
-python -m auto_osint_v.main</code>
+python -m auto_osint_v</code>
 ### Windows
 &gt; :warning: Open an 'Anaconda Powershell Prompt' from Start Menu, then run the following:
 <code>powershell
 conda init powershell
 conda activate auto-osint-v-python38
-python -m auto_osint_v.main</code></li>
+python -m auto_osint_v</code></li>
 </ul>
 <h2 id="usage">🚀 Usage</h2>
 <h3 id="google-colab">🎓 Google Colab</h3>
@@ -73,16 +76,31 @@ available resources (CPU, RAM) will be utilised by the tool. </p>
 <p>Use Google Colab to avoid hogging your computer's resources.</p>
 <hr>
 <h3 id="command-line-instructions">💻 Command line instructions:</h3>
-<pre><code class="language-shell">python -m auto_osint_v.main &lt;ARGS&gt;
+<pre><code class="language-shell">python -m auto_osint_v &lt;ARGS&gt;
 </code></pre>
 <h4 id="arguments">🚧 Arguments 🚧</h4>
-<pre><code>arg1:
-arg2:
-...
-</code></pre>
+<p>The following descriptions can also be found by running <code>auto_osint_v -h</code>.</p>
+<ul>
+<li><code>-s/--Silent</code> Assumes you have already entered the intelligence statement
+<a href="auto_osint_v/data_files/intelligence_file.txt">here</a></li>
+<li><code>-n/--NoEditor</code> Input intelligence statement into command line rather than into text editor.</li>
+<li><code>--html</code> Output will be in HTML (default: csv).</li>
+<li><code>-m/--markdown</code> Output will be in markdown (default: csv).</li>
+<li><code>-f/--FileToUse</code> Specify the file to read the intelligence statement from</li>
+<li><code>-p/--output_postfix</code> Specify the output file's postfix, e.g. 'output3.txt' rather than default
+'output.txt'</li>
+</ul>
 <h3 id="example-usage">Example usage:</h3>
-<pre><code class="language-bash">python -m auto_osint_v.main -arg1 -arg2
+<h4 id="typical-use-first-time-use">Typical use / First time use</h4>
+<pre><code class="language-shell">python -m auto_osint_v
 </code></pre>
+<h4 id="use-with-options">Use with options</h4>
+<p>This reads the statement from the existing intelligence file, and output the results in a
+markdown file called 'output0.md'.</p>
+<pre><code class="language-shell">python -m auto_osint_v -s -m -p 0
+</code></pre>
+<p>The postfix (0 in this case) is useful if you are running the tool multiple times and want to save the results
+separately.</p>
 <details class="source">
 <summary>
 <span>Expand source code</span>
@@ -95,13 +113,13 @@ arg2:
 <section>
 <h2 class="section-title" id="header-submodules">Sub-modules</h2>
 <dl>
+<dt><code class="name"><a title="auto_osint_v.config" href="config.html">auto_osint_v.config</a></code></dt>
+<dd>
+<div class="desc"><p>Enter your Google API key and Custom Search Engine ID</p></div>
+</dd>
 <dt><code class="name"><a title="auto_osint_v.file_handler" href="file_handler.html">auto_osint_v.file_handler</a></code></dt>
 <dd>
 <div class="desc"><p>This module handles all our data files. CSV or TXT.</p></div>
-</dd>
-<dt><code class="name"><a title="auto_osint_v.main" href="main.html">auto_osint_v.main</a></code></dt>
-<dd>
-<div class="desc"><p>This module forms the main part of the program, where other modules are run from …</p></div>
 </dd>
 <dt><code class="name"><a title="auto_osint_v.popular_information_finder" href="popular_information_finder.html">auto_osint_v.popular_information_finder</a></code></dt>
 <dd>
@@ -147,7 +165,11 @@ arg2:
 <li><a href="#arguments">🚧 Arguments 🚧</a></li>
 </ul>
 </li>
-<li><a href="#example-usage">Example usage:</a></li>
+<li><a href="#example-usage">Example usage:</a><ul>
+<li><a href="#typical-use-first-time-use">Typical use / First time use</a></li>
+<li><a href="#use-with-options">Use with options</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -157,8 +179,8 @@ arg2:
 <ul id="index">
 <li><h3><a href="#header-submodules">Sub-modules</a></h3>
 <ul>
+<li><code><a title="auto_osint_v.config" href="config.html">auto_osint_v.config</a></code></li>
 <li><code><a title="auto_osint_v.file_handler" href="file_handler.html">auto_osint_v.file_handler</a></code></li>
-<li><code><a title="auto_osint_v.main" href="main.html">auto_osint_v.main</a></code></li>
 <li><code><a title="auto_osint_v.popular_information_finder" href="popular_information_finder.html">auto_osint_v.popular_information_finder</a></code></li>
 <li><code><a title="auto_osint_v.priority_manager" href="priority_manager.html">auto_osint_v.priority_manager</a></code></li>
 <li><code><a title="auto_osint_v.sentiment_analyser" href="sentiment_analyser.html">auto_osint_v.sentiment_analyser</a></code></li>

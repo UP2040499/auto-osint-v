@@ -8,7 +8,7 @@ import requests
 from bs4 import BeautifulSoup
 from transformers import T5Tokenizer, T5ForConditionalGeneration
 from googleapiclient.discovery import build
-import config
+import auto_osint_v.config as config
 
 
 class SourceAggregator:

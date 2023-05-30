@@ -120,7 +120,7 @@ class EntityProcessor:
         # split the text
         for i, sentence in enumerate(text_list):
             # if you see &#39;token indices sequence length is longer&#39; warning
-            if len(sentence) &gt; 512:    # reduce this value
+            if len(sentence) &gt; 500:    # reduce this value
                 # split the sentence every 500 chars
                 text_list[i] = [sentence[j:j + 500] for j in range(0, len(sentence), 500)]
                 # flatten resulting list
@@ -247,7 +247,7 @@ file_handler_object: the file handler to be used for file IO operations</p></div
         # split the text
         for i, sentence in enumerate(text_list):
             # if you see &#39;token indices sequence length is longer&#39; warning
-            if len(sentence) &gt; 512:    # reduce this value
+            if len(sentence) &gt; 500:    # reduce this value
                 # split the sentence every 500 chars
                 text_list[i] = [sentence[j:j + 500] for j in range(0, len(sentence), 500)]
                 # flatten resulting list
@@ -363,7 +363,7 @@ file_handler_object: the file handler to be used for file IO operations</p></div
     # split the text
     for i, sentence in enumerate(text_list):
         # if you see &#39;token indices sequence length is longer&#39; warning
-        if len(sentence) &gt; 512:    # reduce this value
+        if len(sentence) &gt; 500:    # reduce this value
             # split the sentence every 500 chars
             text_list[i] = [sentence[j:j + 500] for j in range(0, len(sentence), 500)]
             # flatten resulting list
