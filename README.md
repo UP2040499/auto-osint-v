@@ -41,7 +41,7 @@ model used for this project using the Defence Science and Technology Laboratory 
     python -m auto_osint_v
     ```
     ### Windows
-    > :warning: Open an 'Anaconda Powershell Prompt' from Start Menu, then run the following:
+    > Open an 'Anaconda Powershell Prompt' from the Start Menu, then run the following:
     ```powershell
     conda init powershell
     conda activate auto-osint-v-python38
@@ -50,19 +50,6 @@ model used for this project using the Defence Science and Technology Laboratory 
 
 ## 🚀 Usage
 
-### 🎓 Google Colab
-I strongly recommend using Google Colab to run this tool. However, the default machine in the Google
-Colab performs worse than most local machines would (this is likely to do with CPU limits in place).
-
-The Google Colab can be found [here](https://colab.research.google.com/drive/18_PY8sSLYn3ThPBJMMSAfrjj_CxXu1h1?usp=sharing)
-
-The reason it is recommended to use Google Colab, is because it runs the tool remotely.
-While performance on a local machine may be better, it is likely that the majority of the machine's
-available resources (CPU, RAM) will be utilised by the tool. 
-
-Use Google Colab to avoid hogging your computer's resources.
-
----
 ### 💻 Command line instructions:
 ```shell
 python -m auto_osint_v <ARGS>
@@ -99,3 +86,16 @@ python -m auto_osint_v -s -m -p 0
 The postfix (0 in this case) is useful if you are running the tool multiple times and want to save the results 
 separately.
 
+---
+### 🎓 Google Colab
+Previously, I recommended using Google Colab to run this tool. However, the default machine in the Google
+Colab performs worse than most local machines would (this is likely due to CPU limits in place).
+You can pay for a higher-performing machine with a GPU, this does improve performance.
+
+The Google Colab can be found [here](https://colab.research.google.com/drive/18_PY8sSLYn3ThPBJMMSAfrjj_CxXu1h1?usp=sharing)
+
+The reason it is recommended to use Google Colab is because it runs the tool remotely.
+While performance on a local machine may be better, most of my (underpowered) machine's
+available resources (CPU, RAM) were utilised by the tool.
+
+If the tool struggles to run on your local machine use Google Colab to avoid hogging your computer's resources.
